@@ -1,17 +1,100 @@
 <!doctype html>
-<html lang="fr">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Une boutique géniale, avec pleins d'articles géniaux et beau et tout...">
+    <meta name="description" content="Una tienda genial, con muchos artículos genios y hermosos y todo...">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
-    <title>{% block title %}La boot'ique{% endblock %}</title>
+    <title>{% block title %}{{ personalize.companyName ?? 'Empresa' }}{% endblock %}</title>
 
     <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/carousel.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
+    <link href="{{asset('assets/css/modern-theme.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    
+    {% if personalize and personalize.logo %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('uploads/logo/' ~ personalize.logo) }}">
+    {% endif %}
+    
+    <style>
+        :root {
+            --bg-body: #f8f9fa;
+            {% if personalize %}
+                /* Variables base */
+                {% if personalize.primarycolor %}--primary-color: {{ personalize.primarycolor }};{% endif %}
+                {% if personalize.secondarycolor %}--secondary-color: {{ personalize.secondarycolor }};{% endif %}
+                {% if personalize.tertiaryColor %}--tertiary-color: {{ personalize.tertiaryColor }};{% endif %}
+            {% endif %}
+        }
+        
+        body {
+            background-color: var(--bg-body) !important;
+        }
+
+        {% if personalize %}
+            /* Navbar & Footer refinements */
+            .navbar {
+                background-color: {{ headerIsLight ? 'rgba(255, 255, 255, 0.9)' : 'var(--primary-color)' }} !important;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            
+            .footer-custom {
+                background-color: var(--primary-color) !important;
+                color: {{ headerIsLight ? '#333' : 'white' }} !important;
+            }
+            
+            /* Dynamic text colors */
+            .navbar-brand, .nav-link, .navbar .dropdown-toggle, .navbar .btn-cart-icon, .navbar .text-reset {
+                color: {{ headerIsLight ? '#2d3436' : 'white' }} !important;
+            }
+            
+            .nav-link:hover, .navbar .dropdown-toggle:hover {
+                opacity: 0.8;
+            }
+
+            /* Secondary Color */
+            .btn-modern, .btn-primary, .card-action-btn:hover {
+                background-color: var(--secondary-color) !important;
+                color: white !important;
+                border-color: var(--secondary-color) !important;
+            }
+            
+            .card-modern-price, .product-price, .text-primary {
+                color: var(--secondary-color) !important;
+            }
+
+            /* Tertiary Color */
+            .badge, .alert-info {
+                background-color: var(--tertiary-color) !important;
+                color: white !important;
+                border: none;
+            }
+            
+            .btn-modern-outline {
+                border-color: var(--secondary-color) !important;
+                color: var(--secondary-color) !important;
+            }
+            
+            .btn-modern-outline:hover {
+                background-color: var(--secondary-color) !important;
+                color: white !important;
+            }
+        {% endif %}
+
+        @media (max-width: 991px) {
+            .main-content-wrap {
+                margin-top: 1.5rem !important;
+                padding-top: 2rem !important;
+            }
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -21,10 +104,20 @@
     <main class="mb-5" role="main">
         {% if carousel is defined %}
             {% include "_carousel.html.twig" %}
-        {% else %}
-            {% set margin = 'mt-5' %}
         {% endif %}
-        <div class="container {{margin ?? 0}}">
+        
+        <div class="container main-content-wrap {% if carousel is not defined %}mt-5 pt-5{% else %}mt-5{% endif %}">
+            {% for label, messages in app.flashes %}
+                {% if label != 'success_contact' %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show rounded-pill px-4 shadow-sm border-0 mb-4" role="alert">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
             {% block body %}{% endblock %}
         </div>
     </main>

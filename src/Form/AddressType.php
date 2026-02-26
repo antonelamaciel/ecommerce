@@ -17,41 +17,41 @@ class AddressType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom de l\'adresse',
+                'label' => 'Nombre de la dirección',
                 'attr' => [
-                    'placeholder' => 'ex: Domicile'
+                    'placeholder' => 'ej: Casa'
                 ]
             ])
             ->add('firstname', TextType::class, [
-                'label' => 'Prénom'
+                'label' => 'Nombre'
             ])
             ->add('lastname', TextType::class, [
-                'label' =>'Nom de famille'
+                'label' =>'Apellido'
             ])
             ->add('company', TextType::class, [
-                'label' => 'Société (facultatif)',
+                'label' => 'Empresa (opcional)',
                 'required' => false,
             ])
             ->add('address', TextType::class, [
-                'label' => 'Adresse postale',
+                'label' => 'Dirección postal',
                 'attr' => [
-                    'placeholder' => 'ex: 8 rue de Lasoif'
+                    'placeholder' => 'ej: Calle Falsa 123'
                 ]
             ])
             ->add('postal', TextType::class, [
-                'label' => 'Code postal'
+                'label' => 'Código postal'
             ])
             ->add('city', TextType::class, [
-                'label' => 'Ville'
+                'label' => 'Ciudad'
             ])
             ->add('country', CountryType::class, [
-                'label' => 'Pays'
+                'label' => 'País'
             ])
             ->add('phone', TelType::class, [
-                'label' => 'Téléphone'
+                'label' => 'Teléfono'
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Enregistrer adresse', 
+                'label' => 'Guardar dirección', 
                 'attr' => [
                     'class' => 'btn btn-info btn-block mt-2'
                 ]

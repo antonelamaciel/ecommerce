@@ -17,15 +17,15 @@ class CategoryCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Catégorie')
-            ->setEntityLabelInPlural('Catégories')
+            ->setEntityLabelInSingular('Categoría')
+            ->setEntityLabelInPlural('Categorías')
         ;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name', 'Nom'),
+            TextField::new('name', 'Nombre'),
         ];
     }
 }

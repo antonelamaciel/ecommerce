@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma commande - La Boot'Ique{% endblock %}
+{% block title %}Mi pedido - empresa{% endblock %}
 
 {% block body %}
-    <h2>Annulation de votre commande</h2>
+    <h2>Cancelación de su pedido</h2>
     <p>
-        Bonjour {{order.user.firstname}} {{order.user.lastname}}, <br>
-        Votre paiement pour la commande n° <b>{{order.reference}}</b> n'a pas abouti.<br>
+        Hola {{order.user.firstname}} {{order.user.lastname}}, <br>
+        Su pago para el pedido n° <b>{{order.reference}}</b> no se ha completado.<br>
     </p>
     <hr>
-    <a class="btn btn-outline-success" href="{{ path('order') }}">Réessayer</a>
+    <a class="btn btn-outline-success" href="{{ path('order') }}">Reintentar</a>
 {% endblock %}

@@ -32,26 +32,26 @@ class ProductCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name','Nom'),
+            TextField::new('name','Nombre'),
             SlugField::new('slug')->setTargetFieldName('name'),
             ImageField::new('image')
                 ->setBasePath('uploads/')
                 ->setUploadDir('public/uploads/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false),
-            TextField::new('subtitle', 'Sous-titre'),
+            TextField::new('subtitle', 'Subtítulo'),
             TextareaField::new('description')->hideOnIndex(),
-            MoneyField::new('price', 'Prix')->setCurrency('EUR'),
-            AssociationField::new('category', 'Catégorie'),
-            BooleanField::new('isInHome', 'Top produit')
+            MoneyField::new('price', 'Precio')->setCurrency('ARS'),
+            AssociationField::new('category', 'Categoría'),
+            BooleanField::new('isInHome', 'Lo mas buscado')
         ];
     }
     
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Produit')
-            ->setEntityLabelInPlural('Produits')
+            ->setEntityLabelInSingular('Producto')
+            ->setEntityLabelInPlural('Productos')
         ;
     }
 

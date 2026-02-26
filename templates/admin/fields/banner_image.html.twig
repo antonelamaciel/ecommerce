@@ -1,0 +1,7 @@
+{% if field.formattedValue %}
+    <a target="_blank">
+        <img src="{{ field.formattedValue }}" style="max-height: 50px; border-radius: 4px;">
+    </a>
+{% else %}
+    <span class="text-muted">Sin imagen</span>
+{% endif %}

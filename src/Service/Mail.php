@@ -11,7 +11,7 @@ class Mail
 
     public function send($toEmail, $toName, $subject, $content)
     {
-        $mj = new Client($this->api_key, $this->api_key_secret,true,['version' => 'v3.1']);
+        $mj = new Client($this->api_key, $this->api_key_secret, true, ['version' => 'v3.1']);
         $body = 
         [
             'Messages' => 
@@ -20,7 +20,7 @@ class Mail
                     'From' => 
                     [
                         'Email' => "bonnal.tristan@hotmail.fr",
-                        'Name' => "La Boot'ique"
+                        'Name' => "Atención al Cliente"
                     ],
                     'To' => 
                     [
@@ -32,10 +32,15 @@ class Mail
                     'TemplateID' => 3732103,
                     'TemplateLanguage' => true,
                     'Subject' => $subject,
-                    'Variables' => ['content' => $content]
+                    'Variables' => [
+                        'content' => $content
+                    ]
                 ]
             ]
         ];
+        
         $response = $mj->post(Resources::$Email, ['body' => $body]);
+        
+        return $response->success();
     }
 }

@@ -1,32 +1,184 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon compte - La Boot'Ique{% endblock %}
+{% block title %}Mi cuenta - empresa{% endblock %}
 
 {% block body %}
-    <h2>Mon compte</h2>
-    Bienvenue dans votre espace membre {{ app.user.firstname }}.
-    <hr>
-    {% for message in app.flashes('notice') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
-    {% endfor %}
-    <div class="list-group">
-        {% if is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('admin') }}" class="list-group-item list-group-item-action">
-            Back office
-        </a> 
-        {% endif %}
-        <a href="{{ path('account_orders') }}" class="list-group-item list-group-item-action">
-            Mes commandes
-        </a>
-        <a href="{{ path('account_address') }}" class="list-group-item list-group-item-action">
-            Gérer mes adresses
-        </a>
-        <a href="{{ path('account_password') }}" class="list-group-item list-group-item-action">
-            Modifier mot de passe
-        </a>
-    </div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --c-brand: var(--primary-color, #1a1a1a);
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  .account-wrap {
+    font-family: var(--font-main);
+    color: var(--c-ink);
+    padding: 3rem 0 5rem;
+    animation: fadeUp .6s var(--transition) both;
+  }
+
+  .account-header {
+    margin-bottom: 3rem;
+  }
+  .account-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    margin: 0;
+  }
+  .account-greeting {
+    color: var(--c-muted);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
+
+  .account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .account-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    text-decoration: none !important;
+    color: inherit;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .account-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--c-brand);
+    box-shadow: var(--shadow-soft);
+  }
+  .account-card::after {
+    content: '\F138';
+    font-family: "bootstrap-icons";
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%) translateX(20px);
+    opacity: 0;
+    transition: var(--transition);
+    color: var(--c-brand);
+  }
+  .account-card:hover::after {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    background: #fcfaf7;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--c-brand);
+    transition: var(--transition);
+  }
+  .account-card:hover .card-icon {
+    background: var(--c-brand);
+    color: #fff;
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .card-desc {
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    line-height: 1.4;
+  }
+
+  .admin-badge {
+    background: #fff4e5;
+    color: #b45309;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="account-wrap">
+  <header class="account-header">
+    <h1 class="account-title">Mi perfil</h1>
+    <p class="account-greeting">Bienvenido de nuevo, <strong>{{ app.user.firstname }}.</strong></p>
+  </header>
+
+  {% for message in app.flashes('notice') %}
+      <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+  {% endfor %}
+
+  <div class="account-grid">
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('admin') }}" class="account-card">
+            <div class="card-icon"><i class="bi bi-shield-lock"></i></div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <h3 class="card-title">Panel de Control</h3>
+                <span class="admin-badge">Admin</span>
+              </div>
+              <p class="card-desc">Acceder a la administración del sitio y gestión de productos.</p>
+            </div>
+        </a> 
+    {% endif %}
+
+    <a href="{{ path('account_orders') }}" class="account-card">
+        <div class="card-icon"><i class="bi bi-box-seam"></i></div>
+        <div>
+          <h3 class="card-title">Mis pedidos</h3>
+          <p class="card-desc">Consulta el historial y los detalles de tus compras pasadas.</p>
+        </div>
+    </a>
+
+    <a href="{{ path('account_address') }}" class="account-card">
+        <div class="card-icon"><i class="bi bi-geo-alt"></i></div>
+        <div>
+          <h3 class="card-title">Gestionar direcciones</h3>
+          <p class="card-desc">Administra tus direcciones de envío para compras más rápidas.</p>
+        </div>
+    </a>
+
+    <a href="{{ path('account_password') }}" class="account-card">
+        <div class="card-icon"><i class="bi bi-key"></i></div>
+        <div>
+          <h3 class="card-title">Cambiar contraseña</h3>
+          <p class="card-desc">Actualiza tus credenciales para mantener tu cuenta segura.</p>
+        </div>
+    </a>
+  </div>
+</div>
 
 {% endblock %}

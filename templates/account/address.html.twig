@@ -1,34 +1,202 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes adresses - La Boot'Ique'{% endblock %}
+{% block title %}Mis direcciones - {{ personalize.companyName ?? 'Empresa' }}{% endblock %}
 
 {% block body %}
-    <a href="{{ path('account_address_new') }}" class="btn btn-info btn-sm float-right mt-2">Ajouter une adresse</a>
-    <h2>Gérer mes adresses</h2>
 
-    <div class="row mt-3">
+<style>
+  /* ── Tokens (Consistent with whole ecosystem) ── */
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  body { 
+    background: var(--c-bg); 
+    font-family: var(--font-main);
+    color: var(--c-ink);
+  }
+
+  .mt-page { margin-top: 3rem; margin-bottom: 5rem; }
+
+  /* ── Header ── */
+  .page-header {
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .page-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .btn-add-address {
+    background: var(--primary-color, var(--c-ink));
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+  }
+  .btn-add-address:hover {
+    filter: brightness(1.1); transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    color: #fff;
+  }
+
+  /* ── Address Card ── */
+  .address-card {
+    background: var(--c-surface);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-soft);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+  }
+  .address-card:hover {
+    border-color: var(--primary-color, var(--c-ink));
+    transform: translateY(-5px);
+  }
+
+  .address-card__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .address-card__title i { color: var(--primary-color, var(--c-ink)); }
+
+  .address-card__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--c-muted);
+    flex: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Actions ── */
+  .address-card__actions {
+    display: flex;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--c-border);
+  }
+  .action-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--c-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: var(--transition);
+  }
+  .action-link:hover { color: var(--primary-color, var(--c-ink)); }
+  .action-link.delete { color: #ef4444; }
+  .action-link.delete:hover { opacity: 0.8; }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: var(--c-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--c-border);
+  }
+  .empty-state i { font-size: 3.5rem; color: var(--c-border); margin-bottom: 1.5rem; display: block; }
+  .empty-state p { color: var(--c-muted); font-size: 1.1rem; }
+
+  .btn-back-account {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    color: var(--c-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+  .btn-back-account:hover { color: var(--c-ink); transform: translateX(-4px); }
+</style>
+
+<div class="container mt-page">
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Gestionar mis direcciones</h1>
+            <p class="text-muted mt-2">Administra tus lugares de entrega guardados.</p>
+        </div>
+        <a href="{{ path('account_address_new') }}" class="btn-add-address">
+            <i class="bi bi-plus-lg"></i> Añadir una dirección
+        </a>
+    </header>
+
+    <div class="row g-4">
         {% for address in app.user.addresses %}
             <div class="col-md-6">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ address.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted"></h6>
-                        <p class="card-text">
-                            {{ address.address }},<br>
-                            {{ address.postal }} -
-                            {{ address.city }}<br>
-                            {{ address.country }}
-                        </p>
-                        <a href="{{ path('account_address_update', {id: address.id}) }}" class="card-link">Modifier</a>
-                        <a href="{{ path('account_address_delete', {id: address.id}) }}" class="card-link">Supprimer</a>
+                <div class="address-card">
+                    <div class="address-card__title">
+                        <i class="bi bi-house-door-fill"></i>
+                        {{ address.name }}
+                    </div>
+                    <div class="address-card__text">
+                        <strong>{{ address.firstname }} {{ address.lastname }}</strong><br>
+                        {{ address.address }}<br>
+                        {{ address.postal }} {{ address.city }}<br>
+                        {{ address.country }}<br>
+                        {% if address.phone %}
+                            <span class="small mt-2 d-block"><i class="bi bi-telephone pe-1"></i> {{ address.phone }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="address-card__actions">
+                        <a href="{{ path('account_address_update', {id: address.id}) }}" class="action-link">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                        <a href="{{ path('account_address_delete', {id: address.id}) }}" class="action-link delete" 
+                           onclick="return confirm('¿Estás seguro de que quieres eliminar esta dirección?')">
+                            <i class="bi bi-trash3"></i> Eliminar
+                        </a>
                     </div>
                 </div>
             </div>
         {% else %}
-        <p>
-            Vous n'avez ajouté aucune adresse pour le moment.
-        </p>
-    {% endfor %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-geo"></i>
+                    <p>No hay direcciones añadidas por el momento.</p>
+                    <a href="{{ path('account_address_new') }}" class="btn-add-address d-inline-flex mt-3">
+                        Configurar mi primera dirección
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-    <a title="Retour vers votre espace membres"href="{{ path('account') }}">Retourner à mon compte</a>
+
+    <a href="{{ path('account') }}" class="btn-back-account">
+        <i class="bi bi-arrow-left"></i> Volver a mi cuenta
+    </a>
+</div>
 {% endblock %}

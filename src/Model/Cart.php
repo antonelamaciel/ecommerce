@@ -93,6 +93,23 @@ class Cart
 
 
     /**
+     * Récupère la quantité totale de produits dans le panier
+     *
+     * @return int
+     */
+    public function getFullQuantity(): int
+    {
+        $cart = $this->session->get('cart', []);
+        $quantity = 0;
+
+        foreach ($cart as $id => $qty) {
+            $quantity += $qty;
+        }
+
+        return $quantity;
+    }
+
+    /**
      * Récupère le panier en session, puis récupère les objets produits de la bdd
      * et calcule les totaux
      *

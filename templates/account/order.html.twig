@@ -1,49 +1,247 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma commande - La Boot'Ique'{% endblock %}
+{% block title %}Mi pedido - empresa'{% endblock %}
 
 {% block body %}
-    <h2>Commande n° {{order.reference}}</h2>
-    <hr>
-    <p>
-        <b>Commande passée le :</b> {{order.createdAt|date('d/m/Y')}} <br>
-        <b>Statut:</b> {{
-            order.state == 1 ? 'Paiment accepté' :
-            order.state == 2 ? 'En préparation' : 'Expédiée'
-        }}<br>
-        <b>Référence : </b><span>{{order.reference}}</span><br>
-        <b>Transporteur:</b> {{order.carrierName}}<br>
-    </p>
-    <table class="table mt-4">
-    <thead>
-        <tr>
-            <th scope="col">Article</th>
-            <th scope="col">Quantité</th>
-            <th scope="col">Prix unitaire </th>
-            <th scope="col">Total</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in order.orderDetails %}
-            <tr>
-                <td>{{product.product}}</td>
-                <td>x{{product.quantity}}</td>
-                <td>{{(product.price / 100)|number_format(2,',','.') }} €</td>
-                <td>{{(product.total / 100)|number_format(2,',','.') }} €</td>
-            </tr>  
-        {% endfor %}
-            <tr>
-                <th>Sous-total</th>
-                <td></td>
-                <td></td>
-                <td>{{(order.total / 100)|number_format(2,',','.') }} €</td>
-            </tr>
-    </tbody>
-</table>
-    <div class="text-right">
-        <b>Livraison :</b> {{(order.carrierPrice / 100)|number_format(2,',','.') }} €<br>
-        <b>Total : </b> {{((order.carrierPrice + order.total) / 100)|number_format(2,',','.') }} €
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --c-soft: #fcfaf7;
+    --c-brand: var(--primary-color, #1a1a1a);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  .order-detail-wrap {
+    font-family: var(--font-main);
+    color: var(--c-ink);
+    padding: 3rem 0 5rem;
+    animation: fadeUp .6s var(--transition) both;
+  }
+
+  /* Header Section */
+  .order-detail-header {
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .order-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    margin: 0;
+  }
+  .order-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+    color: var(--c-muted);
+    font-size: 0.95rem;
+  }
+  .order-meta strong { color: var(--c-ink); }
+
+  /* Grid Layout */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+  }
+
+  /* Cards */
+  .card-premium {
+    background: var(--c-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--c-border);
+    padding: 2rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .section-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--c-muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-title i { color: var(--c-brand); }
+
+  /* Items Table */
+  .items-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .items-table th {
+    text-align: left;
+    padding-bottom: 1rem;
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    text-transform: uppercase;
+  }
+  .items-table td {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .items-table tr:last-child td { border-bottom: none; }
+
+  .item-name { font-weight: 600; font-size: 1rem; }
+  .item-qty { color: var(--c-muted); font-weight: 500; }
+  .item-price { font-weight: 600; text-align: right; }
+
+  /* Summary Card */
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+  .summary-row.total {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--c-soft);
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--c-brand);
+  }
+
+  /* Badges */
+  .state-pill {
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .state-1 { background: #eafcf1; color: #10b981; }
+  .state-2 { background: #fffbe6; color: #d97706; }
+  .state-3 { background: #eff6ff; color: #2563eb; }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--c-muted);
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: var(--transition);
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+  }
+  .btn-back:hover { border-color: var(--c-brand); color: var(--c-brand); transform: translateX(-5px); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 991px) {
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="order-detail-wrap">
+  <div class="order-detail-header">
+    <div>
+      <h1 class="order-title">Detalle del Pedido</h1>
+      <div class="order-meta">
+        <span>Pedido: <strong>#{{ order.reference }}</strong></span>
+        <span>Fecha: <strong>{{ order.createdAt|date('d/m/Y') }}</strong></span>
+      </div>
     </div>
-    <a title="Retour vers votre espace membres"href="{{ path('account') }}">Retourner à mon compte</a>
+    <a href="{{ path('account_orders') }}" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Volver a mis pedidos
+    </a>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-main">
+      <div class="card-premium">
+        <h3 class="section-title"><i class="bi bi-bag-check"></i> Artículos del pedido</h3>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th class="text-end">Precio Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detail in order.orderDetails %}
+              <tr>
+                <td>
+                  <div class="item-name">{{ detail.product }}</div>
+                  <div class="small text-muted">$ {{ (detail.price / 100)|number_format(2, ',', '.') }} ARS / ud.</div>
+                </td>
+                <td class="item-qty">x{{ detail.quantity }}</td>
+                <td class="item-price">$ {{ (detail.total / 100)|number_format(2, ',', '.') }} ARS</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-premium mt-4">
+        <h3 class="section-title"><i class="bi bi-geo-alt"></i> Información de Entrega</h3>
+        <div class="delivery-content text-muted" style="line-height: 1.8;">
+          {{ order.delivery|raw }}
+        </div>
+      </div>
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="card-premium">
+        <h3 class="section-title"><i class="bi bi-info-circle"></i> Estado del pedido</h3>
+        <div class="mb-4">
+          <span class="state-pill state-{{ order.state }}">
+            {{ order.state == 1 ? 'Pago aceptado' :
+               order.state == 2 ? 'En preparación' : 'Enviado' }}
+          </span>
+        </div>
+        
+        <div class="mb-4">
+          <div class="small text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Transportista</div>
+          <div class="fw-bold">{{ order.carrierName }}</div>
+        </div>
+
+        <div class="order-summary mt-4 pt-4 border-top" style="border-top-style: dashed !important;">
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>$ {{ (order.total / 100)|number_format(2, ',', '.') }} ARS</span>
+          </div>
+          <div class="summary-row">
+            <span>Envío</span>
+            <span>$ {{ (order.carrierPrice / 100)|number_format(2, ',', '.') }} ARS</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>$ {{ ((order.carrierPrice + order.total) / 100)|number_format(2, ',', '.') }} ARS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <p class="text-muted small">¿Tienes alguna duda sobre tu pedido?<br><a href="{{ path('contact') }}" class="text-decoration-none fw-bold" style="color: var(--c-brand)">Contáctanos</a></p>
+      </div>
+    </aside>
+  </div>
+</div>
 {% endblock %}

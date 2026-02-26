@@ -1,14 +1,261 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nous contacter - La Boot'Ique'{% endblock %}
+{% block title %}Contactarnos - empresa'{% endblock %}
 
 {% block body %}
-    <h3 class="mb-3">Envoyez nous votre message</h3>
-    {{form(form)}}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --c-brand: var(--primary-color, #1a1a1a);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  .contact-wrap {
+    font-family: var(--font-main);
+    color: var(--c-ink);
+    padding: 2rem 0 4rem;
+    animation: fadeUp .6s var(--transition) both;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+  .contact-title {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .contact-subtitle {
+    color: var(--c-muted);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .card-premium {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* Form Styling */
+  form div { margin-bottom: 1.25rem; }
+  
+  form input[type="text"], 
+  form input[type="email"],
+  form textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--c-border);
+    background: #fdfcfb;
+    transition: var(--transition);
+    font-size: 0.95rem;
+    color: var(--c-ink);
+    font-family: inherit;
+    display: block;
+  }
+  
+  form textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  form input:focus, 
+  form textarea:focus {
+    outline: none;
+    border-color: var(--c-brand);
+    background: #fff;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-brand) 10%, transparent);
+  }
+
+  form button[type="submit"], .btn-outline-success {
+    width: 100%;
+    background: var(--c-brand) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 1rem !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+  
+  form button:hover, .btn-outline-success:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+
+  label {
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: var(--c-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Alerts */
+  .alert-styled {
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    font-weight: 600;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .alert-success { background: #eafcf1; color: #10b981; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 767px) {
+    .card-premium { padding: 1.5rem; }
+    .contact-wrap { padding: 1rem; }
+  }
+</style>
+
+<div class="contact-wrap">
+  <header class="contact-header">
+    <h1 class="contact-title">Envíenos su mensaje</h1>
+    <p class="contact-subtitle">¿Tienes alguna duda o quieres comentarnos algo? Estamos aquí para escucharte.</p>
+  </header>
+
+  {# Success Message Card #}
+  {% for message in app.flashes('success_contact') %}
+      <div class="success-card shadow-xl">
+          <div class="success-icon">
+              <i class="bi bi-check-lg"></i>
+          </div>
+          <h2 class="success-title">¡Mensaje Enviado!</h2>
+          <p class="success-text">{{ message }}</p>
+          <a href="{{ path('home') }}" class="btn-return">Volver al inicio</a>
+      </div>
+      <style>
+          .card-premium, .contact-header { display: none; }
+          .success-card {
+              background: #fff;
+              border-radius: var(--radius-lg);
+              padding: 3.5rem 2rem;
+              text-align: center;
+              border: 1px solid var(--c-border);
+              animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+          }
+          .success-icon {
+              width: 80px; height: 80px;
+              background: #ecfdf5; color: #10b981;
+              border-radius: 50%;
+              display: flex; align-items: center; justify-content: center;
+              font-size: 2.5rem; margin: 0 auto 1.5rem;
+              border: 4px solid #fff; box-shadow: 0 0 0 6px #ecfdf5;
+          }
+          .success-title { font-weight: 800; margin-bottom: 0.5rem; }
+          .success-text { color: var(--c-muted); margin-bottom: 2rem; }
+          .btn-return {
+              display: inline-block; padding: 0.75rem 2rem;
+              background: var(--c-brand); color: #fff !important;
+              text-decoration: none; border-radius: var(--radius-sm);
+              font-weight: 700; transition: var(--transition);
+          }
+          .btn-return:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+          @keyframes popIn {
+              from { opacity: 0; transform: scale(0.9) translateY(20px); }
+              to { opacity: 1; transform: scale(1) translateY(0); }
+          }
+      </style>
+  {% endfor %}
+
+  {# Error Message Alert #}
+  {% for message in app.flashes('error') %}
+      <div class="alert alert-danger alert-styled alert-dismissible fade show shadow-sm" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>{{ message }}</div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+  {% endfor %}
+
+  <div class="card-premium shadow-xl">
+    {{ form_start(form, {'attr': {'id': 'contact-form'}}) }}
+        <div class="row">
+            <div class="col-md-6">{{ form_row(form.firstname) }}</div>
+            <div class="col-md-6">{{ form_row(form.lastname) }}</div>
+        </div>
+        {{ form_row(form.email) }}
+        {{ form_row(form.content) }}
+        <button type="submit" class="btn-submit" id="submit-btn">
+            <span class="btn-text">Enviar mensaje</span>
+            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            <i class="bi bi-send ms-2"></i>
+        </button>
+    {{ form_end(form) }}
+  </div>
+</div>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    const text = btn.querySelector('.btn-text');
+    const spinner = btn.querySelector('.spinner-border');
     
-    {% for message in app.flashes('notice') %}
-    <div class="alert alert-success">
-        {{ message }}
-    </div>
-    {% endfor %}
+    text.textContent = 'Enviando...';
+    spinner.classList.remove('d-none');
+    btn.setAttribute('disabled', 'disabled');
+    btn.style.opacity = '0.8';
+});
+</script>
+
+<style>
+.btn-submit {
+    width: 100%;
+    background: var(--c-brand) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 1.1rem !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+}
+.btn-submit:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+.shadow-xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important; }
+.alert-danger { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+</style>
 {% endblock %}

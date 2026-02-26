@@ -1,0 +1,5 @@
+name: ecommerce
+recipe: lamp
+config:
+  webroot: public
+  php: 8.4

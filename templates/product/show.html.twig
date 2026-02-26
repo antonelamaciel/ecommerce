@@ -3,17 +3,279 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block body %}
-    <div class="row">
-        <div class="col-md-5">
-            <img class="img-fluid" src="/uploads/{{product.image}}" alt="{{product.name}}">
+
+<style>
+  /* ── Tokens (Consistent with Home) ── */
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561ff;
+    --c-accent: #1a1a1a;
+    --radius-lg: 32px;
+    --radius-md: 20px;
+    --radius-sm: 12px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  body { 
+    background: var(--c-bg); 
+    font-family: var(--font-main);
+    color: var(--c-ink);
+  }
+
+  .product-detail {
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+  }
+
+  /* ── Breadcrumbs ── */
+  .custom-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    list-style: none;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+  .custom-breadcrumb a {
+    color: var(--c-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .custom-breadcrumb a:hover { color: var(--c-ink); }
+  .custom-breadcrumb .separator { color: var(--c-border); font-size: 0.7rem; }
+  .custom-breadcrumb .current { color: var(--c-ink); font-weight: 600; }
+
+  /* ── Image Display ── */
+  .pdetail-img-card {
+    background: var(--c-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--c-border);
+    padding: 3rem;
+    box-shadow: var(--shadow-soft);
+    position: sticky;
+    top: 100px;
+    transition: var(--transition);
+  }
+  .pdetail-img-wrap {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .pdetail-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.6s ease;
+  }
+  .pdetail-img-card:hover .pdetail-img {
+    transform: scale(1.05);
+  }
+
+  /* ── Product Info ── */
+  .pdetail-header { margin-bottom: 2rem; }
+  .pdetail-title {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+  .pdetail-subtitle {
+    font-size: 1.1rem;
+    color: var(--c-muted);
+    font-weight: 400;
+  }
+
+  .pdetail-price-box {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .pdetail-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .pdetail-tax-badge {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    background: var(--c-border);
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+  }
+
+  .pdetail-description {
+    margin-bottom: 3rem;
+  }
+  .pdetail-section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--c-muted);
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+  .pdetail-content {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--c-ink);
+    opacity: 0.9;
+  }
+
+  /* ── Actions ── */
+  .pdetail-actions {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .btn-pdetail-cart {
+    background: var(--secondary-color, var(--primary-color, var(--c-ink)));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 1.2rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: var(--transition);
+  }
+  .btn-pdetail-cart:hover {
+    filter: brightness(1.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    color: #fff;
+  }
+  .btn-pdetail-back {
+    background: transparent;
+    border: 1px solid var(--c-border);
+    color: var(--c-muted);
+    border-radius: var(--radius-md);
+    padding: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+  }
+  .btn-pdetail-back:hover {
+    background: var(--c-border);
+    color: var(--c-ink);
+  }
+
+  /* ── Features ── */
+  .pdetail-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--c-border);
+  }
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--c-muted);
+  }
+  .feature-item i {
+    font-size: 1.2rem;
+    color: var(--c-ink);
+  }
+
+  @media (max-width: 991px) {
+    .pdetail-img-card { position: static; margin-bottom: 3rem; }
+    .pdetail-actions { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="container product-detail">
+    <nav aria-label="breadcrumb">
+        <ul class="custom-breadcrumb">
+            <li><a href="{{ path('home') }}">Inicio</a></li>
+            <li class="separator"><i class="bi bi-chevron-right"></i></li>
+            <li><a href="{{ path('product') }}">Tienda</a></li>
+            <li class="separator"><i class="bi bi-chevron-right"></i></li>
+            <li class="current">{{ product.name }}</li>
+        </ul>
+    </nav>
+
+    <div class="row g-lg-5">
+        <!-- Izquierda: Imagen -->
+        <div class="col-lg-6">
+            <div class="pdetail-img-card">
+                <div class="pdetail-img-wrap">
+                    <img src="/uploads/{{ product.image }}" alt="{{ product.name }}" class="pdetail-img">
+                </div>
+            </div>
         </div>
-        <div class="col-md-7 my-auto">
-            <h3>{{product.name}}</h3>
-            <p>{{product.subtitle}}</p>
-            <span class="product-price">{{(product.price / 100 )|number_format(2,',', '.')}} € </span>
-            <hr>
-            <p>{{product.description}}</p>
-        <a href="{{ path('add_to_cart', {id: product.id}) }}"class="btn btn-outline-success">Ajouter au panier</a>
+
+        <!-- Derecha: Datos -->
+        <div class="col-lg-6">
+            <header class="pdetail-header">
+                <h1 class="pdetail-title">{{ product.name }}</h1>
+                <p class="pdetail-subtitle">{{ product.subtitle }}</p>
+            </header>
+
+            <div class="pdetail-price-box">
+                <span class="pdetail-price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                <span class="pdetail-tax-badge">IVA incluido</span>
+            </div>
+
+            <div class="pdetail-description">
+                <span class="pdetail-section-title">Sobre este artículo</span>
+                <div class="pdetail-content">
+                    {{ product.description }}
+                </div>
+            </div>
+
+            <div class="pdetail-actions">
+                <a href="{{ path('add_to_cart', {id: product.id}) }}" class="btn-pdetail-cart">
+                    <i class="bi bi-bag-plus-fill"></i>
+                    Comprar ahora
+                </a>
+                <a href="{{ path('home') }}" class="btn-pdetail-back">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver a la tienda
+                </a>
+            </div>
+
+            <div class="pdetail-features">
+                <div class="feature-item">
+                    <i class="bi bi-truck"></i>
+                    <span>Envío express</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Pago 100% seguro</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Decepción cero</span>
+                </div>
+            </div>
         </div>
-    </div>   
+    </div>
+</div>
 {% endblock %}

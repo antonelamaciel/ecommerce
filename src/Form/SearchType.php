@@ -37,10 +37,10 @@ class SearchType extends AbstractType
     {
         $builder
             ->add('string', TextType::class, [
-                'label' => 'Mots-clés:',
+                'label' => 'Palabras clave:',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Votre recherche'
+                    'placeholder' => 'Su búsqueda'
                 ]
             ])
             ->add('categories', EntityType::class, [
@@ -52,7 +52,7 @@ class SearchType extends AbstractType
                 'expanded' => true,
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Valider',
+                'label' => 'Validar',
                 'attr' => [
                     'class' => 'btn btn-outline-info w-100'
                 ]

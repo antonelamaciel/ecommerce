@@ -1,23 +1,221 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes adresses - La Boot'Ique'{% endblock %}
+{% block title %}Guardar una dirección - {{ personalize.companyName ?? 'Empresa' }}{% endblock %}
 
 {% block body %}
-    <h2 class="mb-4">Enregistrer une addresse</h2>
-    {{form_start(form)}}
-    <div class="row">
-        <div class="col-md-12">{{form_row(form.name)}}</div>
-        <div class="col-md-6">{{form_row(form.firstname)}}</div>
-        <div class="col-md-6">{{form_row(form.lastname)}}</div>
-        <div class="col-md-6">{{form_row(form.address)}}</div>
-        <div class="col-md-6">{{form_row(form.postal)}}</div>
-        <div class="col-md-6">{{form_row(form.city)}}</div>
-        <div class="col-md-6">{{form_row(form.country)}}</div>
-        <div class="col-md-6">{{form_row(form.phone)}}</div>
-        <div class="col-md-6">{{form_row(form.company)}}</div>
-        <div class="col-md-12">{{form_row(form.submit)}}</div>
+
+<style>
+  /* ── Tokens (Consistent with whole ecosystem) ── */
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  body { 
+    background: var(--c-bg); 
+    font-family: var(--font-main);
+    color: var(--c-ink);
+  }
+
+  .address-container {
+    max-width: 800px;
+    margin: 3rem auto 5rem;
+  }
+
+  /* ── Header ── */
+  .address-header {
+    margin-bottom: 2.5rem;
+  }
+  .address-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+  .address-subtitle {
+    color: var(--c-muted);
+    font-size: 1rem;
+  }
+
+  /* ── Form Card ── */
+  .address-card {
+    background: var(--c-surface);
+    border-radius: var(--radius-lg);
+    padding: 3rem;
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* ── Form Group Styling ── */
+  .form-group label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--c-ink);
+    margin-bottom: 0.5rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .form-control {
+    background: #fdfcfb;
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    color: var(--c-ink);
+    transition: var(--transition);
+    height: auto;
+  }
+  .form-control:focus {
+    background: #fff;
+    border-color: var(--primary-color, var(--c-ink));
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+    outline: none;
+  }
+
+  /* ── Form Section ── */
+  .form-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--c-muted);
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+    margin-top: 2rem;
+  }
+  .form-section-title:first-child { margin-top: 0; }
+
+  /* ── Submit Button ── */
+  .btn-submit-address {
+    width: 100%;
+    background: var(--primary-color, var(--c-ink));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  .btn-submit-address:hover {
+    filter: brightness(1.1); transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+
+  .btn-back-account {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    color: var(--c-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+  .btn-back-account:hover { color: var(--c-ink); transform: translateX(-4px); }
+
+  /* Grid Fixes */
+  .row { --bs-gutter-y: 1.5rem; }
+</style>
+
+<div class="address-container">
+    <header class="address-header">
+        <h1 class="address-title">Guardar una dirección</h1>
+        <p class="address-subtitle">Completa los datos para agilizar tus envíos.</p>
+    </header>
+
+    <div class="address-card">
+        {{ form_start(form) }}
+            <div class="form-section-title">Identificación de la dirección</div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.name, 'Asigna un nombre a esta dirección (ej: Casa, Trabajo)') }}
+                        {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Mi Casa'}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section-title">Datos personales</div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.firstname, 'Nombre') }}
+                        {{ form_widget(form.firstname, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.lastname, 'Apellido') }}
+                        {{ form_widget(form.lastname, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.phone, 'Teléfono') }}
+                        {{ form_widget(form.phone, {'attr': {'class': 'form-control', 'placeholder': '+34'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.company, 'Empresa (Opcional)') }}
+                        {{ form_widget(form.company, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section-title">Detalles de envío</div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.address, 'Dirección completa') }}
+                        {{ form_widget(form.address, {'attr': {'class': 'form-control', 'placeholder': 'Calle, número, piso...'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.postal, 'Código Postal') }}
+                        {{ form_widget(form.postal, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.city, 'Ciudad') }}
+                        {{ form_widget(form.city, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-0">
+                        {{ form_label(form.country, 'País') }}
+                        {{ form_widget(form.country, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ form_widget(form.submit, {'attr': {'class': 'btn-submit-address'}, 'label': 'Guardar dirección'}) }}
+            </div>
+        {{ form_end(form) }}
     </div>
 
-    {{form_end(form)}}
-    <a title="Retour vers votre espace membres"href="{{ path('account') }}">Retourner à mon compte</a>
+    <a href="{{ path('account') }}" class="btn-back-account">
+        <i class="bi bi-arrow-left"></i> Volver a mi cuenta
+    </a>
+</div>
 {% endblock %}

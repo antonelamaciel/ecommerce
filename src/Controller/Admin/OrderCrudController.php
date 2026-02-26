@@ -34,8 +34,8 @@ class OrderCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Commande')
-            ->setEntityLabelInPlural('Commandes')
+            ->setEntityLabelInSingular('Pedido')
+            ->setEntityLabelInPlural('Pedidos')
             ->setDefaultSort(['id' => 'DESC']);
     }
  
@@ -43,18 +43,18 @@ class OrderCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            DateTimeField::new('createdAt', 'Créée le'),
-            TextField::new('user.fullname', 'Acheteur'),
-            MoneyField::new('total')->setCurrency('EUR')->hideOnForm(),
-            MoneyField::new('carrierPrice', 'Frais livraison')->setCurrency('EUR'),
-            ChoiceField::new('state', 'Etat')->setChoices([
-                'Non payée' => 0,
-                'Payée' => 1,
-                'Préparation en cours' => 2,
-                'Expédiée' => 3,
+            DateTimeField::new('createdAt', 'Creado el'),
+            TextField::new('user.fullname', 'Comprador'),
+            MoneyField::new('total')->setCurrency('ARS')->hideOnForm(),
+            MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS'),
+            ChoiceField::new('state', 'Estado')->setChoices([
+                'No pagado' => 0,
+                'Pagado' => 1,
+                'En preparación' => 2,
+                'Enviado' => 3,
             ]
             ),
-            ArrayField::new('orderDetails', 'Produits achetés')->hideOnIndex()->hideOnForm()
+            ArrayField::new('orderDetails', 'Productos comprados')->hideOnIndex()->hideOnForm()
         ];
     }
 

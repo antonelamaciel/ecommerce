@@ -1,27 +1,300 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos produits{% endblock %}
+{% block title %}Nuestros productos{% endblock %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-3">
-        <h3 class="text-center">Rechercher</h3>
-        {{ form(form) }}
-    </div>
-    <div class="col-md-9">
-            <h3 class="text-center">Nos Produits</h3>
-        <div class="row">
-            {% for product in products %}
-                <div class="col-md-4">
-                    <div class="product-item">
-                        <a href="{{ path('product_show', {slug: product.slug}) }}"><img class="img-fluid" src="/uploads/{{product.image}}" alt="{{product.name}}"></a>
-                        <h5 class="mt-2">{{ product.name}}</h5>
-                        <span class="product-subtitle text-center">{{product.subtitle}}</span>
-                        <span class="product-price text-center">{{(product.price / 100 )|number_format(2,',', '.')}} € </span>
-                    </div>
+
+<style>
+  /* ── Tokens (Consistent with Home/Show) ── */
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #7c7772;
+    --radius: 20px;
+    --radius-sm: 12px;
+    --shadow: 0 4px 20px rgba(0,0,0,.03);
+    --shadow-hover: 0 12px 40px rgba(0,0,0,.08);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  body { 
+    background: var(--c-bg); 
+    font-family: var(--font-main);
+    color: var(--c-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Sidebar Filters ── */
+  .shop-sidebar {
+    background: var(--c-surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 100px;
+  }
+  .filter-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+  }
+  /* Style symfony filters */
+  .shop-sidebar form div { margin-bottom: 1rem; }
+  .shop-sidebar form label { 
+    display: block; 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    color: var(--c-muted); 
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .shop-sidebar input, .shop-sidebar select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--c-border);
+    outline: none;
+    transition: var(--transition);
+  }
+  .shop-sidebar input:focus { border-color: var(--c-ink); }
+  .btn-filter-submit {
+    width: 100%;
+    margin-top: 1rem;
+    background: var(--c-ink);
+    color: #fff;
+    border: none;
+    padding: 0.8rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-filter-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  
+  /* ── Categories Checkboxes ── */
+  #categories .form-check {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row-reverse;
+    padding-left: 0;
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  #categories .form-check-input {
+    margin: 0;
+    position: static;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid var(--c-border);
+  }
+  #categories .form-check-input:checked {
+    background-color: var(--c-ink);
+    border-color: var(--c-ink);
+  }
+  #categories .form-check-label {
+    flex: 1;
+    margin-right: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    text-transform: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--c-ink);
+    letter-spacing: 0;
+  }
+  #categories .form-check:hover .form-check-label {
+    color: var(--c-muted);
+  }
+
+  /* ── Header ── */
+  .shop-header {
+    margin-bottom: 3rem;
+  }
+  .shop-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+  .shop-count {
+    font-size: 0.9rem;
+    color: var(--c-muted);
+  }
+
+  /* ── Product Card (Match Home) ── */
+  .pcard {
+    background: var(--c-surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--c-border);
+    position: relative;
+  }
+  .pcard:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-6px);
+    border-color: rgba(0,0,0,0.05);
+  }
+  .pcard__img-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    background: #fdfcfb;
+    margin: 0.5rem;
+    border-radius: calc(var(--radius) - 6px);
+  }
+  .pcard__img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    padding: 1.5rem;
+    transition: transform .6s ease;
+  }
+  .pcard:hover .pcard__img { transform: scale(1.08); }
+
+  .pcard__cart-btn {
+    position: absolute;
+    top: 1.25rem; right: 1.25rem;
+    width: 44px; height: 44px;
+    background: #fff;
+    color: var(--secondary-color, var(--c-ink));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: var(--transition);
+    border: 1px solid var(--c-border);
+    text-decoration: none !important;
+  }
+  .pcard__cart-btn:hover {
+    background: var(--secondary-color, var(--c-ink));
+    color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    border-color: var(--secondary-color, var(--c-ink));
+  }
+
+  .pcard__body {
+    padding: 0.5rem 1.25rem 1.5rem;
+    display: flex; flex-direction: column;
+    gap: .4rem; flex: 1; text-align: center;
+  }
+  .pcard__name {
+    font-size: 1.05rem; font-weight: 600; line-height: 1.3; margin: 0;
+  }
+  .pcard__name a { color: var(--c-ink); text-decoration: none; }
+  .pcard__subtitle {
+    font-size: .85rem; color: var(--c-muted); line-height: 1.4;
+  }
+  .pcard__footer {
+    display: flex; align-items: center; justify-content: center;
+    margin-top: auto; padding-top: 0.5rem;
+  }
+  .pcard__price {
+    font-size: 1.2rem; font-weight: 700; color: var(--c-ink);
+  }
+
+  /* Fade-in */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .col { animation: fadeUp .5s ease both; }
+  {% for i in 1..9 %}
+    .col:nth-child({{ i }}){ animation-delay: {{ i * 0.05 }}s; }
+  {% endfor %}
+
+  @media (max-width: 767px) {
+    .pcard__body {
+      padding: 0.5rem 0.75rem 1rem;
+      gap: 0.25rem;
+    }
+    .pcard__name { font-size: 0.9rem; }
+    .pcard__subtitle { font-size: 0.75rem; }
+    .pcard__price { font-size: 1rem; }
+    .pcard__img-wrap { margin: 0.25rem; }
+    .pcard__cart-btn {
+        width: 32px; height: 32px;
+        top: 0.75rem; right: 0.75rem;
+        font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="container py-5">
+    <!-- Mobile Filter Toggle -->
+    <button class="btn btn-dark d-lg-none w-100 mb-4 rounded-pill py-3 fw-bold shadow-sm" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+        <i class="bi bi-filter-right me-2"></i> Filtrar productos
+    </button>
+
+    <div class="row g-5">
+        <!-- Sidebar -->
+        <aside class="col-lg-3">
+            <div class="collapse d-lg-block shop-sidebar" id="filterCollapse">
+                <h3 class="filter-title d-none d-lg-block">Personaliza tu búsqueda</h3>
+                <h3 class="filter-title d-lg-none">Filtros</h3>
+                {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button type="submit" class="btn-filter-submit">Aplicar filtros</button>
+                {{ form_end(form) }}
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="col-lg-9">
+            <header class="shop-header d-flex justify-content-between align-items-end">
+                <div>
+                    <h1 class="shop-title">Nuestros productos</h1>
+                    <span class="shop-count">{{ products|length }} items encontrados</span>
                 </div>
-            {% endfor %}
-        </div> 
+            </header>
+            
+            <div class="row row-cols-2 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for product in products %}
+                    <div class="col mb-3">
+                        <article class="pcard">
+                            <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__cart-btn" title="Agregar al carrito">
+                                <i class="bi bi-bag-plus"></i>
+                            </a>
+                            
+                            <div class="pcard__img-wrap">
+                                <a href="{{ path('product_show', {slug: product.slug}) }}">
+                                    <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}">
+                                </a>
+                            </div>
+
+                            <div class="pcard__body">
+                                <h3 class="pcard__name">
+                                    <a href="{{ path('product_show', {slug: product.slug}) }}">{{ product.name }}</a>
+                                </h3>
+                                <span class="pcard__subtitle">{{ product.subtitle }}</span>
+                                <div class="pcard__footer">
+                                    <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div> 
+        </main>
     </div>
 </div>
   

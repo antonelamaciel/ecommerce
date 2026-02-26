@@ -1,30 +1,256 @@
-<div id="myCarousel" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators">
-        {% for key, header in headers %}
-            <li data-target="#myCarousel" data-slide-to="{{key}}" class="{{key == 0 ? 'active' : ''}}"></li>  
-        {% endfor %}
-    </ol>
+<div id="heroCarousel" class="hc-carousel carousel slide" data-ride="carousel" data-interval="6500">
+
     <div class="carousel-inner">
         {% for key, header in headers %}
-            <div class="carousel-item {{key == 0 ? 'active' : ''}}" 
-                style="background: linear-gradient(45deg, rgba(0, 0, 0, 0.8), rgba(54, 54, 54, 0.4) 50%,  rgba(28, 28, 28, 0.3)),
-                url(uploads/{{header.image}}) center center/ cover no-repeat;">
-                <div class="container">
-                    <div class="carousel-caption text-left">
-                        <h2>{{header.title}}</h2>
-                        <p>{{header.content}}</p>
-                        <p><a class="btn btn-lg btn-dark shadow" href="{{header.btnUrl}}" role="button">{{header.btnTitle}}</a></p>
+        <div class="hc-slide carousel-item {{ key == 0 ? 'active' : '' }}">
+
+            {# Dedicated clickable link covering entire banner #}
+            <a href="{{ header.btnUrl }}"
+               class="hc-slide__link"
+               aria-label="{{ header.title }}"></a>
+
+            {# Background image + dual overlay #}
+            <div class="hc-slide__bg"
+                 style="background-image: url(/uploads/{{ header.image }});"></div>
+            <div class="hc-slide__overlay"></div>
+
+            {# Main content #}
+            <div class="hc-slide__body">
+                <div class="hc-content">
+                    {% if header.title %}
+                    <h2 class="hc-content__title">{{ header.title }}</h2>
+                    {% endif %}
+
+                    {% if header.content %}
+                    <p class="hc-content__lead">{{ header.content }}</p>
+                    {% endif %}
+
+                    {% if header.btnTitle %}
+                    <div class="hc-content__actions">
+                        <a href="{{ header.btnUrl }}"
+                           class="hc-btn-primary"
+                           style="position:relative;z-index:30;">
+                            {{ header.btnTitle }}
+                            <span class="hc-btn__icon"><i class="bi bi-arrow-right"></i></span>
+                        </a>
                     </div>
+                    {% endif %}
                 </div>
-            </div>   
+            </div>
+
+        </div>
         {% endfor %}
     </div>
-    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
+
+    {# Navigation arrows #}
+    <a class="hc-ctrl hc-ctrl--prev" href="#heroCarousel" role="button" data-slide="prev" aria-label="Anterior">
+        <i class="bi bi-caret-left-fill"></i>
     </a>
-    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
+    <a class="hc-ctrl hc-ctrl--next" href="#heroCarousel" role="button" data-slide="next" aria-label="Siguiente">
+        <i class="bi bi-caret-right-fill"></i>
     </a>
+
 </div>
+
+<style>
+/* ─────────────────────────────────────────────
+   HERO CAROUSEL  –  Design adjusted
+   ───────────────────────────────────────────── */
+
+/* Container - Reduced Height */
+.hc-carousel {
+    position: relative;
+    width: 100%;
+    height: 65vh; /* Reduced height as requested */
+    min-height: 450px;
+    max-height: 700px;
+    overflow: hidden;
+    background: #0a0a0a;
+    margin-bottom: 0;
+}
+
+/* ── Slide ── */
+.hc-slide {
+    height: 65vh;
+    min-height: 450px;
+    max-height: 700px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Full-slide clickable layer */
+.hc-slide__link {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    display: block;
+    cursor: pointer;
+}
+
+/* Background image with Ken Burns zoom */
+.hc-slide__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    transition: transform 8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+    will-change: transform;
+}
+.hc-slide.active .hc-slide__bg {
+    transform: scale(1);
+}
+
+/* Layered overlay: dark bottom + directional gradient */
+.hc-slide__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+        linear-gradient(to top,  rgba(0,0,0,0.6) 0%, transparent 55%),
+        linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 70%);
+}
+
+/* ── Content ── */
+.hc-slide__body {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center; /* Center vertically for shorter height */
+    padding: 2rem 0;
+    pointer-events: none;
+}
+
+.hc-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 5rem; /* Increased padding to breathe with arrows */
+    pointer-events: none;
+}
+
+/* Title */
+.hc-content__title {
+    font-size: clamp(2rem, 4vw, 3.5rem); /* Adjusted size for shorter height */
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    letter-spacing: -1.5px;
+    margin: 0 0 1rem 0;
+    max-width: 700px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+
+    /* Entrance animation */
+    opacity: 0;
+    transform: translateY(30px);
+    transition:
+        opacity 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s,
+        transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s;
+}
+
+/* Body text */
+.hc-content__lead {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: rgba(255,255,255,0.85);
+    max-width: 500px;
+    line-height: 1.6;
+    margin: 0 0 2rem 0;
+
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+        opacity 0.8s cubic-bezier(0.16,1,0.3,1) 0.35s,
+        transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.35s;
+}
+
+/* Button wrapper */
+.hc-content__actions {
+    pointer-events: auto;
+
+    opacity: 0;
+    transform: translateY(15px);
+    transition:
+        opacity 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s,
+        transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s;
+}
+
+/* Activate animations on active slide */
+.hc-slide.active .hc-content__title,
+.hc-slide.active .hc-content__lead,
+.hc-slide.active .hc-content__actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ── Primary CTA button ── */
+.hc-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 2rem;
+    background: #fff;
+    color: #111;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+}
+.hc-btn-primary:hover {
+    background: var(--secondary-color, #2563eb);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ── Arrow controls ── */
+.hc-ctrl {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 25;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-color, #000) !important; /* Backend Primary Color */
+    color: #fff !important; /* White icon color */
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: transform 0.3s, filter 0.3s;
+    opacity: 1 !important; /* Always visible */
+    pointer-events: auto !important;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hc-ctrl:hover {
+    transform: translateY(-50%) scale(1.1);
+    filter: brightness(1.15);
+}
+
+.hc-ctrl--prev { left: 1rem; }
+.hc-ctrl--next { right: 1rem; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .hc-carousel,
+    .hc-slide {
+        height: 50vh;
+        min-height: 350px;
+    }
+    .hc-content {
+        padding: 0 3.5rem;
+    }
+    .hc-ctrl {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+</style>

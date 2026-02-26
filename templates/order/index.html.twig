@@ -1,35 +1,248 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma commande - La Boot'Ique{% endblock %}
+{% block title %}Mi pedido - {{ personalize.companyName ?? 'Empresa' }}{% endblock %}
 
 {% block body %}
-<h2>Je valide ma commande</h2>
-<div class="row">
-    <div class="col-md-6">
-        {% set formHtml %}
-            {{form_start(form, {action:path('order_add')})}}
-            {{ form_label(form.addresses, 'Choisissez votre adresse de livraison')}}
-            <a class="d-block mb-3" href="{{ path('account_address_new') }}">Ajouter nouvelle adresse</a>
-            {{form_end(form)}}
-        {% endset %}
-        {{ formHtml|replace({'[br]' : '<br>'})|raw }}
-    </div>
-    <div class="col-md-6">
-        <strong class="summary-label">Récapitulatif :</strong>
-        <div class="cart-summary">
-            {% for item in cart.products %}
-                <div class="row">
-                    <div class="col-2 my-auto"><img height="50px" src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}"></div>
-                    <div class="col-8 my-auto">{{ item.product.name }}</div>
-                    <div class="col-2 my-auto">x{{ item.quantity }}</div>
+
+<style>
+  /* ── Tokens (Consistent with ecosystem) ── */
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  body { 
+    background: var(--c-bg); 
+    font-family: var(--font-main);
+    color: var(--c-ink);
+  }
+
+  .order-container { padding-top: 3rem; padding-bottom: 5rem; }
+
+  /* ── Header ── */
+  .order-header { margin-bottom: 3rem; }
+  .order-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  /* ── Grid Layout ── */
+  .order-grid { display: grid; grid-template-columns: 1fr 400px; gap: 3rem; }
+
+  /* ── Form Section ── */
+  .order-card {
+    background: var(--c-surface);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-soft);
+  }
+  .order-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .order-card__title i { color: var(--primary-color, var(--c-ink)); }
+
+  /* Address Selection Styling */
+  .address-form-box { margin-top: 1rem; }
+  .address-form-box label { 
+    display: block; 
+    font-weight: 600; 
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: var(--c-muted);
+  }
+  
+  /* Styling the container of radio buttons/labels */
+  .address-form-box .form-check {
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.25rem 1.25rem 3rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+  }
+  .address-form-box .form-check:hover { background: #fdfcfb; border-color: var(--c-ink); }
+  .address-form-box input[type="radio"]:checked + label { color: var(--c-ink); font-weight: 600; }
+  
+  .btn-add-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--c-ink);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    background: #f3f1ed;
+    border-radius: 99px;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+  }
+  .btn-add-new:hover { background: var(--c-ink); color: #fff; }
+
+  /* ── Right Summary Sidebar ── */
+  .summary-sidebar {
+    background: var(--c-surface);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-soft);
+    position: sticky; top: 100px;
+    height: fit-content;
+  }
+  .summary-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 2rem; }
+
+  .summary-item {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .summary-item__img {
+    width: 50px; height: 50px;
+    object-fit: contain;
+    background: #fdfcfb;
+    border-radius: var(--radius-sm);
+    padding: 0.25rem;
+  }
+  .summary-item__name { font-size: 0.9rem; font-weight: 500; color: var(--c-ink); line-height: 1.3; }
+  .summary-item__qty { font-size: 0.85rem; color: var(--c-muted); font-weight: 600; }
+
+  .summary-totals {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--c-border);
+  }
+  .total-row {
+    display: flex; justify-content: space-between;
+    font-size: 1.25rem; font-weight: 700; color: var(--c-ink);
+  }
+
+  .btn-order-next {
+    width: 100%;
+    background: var(--primary-color, var(--c-ink));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  .btn-order-next:hover {
+    filter: brightness(1.1); transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 991px) {
+    .order-grid { grid-template-columns: 1fr; }
+    .summary-sidebar { position: static; }
+  }
+</style>
+
+<div class="container order-container">
+    <header class="order-header">
+        <h1 class="order-title">Valido mi pedido</h1>
+        <p class="text-muted mt-2">Paso 1: Selecciona tu lugar de entrega</p>
+    </header>
+
+    <div class="order-grid">
+        <!-- Left: Form -->
+        <main>
+            <div class="order-card">
+                <div class="order-card__title">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Dirección de entrega
                 </div>
-            {% endfor %}
-            <hr>
-            <div class="row">
-                <div class="col-9 font-weight-bold">Total</div>
-                <div class="col-3 font-weight-bold">{{ (totalPrice / 100)|number_format(2,',','.') }} €</div>
+                
+                <a href="{{ path('account_address_new') }}" class="btn-add-new">
+                    <i class="bi bi-plus-circle"></i> Añadir nueva dirección
+                </a>
+
+                <div class="address-form-box">
+                    {% set formHtml %}
+                        {{ form_start(form, {action: path('order_add')}) }}
+                            <div class="custom-form-rows">
+                                {{ form_widget(form.addresses) }}
+                            </div>
+
+                            <div class="order-card__title mt-5">
+                                <i class="bi bi-truck"></i>
+                                Elija su transportista
+                            </div>
+                            <div class="custom-form-rows">
+                                {{ form_widget(form.carriers) }}
+                            </div>
+
+                            <div class="mt-4">
+                                {{ form_widget(form.submit, {'attr': {'class': 'btn-order-next'}, 'label': 'Continuar con el pago'}) }}
+                            </div>
+                        {{ form_end(form) }}
+                    {% endset %}
+                    
+                    {# 
+                       We use raw and manual styling for the Symfony radio outputs 
+                       The replace [br] is for better formatting of the address labels 
+                    #}
+                    {{ formHtml|replace({
+                        '[br]' : '<br>',
+                        'form-check' : 'form-check custom-p-check'
+                    })|raw }}
+                </div>
             </div>
-        </div>
+        </main>
+
+        <!-- Right: Summary -->
+        <aside>
+            <div class="summary-sidebar">
+                <h2 class="summary-title">Resumen de tu selección</h2>
+                
+                <div class="summary-items-list">
+                    {% for item in cart.products %}
+                        <div class="summary-item">
+                            <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="summary-item__img">
+                            <div class="summary-item__name">{{ item.product.name }}</div>
+                            <div class="summary-item__qty">x{{ item.quantity }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="summary-totals">
+                    <div class="total-row">
+                        <span>Total estimado</span>
+                        <span>$ {{ (totalPrice / 100)|number_format(2,',','.') }} ARS</span>
+                    </div>
+                    <p class="small text-muted mt-2 mb-0 text-center">
+                        <i class="bi bi-shield-check me-1"></i> Transacción segura y protegida
+                    </p>
+                </div>
+            </div>
+        </aside>
     </div>
 </div>
 

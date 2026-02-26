@@ -13,13 +13,13 @@ class Headers
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $title;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $content;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $btnTitle;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -38,7 +38,7 @@ class Headers
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -50,7 +50,7 @@ class Headers
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    public function setContent(?string $content): self
     {
         $this->content = $content;
 
@@ -62,7 +62,7 @@ class Headers
         return $this->btnTitle;
     }
 
-    public function setBtnTitle(string $btnTitle): self
+    public function setBtnTitle(?string $btnTitle): self
     {
         $this->btnTitle = $btnTitle;
 

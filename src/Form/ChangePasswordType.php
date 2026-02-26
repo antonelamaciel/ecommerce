@@ -21,35 +21,35 @@ class ChangePasswordType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'disabled' => true,
-                'label' => 'Adresse email'
+                'label' => 'Dirección de correo electrónico'
             ])
             ->add('firstname', TextType::class, [
                 'disabled' => true,
-                'label' => 'Prénom'
+                'label' => 'Nombre'
             ])
             ->add('lastname', TextType::class, [
                 'disabled' => true,
-                'label' => 'Nom de famille'
+                'label' => 'Apellido'
             ])
             ->add('old_password', PasswordType::class, [
-                'label' => 'Mot de passe actuel',
+                'label' => 'Contraseña actual',
                 'mapped' => false,
                 'attr' => [
-                    'placeholder' => 'Veuillez saisir votre mot de passe actuel'
+                    'placeholder' => 'Por favor ingrese su contraseña actual'
                 ]
             ])
             ->add('new_password', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'invalid_message' => 'Les mots de passe doivent être identiques',
+                'invalid_message' => 'Las contraseñas deben ser idénticas',
                 'options' => ['attr' => ['class' => 'password-field']],
                 'required' => true,
                 'first_options'  => [
-                    'label' => 'Nouveau mot de passe',
-                    'attr' => ['placeholder' => 'Saisir mot de passe souhaité']
+                    'label' => 'Nueva contraseña',
+                    'attr' => ['placeholder' => 'Ingresar contraseña deseada']
                 ],
                 'second_options' => [
-                    'label' => 'Répétez mot de passe',
-                    'attr' => ['placeholder' => 'Confirmer mot de passe ']
+                    'label' => 'Repetir contraseña',
+                    'attr' => ['placeholder' => 'Confirmar contraseña ']
                 ],
                 'mapped' => false,
                 'attr' => [
@@ -57,17 +57,17 @@ class ChangePasswordType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Veuillez renseigner un mot de passe',
+                        'message' => 'Por favor ingrese una contraseña',
                     ]),
                     new Length([
                         'min' => 4,
-                        'minMessage' => 'Votre mot de passe doit contenir minimum 8 charactères',
+                        'minMessage' => 'Su contraseña debe tener al menos 4 caracteres',
                         'max' => 4096,
                     ]),
                 ],
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Enregistrer modifications',
+                'label' => 'Guardar cambios',
                 'attr' => [
                     'class' => 'btn btn-outline-success'
                 ]

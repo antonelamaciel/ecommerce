@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Preguntas Frecuentes - {{ personalize.companyName ?? 'Empresa' }}{% endblock %}
+
+{% block body %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --c-brand: var(--primary-color, #1a1a1a);
+    --radius-md: 16px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  .content-wrap {
+    font-family: var(--font-main);
+    color: var(--c-ink);
+    padding: 4rem 0 6rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    margin-bottom: 4rem;
+    text-align: center;
+  }
+  .page-title {
+    font-size: clamp(2.2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .accordion-item {
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-md) !important;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .accordion-button {
+    width: 100%;
+    text-align: left;
+    padding: 1.5rem;
+    font-weight: 700;
+    color: var(--c-ink);
+    background-color: var(--c-surface);
+    border: none;
+    box-shadow: none !important;
+    outline: none !important;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+  }
+
+  .accordion-button:focus,
+  .accordion-button:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .accordion-button:not(.collapsed) {
+    color: var(--c-brand);
+    background-color: #fdfcfb;
+  }
+
+  .accordion-button::after {
+    content: "\F282";
+    font-family: "bootstrap-icons";
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .accordion-button:not(.collapsed)::after {
+    transform: rotate(180deg);
+  }
+
+  .accordion-body {
+    padding: 1.5rem;
+    line-height: 1.7;
+    color: var(--c-muted);
+    background-color: var(--c-surface);
+  }
+
+  @media (max-width: 767px) {
+    .content-wrap { padding: 2rem 1rem; }
+  }
+</style>
+
+<div class="content-wrap">
+  <header class="page-header">
+    <h1 class="page-title">Preguntas Frecuentes</h1>
+    <p class="text-muted mt-3">Todo lo que necesitas saber sobre nuestras compras y servicios.</p>
+  </header>
+
+  <div class="accordion" id="faqAccordion">
+    {% for faq in faqs %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="heading{{ faq.id }}">
+            <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapse{{ faq.id }}" aria-expanded="false" aria-controls="collapse{{ faq.id }}">
+              {{ faq.question }}
+            </button>
+          </h2>
+          <div id="collapse{{ faq.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ faq.id }}">
+            <div class="accordion-body">
+              {{ faq.answer|raw }}
+            </div>
+          </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">No hay preguntas frecuentes en este momento.</p>
+        </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

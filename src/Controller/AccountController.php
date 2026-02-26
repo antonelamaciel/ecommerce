@@ -45,13 +45,13 @@ class AccountController extends AbstractController
                 $em->flush();
                 $this->addFlash(
                     'notice', 
-                    'Mot de passe modifié :)'
+                    'Contraseña modificada :)'
                 );
                 return $this->redirectToRoute('account');
             } else {
                 $this->addFlash(
                     'notice', 
-                    'Mot de passe actuel erroné :('
+                    'Contraseña actual incorrecta :('
                 );
             }
         }
@@ -80,7 +80,7 @@ class AccountController extends AbstractController
     public function showOrder(Order $order): Response
     {
         if (!$order || $order->getUser() != $this->getUser()) {
-            throw $this->createNotFoundException('Commande innaccessible');
+            throw $this->createNotFoundException('Pedido inaccesible');
         }
         return $this->render('account/order.html.twig', [
             'order' => $order

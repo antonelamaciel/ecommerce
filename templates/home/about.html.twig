@@ -1,26 +1,105 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Nosotros - {{ personalize.companyName ?? 'Empresa' }}{% endblock %}
+
 {% block body %}
-<h3>A propos de La Boot'Ique</h3>
-<p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae eaque harum aliquid repellendus exercitationem nihil in animi velit, dolores perferendis expedita! Dicta excepturi mollitia ullam laborum eligendi. Officiis, dolorum dolore.
-    Quaerat illum commodi, ad, voluptatum ab alias veniam omnis minus dicta autem consequatur enim delectus similique amet! Aliquam distinctio maiores, vel cupiditate error architecto quidem itaque voluptates, totam consequuntur omnis.
-    Quisquam id, ex accusamus iusto modi autem quis natus at non corporis, voluptate animi porro quam beatae repellendus alias vero. Delectus et aliquid atque? Rem hic unde minima vel odit?
-    Distinctio suscipit, cupiditate quod ipsa quaerat reprehenderit perspiciatis modi voluptatum ea quis est magnam odio harum aut dignissimos ipsum maiores accusamus soluta eveniet corrupti debitis molestiae in aliquid. Quaerat, esse?
-    Nesciunt ab optio aut! Nisi beatae dolor reprehenderit aspernatur magni, similique quas commodi soluta tenetur voluptates libero fugiat. Repellat culpa suscipit expedita fugit tempora nesciunt eveniet quaerat harum asperiores in.
-</p>
-<p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae eaque harum aliquid repellendus exercitationem nihil in animi velit, dolores perferendis expedita! Dicta excepturi mollitia ullam laborum eligendi. Officiis, dolorum dolore.
-    Quaerat illum commodi, ad, voluptatum ab alias veniam omnis minus dicta autem consequatur enim delectus similique amet! Aliquam distinctio maiores, vel cupiditate error architecto quidem itaque voluptates, totam consequuntur omnis.
-    Quisquam id, ex accusamus iusto modi autem quis natus at non corporis, voluptate animi porro quam beatae repellendus alias vero. Delectus et aliquid atque? Rem hic unde minima vel odit?
-    Distinctio suscipit, cupiditate quod ipsa quaerat reprehenderit perspiciatis modi voluptatum ea quis est magnam odio harum aut dignissimos ipsum maiores accusamus soluta eveniet corrupti debitis molestiae in aliquid. Quaerat, esse?
-    Nesciunt ab optio aut! Nisi beatae dolor reprehenderit aspernatur magni, similique quas commodi soluta tenetur voluptates libero fugiat. Repellat culpa suscipit expedita fugit tempora nesciunt eveniet quaerat harum asperiores in.
-</p>
-<p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae eaque harum aliquid repellendus exercitationem nihil in animi velit, dolores perferendis expedita! Dicta excepturi mollitia ullam laborum eligendi. Officiis, dolorum dolore.
-    Quaerat illum commodi, ad, voluptatum ab alias veniam omnis minus dicta autem consequatur enim delectus similique amet! Aliquam distinctio maiores, vel cupiditate error architecto quidem itaque voluptates, totam consequuntur omnis.
-    Quisquam id, ex accusamus iusto modi autem quis natus at non corporis, voluptate animi porro quam beatae repellendus alias vero. Delectus et aliquid atque? Rem hic unde minima vel odit?
-    Distinctio suscipit, cupiditate quod ipsa quaerat reprehenderit perspiciatis modi voluptatum ea quis est magnam odio harum aut dignissimos ipsum maiores accusamus soluta eveniet corrupti debitis molestiae in aliquid. Quaerat, esse?
-    Nesciunt ab optio aut! Nisi beatae dolor reprehenderit aspernatur magni, similique quas commodi soluta tenetur voluptates libero fugiat. Repellat culpa suscipit expedita fugit tempora nesciunt eveniet quaerat harum asperiores in.
-</p>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --c-bg: #fcfbf9;
+    --c-surface: #ffffff;
+    --c-border: #f0ede8;
+    --c-ink: #1a1a1a;
+    --c-muted: #696561;
+    --c-brand: var(--primary-color, #1a1a1a);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --transition: .3s cubic-bezier(.4, 0, .2, 1);
+    --font-main: 'Outfit', sans-serif;
+  }
+
+  .about-wrap {
+    font-family: var(--font-main);
+    color: var(--c-ink);
+    padding: 2rem 0 6rem;
+  }
+
+  .hero-section {
+    text-align: center;
+    margin-bottom: 5rem;
+    animation: fadeIn 0.8s var(--transition);
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    background: color-mix(in srgb, var(--c-brand) 8%, transparent);
+    color: var(--c-brand);
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-lead {
+    font-size: 1.25rem;
+    color: var(--c-muted);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .card-premium {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: 3.5rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 767px) {
+    .hero-title { font-size: 2.5rem; }
+    .card-premium { padding: 2rem; }
+  }
+</style>
+
+<div class="about-wrap">
+  <section class="hero-section">
+    <span class="hero-badge">Conoce más</span>
+    <h1 class="hero-title">Sobre {{ personalize.companyName ?? 'nosotros' }}</h1>
+  </section>
+
+  <div class="about-content-sections">
+    {% for item in contents %}
+        <section class="card-premium mb-5">
+          <h2 class="mb-4" style="color: var(--c-brand); font-weight: 800; letter-spacing: -0.02em;">{{ item.title }}</h2>
+          <div class="content-body" style="color: var(--c-muted); line-height: 1.8; font-size: 1.1rem;">
+            {{ item.content|raw }}
+          </div>
+        </section>
+    {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">Próximamente más información sobre nosotros.</p>
+        </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
