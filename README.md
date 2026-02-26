@@ -47,3 +47,4 @@ As an admin (role = "ROLE_ADMIN"), we can add products, modify banners, top prod
     ```bash
     php bin/console cache:clear
     ```
+# ecommerce
