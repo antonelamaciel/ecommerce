@@ -64,8 +64,8 @@
                            aria-haspopup="true"
                            aria-expanded="false">
                             <div class="user-avatar">{{ app.user.firstname|slice(0,1)|upper }}</div>
-                            <span class="d-none d-lg-inline">{{ app.user.firstname }}</span>
-                            <i class="bi bi-chevron-down dropdown-arrow-icon"></i>
+                            <span class="ms-2 user-name-label">{{ app.user.firstname }}</span>
+                            <i class="bi bi-chevron-down dropdown-arrow-icon ms-auto"></i>
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-right dropdown-menu-styled shadow-xl dropdown-animated">
@@ -89,15 +89,19 @@
                     </div>
                 {% else %}
                     <a class="btn-login" href="{{ path('app_login') }}">
-                        <i class="bi bi-person me-1"></i>Ingresar
+                        <i class="bi bi-person me-2"></i>
+                        <span>Ingresar</span>
                     </a>
                 {% endif %}
 
                 <a href="{{ path('cart') }}" class="cart-btn text-white" aria-label="Ver carrito">
-                    <i class="bi bi-bag fs-5"></i>
-                    {% if cartCount > 0 %}
-                        <span class="cart-badge-custom">{{ cartCount }}</span>
-                    {% endif %}
+                    <div class="cart-icon-wrapper">
+                        <i class="bi bi-bag fs-5"></i>
+                        {% if cartCount > 0 %}
+                            <span class="cart-badge-custom">{{ cartCount }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="ms-3 d-lg-none">Carrito</span>
                 </a>
             </div>
             </div>
@@ -213,11 +217,66 @@
 }
 
 .cart-btn {
-    position: relative;
     display: flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; border-radius: 50%;
     color: #fff; border: 1px solid transparent; text-decoration: none;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cart-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-badge-custom {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: #fff;
+    color: var(--primary-color);
+    font-size: 0.75rem;
+    font-weight: 900;
+    min-width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border: 2px solid var(--primary-color);
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 5;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-avatar-lg {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+}
+
+.dropdown-user-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.25rem;
+    list-style: none;
 }
 
 /* =============================================
@@ -280,7 +339,8 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
-        padding: 1.5rem; gap: 1rem;
+        padding: 2rem 1.5rem; 
+        gap: 1rem; /* ESPACIADO ENTRE BLOQUES PRINCIPALES */
         transform: translateX(-100%);
         visibility: hidden;
         overflow-y: auto;
@@ -299,7 +359,7 @@
         flex-direction: column !important;
         width: 100% !important;
         max-width: 100% !important;
-        gap: 0 !important;
+        gap: 1rem !important; /* AIRE ENTRE BUSCADOR Y CATEGORÍAS */
     }
     
     .search-wrapper {
@@ -315,7 +375,7 @@
     }
 
     .search-modern-custom input {
-        border-radius: 16px 16px 0 0 !important;
+        border-radius: 16px !important; /* REDONDEADO COMPLETO */
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         height: 54px;
         width: 100% !important;
@@ -324,17 +384,15 @@
     .nav-pill-btn {
         width: 100% !important;
         height: 54px;
-        border-radius: 0 0 16px 16px !important;
+        border-radius: 16px !important; /* REDONDEADO COMPLETO */
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-top: none !important;
         background: rgba(255, 255, 255, 0.15) !important;
         justify-content: center;
         font-size: 1rem;
-        transition: border-radius 0.2s;
     }
 
     .dropdown.show .nav-pill-btn {
-        border-radius: 0 !important; /* Cuadrado para unir con el dropdown */
+        border-radius: 16px 16px 0 0 !important; /* Solo plano abajo si está abierto */
     }
 
     /* CONTENEDOR DERECHO: USUARIO + CARRITO */
@@ -342,13 +400,13 @@
         order: 3;
         width: 100% !important;
         display: flex !important;
-        margin-top: 2rem;
-        background: rgba(255,255,255,0.1);
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,0.15);
-        padding: 6px;
-        gap: 6px;
-        position: relative;
+        flex-direction: column !important;
+        margin-top: 0 !important;
+        background: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        gap: 1rem !important; /* AIRE ENTRE USUARIO Y CARRITO */
     }
     
     .navbar-right > .dropdown,
@@ -374,33 +432,43 @@
     }
 
     .user-avatar {
-        width: 38px !important;
-        height: 38px !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: #fff !important;
+        color: var(--primary-color) !important;
         font-size: 1rem !important;
-        border: 2px solid rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.2) !important;
+        border-radius: 50% !important;
     }
 
     .btn-login, .nav-user-btn, .cart-btn {
         width: 100% !important;
-        height: 64px !important;
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
+        height: 54px !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 16px !important; /* FORMA REDONDEADA */
+        padding: 0 1.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important; /* TEXTO CENTRADO */
+        color: #fff !important;
+        text-decoration: none;
     }
 
-    /* DROPDOWNS EN MÓVIL */
+    .dropdown.show .nav-user-btn {
+        border-radius: 16px 16px 0 0 !important;
+    }
+
     .navbar-collapsible .dropdown-menu-styled {
         position: static !important;
         width: 100% !important; 
         max-width: none !important;
         margin: 0 !important; 
-        margin-top: 0 !important; /* Forzar pegado superior */
         display: none;
         background: #fff !important;
         border-radius: 0 0 16px 16px !important;
         padding: 0.5rem !important;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+        box-shadow: none !important;
         border: 1px solid rgba(0,0,0,0.1) !important;
         border-top: none !important;
         transform: none !important;
@@ -433,6 +501,6 @@
         text-overflow: ellipsis !important;
     }
     
-    .nav-user-btn span { display: none !important; }
+    .user-name-label { display: none; }
 }
 </style>
