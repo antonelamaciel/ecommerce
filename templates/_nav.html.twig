@@ -58,9 +58,30 @@
                     </a>
                     <div class="dropdown-divider"></div>
                     {% for category in allCategories %}
-                        <a class="nav-dropdown-item" href="{{ path('product', {'categories[]': category.id}) }}">
-                            <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
-                        </a>
+                        {% if category.subcategories|length > 0 %}
+                            <div class="nav-category-group">
+                                <a class="nav-dropdown-item d-flex align-items-center justify-content-between" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDesktopCat{{ category.id }}" aria-expanded="false" onclick="event.preventDefault(); event.stopPropagation(); $('#collapseDesktopCat{{ category.id }}').collapse('toggle'); let exp = this.getAttribute('aria-expanded') === 'true'; this.setAttribute('aria-expanded', !exp);">
+                                    <span><i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}</span>
+                                    <i class="bi bi-chevron-down opacity-50 ms-2" style="font-size: 0.75rem; transition: transform 0.2s;"></i>
+                                </a>
+                                <div class="collapse" id="collapseDesktopCat{{ category.id }}">
+                                    <div class="ps-4 pe-2 py-1 mb-1 border-start ms-3 mt-1" style="border-color: #eee !important;">
+                                        <a class="nav-dropdown-item py-1 text-primary fw-semibold" href="{{ path('product', {'categories[]': category.id}) }}" style="font-size: 0.8rem;">
+                                            Ver todo en {{ category.name }}
+                                        </a>
+                                        {% for sub in category.subcategories %}
+                                            <a class="nav-dropdown-item py-1 text-muted" href="{{ path('product', {'categories[]': category.id, 'subcategories[]': sub.id}) }}" style="font-size: 0.8rem;">
+                                                {{ sub.name }}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a class="nav-dropdown-item" href="{{ path('product', {'categories[]': category.id}) }}">
+                                <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -124,7 +145,46 @@
 
     <div class="drawer-body">
 
-        <!-- SECCIÓN USUARIO -->
+        <!-- SECCIÓN CATEGORÍAS (primero en mobile) -->
+        <div class="drawer-section">
+            <div class="drawer-section-title">
+                <i class="bi bi-tags me-2"></i>Categorías
+            </div>
+            <div class="drawer-section-content">
+                <a class="drawer-item fw-semibold" href="{{ path('product') }}">
+                    <i class="bi bi-grid me-2"></i><b>Todas las categorías</b>
+                </a>
+                <div class="drawer-divider"></div>
+                {% for category in allCategories %}
+                    {% if category.subcategories|length > 0 %}
+                        <div class="nav-drawer-category-group">
+                            <a class="drawer-item d-flex align-items-center justify-content-between drawer-cat-toggle" href="#" data-target="collapseMobileCat{{ category.id }}" onclick="event.preventDefault(); toggleDrawerSub(this);">
+                                <span><i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}</span>
+                                <i class="bi bi-chevron-down drawer-cat-arrow opacity-50 ms-2" style="font-size: 0.85rem; transition: transform 0.25s;"></i>
+                            </a>
+                            <div class="drawer-subcats" id="collapseMobileCat{{ category.id }}" style="max-height: 0; overflow: hidden; transition: max-height 0.35s ease;">
+                                <div class="ps-4 pe-2 py-1 mb-2 border-start ms-3 mt-1" style="border-color: rgba(255,255,255,0.18) !important;">
+                                    <a class="drawer-item py-1 fw-bold text-primary fw-semibold" href="{{ path('product', {'categories[]': category.id}) }}" style="font-size: 0.85rem; color: #fff;">
+                                        Ver todo en {{ category.name }}
+                                    </a>
+                                    {% for sub in category.subcategories %}
+                                        <a class="drawer-item py-1" href="{{ path('product', {'categories[]': category.id, 'subcategories[]': sub.id}) }}" style="font-size: 0.85rem; opacity: 0.8;">
+                                            {{ sub.name }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="drawer-item" href="{{ path('product', {'categories[]': category.id}) }}">
+                            <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- SECCIÓN USUARIO (segundo en mobile) -->
         <div class="drawer-section">
             <div class="drawer-section-title">
                 <i class="bi bi-person-circle me-2"></i>
@@ -143,24 +203,6 @@
                 {% else %}
                     <a class="drawer-item" href="{{ path('app_login') }}"><i class="bi bi-box-arrow-in-right me-2"></i>Ingresar</a>
                 {% endif %}
-            </div>
-        </div>
-
-        <!-- SECCIÓN CATEGORÍAS -->
-        <div class="drawer-section">
-            <div class="drawer-section-title">
-                <i class="bi bi-tags me-2"></i>Categorías
-            </div>
-            <div class="drawer-section-content">
-                <a class="drawer-item fw-semibold" href="{{ path('product') }}">
-                    <i class="bi bi-grid me-2"></i><b>Todas las categorías</b>
-                </a>
-                <div class="drawer-divider"></div>
-                {% for category in allCategories %}
-                    <a class="drawer-item" href="{{ path('product', {'categories[]': category.id}) }}">
-                        <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
-                    </a>
-                {% endfor %}
             </div>
         </div>
 
@@ -408,6 +450,7 @@
 .shadow-xl { box-shadow: 0 16px 48px rgba(0,0,0,.14) !important; }
 .arrow-icon { font-size: .75rem; opacity: .7; transition: transform .25s; }
 .dropdown.show .arrow-icon { transform: rotate(180deg); opacity: 1; }
+[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); opacity: 1; }
 
 @media (min-width: 992px) {
     .dropdown-animated {
@@ -730,4 +773,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+/* ── Drawer subcategory accordion (vanilla JS, no jQuery/BS collapse needed) ── */
+function toggleDrawerSub(trigger) {
+    const targetId = trigger.getAttribute('data-target');
+    const panel = document.getElementById(targetId);
+    const arrow = trigger.querySelector('.drawer-cat-arrow');
+    const isOpen = panel.style.maxHeight && panel.style.maxHeight !== '0px';
+
+    // Close all other open panels first
+    document.querySelectorAll('.drawer-subcats').forEach(function(p) {
+        p.style.maxHeight = '0px';
+    });
+    document.querySelectorAll('.drawer-cat-toggle').forEach(function(t) {
+        t.setAttribute('aria-expanded', 'false');
+        const a = t.querySelector('.drawer-cat-arrow');
+        if (a) a.style.transform = 'rotate(0deg)';
+    });
+
+    // Toggle the clicked one
+    if (!isOpen) {
+        panel.style.maxHeight = panel.scrollHeight + 200 + 'px';
+        trigger.setAttribute('aria-expanded', 'true');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+    }
+}
 </script>

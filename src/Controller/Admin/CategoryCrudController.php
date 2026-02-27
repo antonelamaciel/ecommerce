@@ -26,6 +26,10 @@ class CategoryCrudController extends AbstractCrudController
     {
         return [
             TextField::new('name', 'Nombre'),
+            \EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField::new('subcategories', 'Subcategorías')
+                ->setEntryType(\App\Form\SubcategoryType::class)
+                ->showEntryLabel(false)
+                ->setFormTypeOptions(['by_reference' => false])
         ];
     }
 }

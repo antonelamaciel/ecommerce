@@ -58,27 +58,33 @@
     background: var(--c-surface);
     border-radius: var(--radius-lg);
     border: 1px solid var(--c-border);
-    padding: 3rem;
+    padding: 1.5rem 1rem;
     box-shadow: var(--shadow-soft);
     position: sticky;
     top: 100px;
     transition: var(--transition);
   }
   .pdetail-img-wrap {
-    aspect-ratio: 1/1;
+    width: 100%;
+    max-width: 500px;
+    height: 420px;
+    min-height: 280px;
+    max-height: 480px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: 10px;
+    background: #f8f8f8;
+    margin: 0 auto;
   }
   .pdetail-img {
     max-width: 100%;
     max-height: 100%;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    transition: transform 0.6s ease;
-  }
-  .pdetail-img-card:hover .pdetail-img {
-    transform: scale(1.05);
+    transition: opacity 0.3s ease;
   }
 
   /* ── Product Info ── */
@@ -139,10 +145,15 @@
 
   /* ── Actions ── */
   .pdetail-actions {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
     margin-bottom: 2rem;
+  }
+  .pdetail-add-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
   }
   .btn-pdetail-cart {
     background: var(--secondary-color, var(--primary-color, var(--c-ink)));
@@ -206,7 +217,7 @@
 
   @media (max-width: 991px) {
     .pdetail-img-card { position: static; margin-bottom: 3rem; }
-    .pdetail-actions { grid-template-columns: 1fr; }
+    .pdetail-add-grid { grid-template-columns: 1fr; }
   }
 </style>
 
@@ -225,9 +236,34 @@
         <!-- Izquierda: Imagen -->
         <div class="col-lg-6">
             <div class="pdetail-img-card">
-                <div class="pdetail-img-wrap">
-                    <img src="/uploads/{{ product.image }}" alt="{{ product.name }}" class="pdetail-img">
+                {% set all_images = [product.image] %}
+                {% if product.images is defined and product.images %}
+                    {% for img in product.images %}
+                        {% set all_images = all_images|merge([img]) %}
+                    {% endfor %}
+                {% endif %}
+
+                <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                    {% if all_images|length > 1 %}
+                    <button type="button" id="pd-prev-img" class="btn text-white rounded-circle shadow flex-shrink-0 d-flex align-items-center justify-content-center" style="width:42px; height:42px; min-width:42px; background: var(--primary-color, #333); border: none; transition: opacity 0.2s;"><i class="bi bi-chevron-left fs-5"></i></button>
+                    {% endif %}
+                    
+                    <div class="pdetail-img-wrap flex-grow-1 w-100 mx-3">
+                        <img id="main-product-img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" class="pdetail-img">
+                    </div>
+                    
+                    {% if all_images|length > 1 %}
+                    <button type="button" id="pd-next-img" class="btn text-white rounded-circle shadow flex-shrink-0 d-flex align-items-center justify-content-center" style="width:42px; height:42px; min-width:42px; background: var(--primary-color, #333); border: none; transition: opacity 0.2s;"><i class="bi bi-chevron-right fs-5"></i></button>
+                    {% endif %}
                 </div>
+                
+                {% if all_images|length > 1 %}
+                <div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
+                    {% for img in all_images %}
+                        <img src="/uploads/{{ img }}" alt="Thumbnail" class="pd-thumbnail" data-src="/uploads/{{ img }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; cursor: pointer; border: {{ loop.first ? '2px solid var(--primary-color, #333)' : '2px solid transparent' }}; transition: border 0.2s;">
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -251,10 +287,21 @@
             </div>
 
             <div class="pdetail-actions">
-                <a href="{{ path('add_to_cart', {id: product.id}) }}" class="btn-pdetail-cart">
-                    <i class="bi bi-bag-plus-fill"></i>
-                    Comprar ahora
-                </a>
+                <form id="product-add-form" action="{{ path('add_to_cart', {id: product.id}) }}" method="GET">
+                    <div class="pdetail-add-grid">
+                        <div class="d-flex align-items-center" style="border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 0.2rem;">
+                            <button type="button" class="btn fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="pd-minus" style="width: 40px; height: 100%; background: transparent;">-</button>
+                            <input type="number" id="pd-qty" name="qty" value="1" min="1" class="form-control text-center border-0 fw-bold bg-transparent p-0 flex-grow-1" style="pointer-events: none; font-size: 1.1rem; box-shadow: none;" readonly>
+                            <button type="button" class="btn fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="pd-plus" style="width: 40px; height: 100%; background: transparent;">+</button>
+                        </div>
+                        
+                        <button type="submit" id="pd-submit" class="btn-pdetail-cart m-0 w-100">
+                            <i class="bi bi-bag-plus-fill"></i>
+                            Comprar ahora
+                        </button>
+                    </div>
+                </form>
+
                 <a href="{{ path('home') }}" class="btn-pdetail-back">
                     <i class="bi bi-arrow-left"></i>
                     Volver a la tienda
@@ -278,4 +325,118 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mainImg = document.getElementById('main-product-img');
+    const thumbnails = document.querySelectorAll('.pd-thumbnail');
+    const pdPrevImg = document.getElementById('pd-prev-img');
+    const pdNextImg = document.getElementById('pd-next-img');
+    
+    if (mainImg && thumbnails.length > 0) {
+        let currentIndex = 0;
+        
+        function updateMainImg(idx) {
+            if (idx < 0) idx = thumbnails.length - 1;
+            if (idx >= thumbnails.length) idx = 0;
+            currentIndex = idx;
+            
+            const thumb = thumbnails[currentIndex];
+            const src = thumb.getAttribute('data-src');
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => {
+                mainImg.src = src;
+                mainImg.style.opacity = '1';
+            }, 150);
+            
+            thumbnails.forEach(t => t.style.border = '2px solid transparent');
+            thumb.style.border = '2px solid var(--c-ink)';
+        }
+
+        thumbnails.forEach((thumb, index) => {
+            thumb.addEventListener('click', () => updateMainImg(index));
+        });
+
+        if (pdPrevImg) pdPrevImg.addEventListener('click', () => updateMainImg(currentIndex - 1));
+        if (pdNextImg) pdNextImg.addEventListener('click', () => updateMainImg(currentIndex + 1));
+        
+        let touchStartX = 0;
+        let touchEndX = 0;
+        if(mainImg.parentElement) {
+            mainImg.parentElement.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+            mainImg.parentElement.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchEndX < touchStartX - 40) updateMainImg(currentIndex + 1);
+                if (touchEndX > touchStartX + 40) updateMainImg(currentIndex - 1);
+            }, {passive: true});
+        }
+    }
+
+    const pdMinus = document.getElementById('pd-minus');
+    const pdPlus = document.getElementById('pd-plus');
+    const pdQty = document.getElementById('pd-qty');
+    const pdForm = document.getElementById('product-add-form');
+    const pdSubmit = document.getElementById('pd-submit');
+
+    if(pdMinus && pdPlus && pdQty) {
+        pdMinus.addEventListener('click', () => {
+            let val = parseInt(pdQty.value);
+            if(val > 1) pdQty.value = val - 1;
+        });
+        pdPlus.addEventListener('click', () => {
+            let val = parseInt(pdQty.value);
+            pdQty.value = val + 1;
+        });
+    }
+
+    if(pdForm && pdSubmit) {
+        pdForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const actionUrl = new URL(pdForm.action, window.location.origin);
+            actionUrl.searchParams.set('qty', pdQty.value);
+            actionUrl.searchParams.set('ajax', '1');
+
+            const originalBtnHtml = pdSubmit.innerHTML;
+            pdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Añadiendo...';
+            pdSubmit.disabled = true;
+
+            fetch(actionUrl.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    let badges = document.querySelectorAll('.cart-badge');
+                    if(badges.length > 0) {
+                        badges.forEach(b => b.textContent = data.cartCount);
+                    } else {
+                        document.querySelectorAll('.cart-btn').forEach(btn => {
+                            const badge = document.createElement('span');
+                            badge.className = 'cart-badge';
+                            badge.textContent = data.cartCount;
+                            btn.appendChild(badge);
+                        });
+                    }
+                    
+                    pdSubmit.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Agregado!';
+                    pdSubmit.style.background = '#198754'; // Bootstrap success color
+                    
+                    setTimeout(() => {
+                        pdSubmit.style.background = '';
+                        pdSubmit.innerHTML = originalBtnHtml;
+                        pdSubmit.disabled = false;
+                    }, 2000);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                pdSubmit.innerHTML = originalBtnHtml;
+                pdSubmit.disabled = false;
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

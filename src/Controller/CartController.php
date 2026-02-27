@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Model\Cart;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -34,9 +35,18 @@ class CartController extends AbstractController
      * @return Repsonse
      */
     #[Route('/panier/ajouter/{id}', name: 'add_to_cart')]
-    public function add(Cart $cart, int $id): Response
+    public function add(Cart $cart, int $id, Request $request): Response
     {
-        $cart->add($id);
+        $qty = $request->query->getInt('qty', 1);
+        $cart->add($id, $qty);
+
+        if ($request->isXmlHttpRequest() || $request->query->get('ajax')) {
+            return $this->json([
+                'cartCount' => $cart->getFullQuantity(),
+                'success' => true
+            ]);
+        }
+
         return $this->redirectToRoute('cart');
     }
 

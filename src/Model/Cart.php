@@ -24,14 +24,14 @@ class Cart
      * @param int $id
      * @return void
      */
-    public function add(int $id):void
+    public function add(int $id, int $qty = 1):void
     {
         $cart = $this->session->get('cart', []);
 
         if (empty($cart[$id])) {
-            $cart[$id] = 1;
+            $cart[$id] = $qty;
         } else {
-            $cart[$id]++;
+            $cart[$id] += $qty;
         }
 
         $this->session->set('cart', $cart);

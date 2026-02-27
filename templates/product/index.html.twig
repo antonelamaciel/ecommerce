@@ -277,7 +277,7 @@
                             
                             <div class="pcard__img-wrap">
                                 <a href="{{ path('product_show', {slug: product.slug}) }}">
-                                    <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}">
+                                    <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" data-extra-images="{{ product.images|default([])|json_encode }}">
                                 </a>
                             </div>
 
