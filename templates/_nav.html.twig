@@ -1,506 +1,733 @@
 <nav class="navbar-custom fixed-top">
-    <div class="navbar-inner my-2">
+    <div class="navbar-inner">
 
-        <!-- Hamburguesa para Móvil -->
-        <input type="checkbox" id="nav-toggle" class="nav-toggle-checkbox d-none">
-        <label for="nav-toggle" class="nav-toggle-label d-lg-none">
-            <i class="bi bi-list fs-1 text-white"></i>
-        </label>
+        <!-- IZQUIERDA: HAMBURGUESA (mobile) -->
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menú" type="button">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
 
-        <!-- IZQUIERDA: LOGO -->
+        <!-- LOGO -->
         <a class="navbar-brand-custom" href="{{ path('home') }}">
             {% if personalize and personalize.logo %}
-                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" height="64" class="navbar-logo">
+                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" class="navbar-logo">
             {% else %}
                 <span class="brand-text">{{ personalize.companyName ?? 'Empresa' }}</span>
             {% endif %}
         </a>
 
-        <!-- MENÚ COLAPSABLE (CENTRO + DERECHA) -->
-        <div class="navbar-collapsible">
-            
-            <!-- CENTRO: CATEGORÍAS + BUSCADOR -->
-            <div class="navbar-center">
-                <form action="{{ path('product') }}" method="GET" class="search-wrapper">
-                    <div class="search-modern-custom">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="search" name="string" placeholder="Buscar productos…" autocomplete="off">
-                    </div>
-                </form>
-                
-                <div class="dropdown">
-                    <button class="nav-pill-btn"
-                            type="button"
-                            id="dropdownMenuCategories"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false">
-                        <span>Categorías</span>
-                        <i class="bi bi-chevron-down dropdown-arrow-icon"></i>
-                    </button>
-
-                    <div class="dropdown-menu dropdown-menu-styled shadow-xl dropdown-animated"
-                         aria-labelledby="dropdownMenuCategories">
-                        <a class="dropdown-item dropdown-item-styled fw-semibold" href="{{ path('product') }}">
-                            <b>Todas las categorías</b>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        {% for category in allCategories %}
-                            <a class="dropdown-item dropdown-item-styled"
-                               href="{{ path('product', {'categories[]': category.id}) }}">
-                                <i class="bi bi-tag me-2 opacity-50 mx-2"></i>{{ category.name }}
-                            </a>
-                        {% endfor %}
-                    </div>
+        <!-- CENTRO: BUSCADOR + CATEGORÍAS -->
+        <div class="navbar-center">
+            <form action="{{ path('product') }}" method="GET" class="search-wrapper">
+                <div class="search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="search" name="string" placeholder="Buscar…" autocomplete="off">
                 </div>
-                <div class="navbar-right">
+            </form>
+            <button class="search-toggle-btn" id="searchToggle" aria-label="Buscar" type="button">
+                <i class="bi bi-search"></i>
+            </button>
 
-                {% if app.user %}
-                    <div class="dropdown">
-                        <a class="nav-user-btn text-white"
-                           href="#"
-                           role="button"
-                           data-toggle="dropdown"
-                           aria-haspopup="true"
-                           aria-expanded="false">
-                            <div class="user-avatar">{{ app.user.firstname|slice(0,1)|upper }}</div>
-                            <span class="ms-2 user-name-label">{{ app.user.firstname }}</span>
-                            <i class="bi bi-chevron-down dropdown-arrow-icon ms-auto"></i>
-                        </a>
+            <div class="search-overlay" id="searchOverlay">
+                <form action="{{ path('product') }}" method="GET" class="search-overlay-form">
+                    <i class="bi bi-search search-overlay-icon"></i>
+                    <input type="search" name="string" id="searchOverlayInput"
+                        placeholder="Buscar…" autocomplete="off">
+                    <button type="button" class="search-close-btn" id="searchClose">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </form>
+            </div>
 
-                        <ul class="dropdown-menu dropdown-menu-right dropdown-menu-styled shadow-xl dropdown-animated">
-                            <li class="dropdown-user-header">
-                                <div class="user-avatar user-avatar-lg">{{ app.user.firstname|slice(0,1)|upper }}</div>
-                                <div>
-                                    <div class="fw-semibold">{{ app.user.firstname }}</div>
-                                    <small class="text-muted">Mi cuenta</small>
-                                </div>
-                            </li>
-                            <li><div class="dropdown-divider"></div></li>
-                            <li><a class="dropdown-item dropdown-item-styled" href="{{ path('account') }}"><i class="mx-2 bi bi-person me-2"></i>Mi Perfil</a></li>
-                            <li><a class="dropdown-item dropdown-item-styled" href="{{ path('account_orders') }}"><i class="mx-2 bi bi-bag-check me-2"></i>Mis Pedidos</a></li>
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <li><div class="dropdown-divider"></div></li>
-                                <li><a class="dropdown-item dropdown-item-styled" href="/admin"><i class="mx-2 bi bi-speedometer2 me-2"></i>Administración</a></li>
-                            {% endif %}
-                            <li><div class="dropdown-divider"></div></li>
-                            <li><a class="dropdown-item dropdown-item-styled text-danger" href="{{ path('app_logout') }}"><i class="mx-2 bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
-                        </ul>
-                    </div>
-                {% else %}
-                    <a class="btn-login" href="{{ path('app_login') }}">
-                        <i class="bi bi-person me-2"></i>
-                        <span>Ingresar</span>
+            <div class="dropdown desktop-categories">
+                <button class="nav-pill-btn categories-btn" type="button"
+                        id="dropdownMenuCategories"
+                        data-toggle="dropdown"
+                        data-display="static"
+                        aria-haspopup="true"
+                        aria-expanded="false">
+                    <i class="bi bi-tags categories-icon-mobile"></i>
+                    <span class="categories-label">Productos</span>
+                    <i class="bi bi-chevron-down arrow-icon categories-arrow"></i>
+                </button>
+                <div class="dropdown-menu nav-dropdown shadow-xl dropdown-animated"
+                     aria-labelledby="dropdownMenuCategories">
+                    <a class="nav-dropdown-item fw-semibold" href="{{ path('product') }}">
+                        <b>Categorías de productos</b>
                     </a>
-                {% endif %}
-
-                <a href="{{ path('cart') }}" class="cart-btn text-white" aria-label="Ver carrito">
-                    <div class="cart-icon-wrapper">
-                        <i class="bi bi-bag fs-5"></i>
-                        {% if cartCount > 0 %}
-                            <span class="cart-badge-custom">{{ cartCount }}</span>
-                        {% endif %}
-                    </div>
-                    <span class="ms-3 d-lg-none">Carrito</span>
-                </a>
+                    <div class="dropdown-divider"></div>
+                    {% for category in allCategories %}
+                        <a class="nav-dropdown-item" href="{{ path('product', {'categories[]': category.id}) }}">
+                            <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
+                        </a>
+                    {% endfor %}
+                </div>
             </div>
-            </div>
-
-            
         </div>
+
+        <!-- DERECHA: USUARIO + CARRITO -->
+        <div class="navbar-right">
+            {% if app.user %}
+                <div class="dropdown desktop-user">
+                    <a class="nav-user-btn" href="#" role="button"
+                       data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                        <div class="user-avatar"><i class="bi bi-person"></i></div>
+                        <span class="user-name">{{ app.user.firstname }}</span>
+                        <i class="bi bi-chevron-down arrow-icon"></i>
+                    </a>
+                    <ul class="dropdown-menu nav-dropdown shadow-xl dropdown-animated dropdown-menu-right">
+                        <li class="dropdown-user-header">
+                            <div class="user-avatar user-avatar-lg"><i class="bi bi-person"></i></div>
+                            <div>
+                                <div class="fw-semibold">{{ app.user.firstname }}</div>
+                                <small class="text-muted">Mi cuenta</small>
+                            </div>
+                        </li>
+                        <li><div class="dropdown-divider"></div></li>
+                        <li><a class="nav-dropdown-item" href="{{ path('account') }}"><i class="bi bi-person me-2"></i>Mi Perfil</a></li>
+                        <li><a class="nav-dropdown-item" href="{{ path('account_orders') }}"><i class="bi bi-bag-check me-2"></i>Mis Pedidos</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><div class="dropdown-divider"></div></li>
+                            <li><a class="nav-dropdown-item" href="/admin"><i class="bi bi-speedometer2 me-2"></i>Administración</a></li>
+                        {% endif %}
+                        <li><div class="dropdown-divider"></div></li>
+                        <li><a class="nav-dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <a class="btn-login desktop-login" href="{{ path('app_login') }}">
+                    <i class="bi bi-person me-1"></i><span class="btn-login-label">Ingresar</span>
+                </a>
+            {% endif %}
+
+            <a href="{{ path('cart') }}" class="cart-btn" aria-label="Ver carrito">
+                <i class="bi bi-bag fs-5"></i>
+                {% if cartCount > 0 %}
+                    <span class="cart-badge">{{ cartCount }}</span>
+                {% endif %}
+            </a>
+        </div>
+
     </div>
 </nav>
 
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer-overlay" id="drawerOverlay"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+        <span class="drawer-title">Menú</span>
+        <button class="drawer-close-btn" id="drawerClose" aria-label="Cerrar menú">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="drawer-body">
+
+        <!-- SECCIÓN USUARIO -->
+        <div class="drawer-section">
+            <div class="drawer-section-title">
+                <i class="bi bi-person-circle me-2"></i>
+                {% if app.user %}{{ app.user.firstname }}{% else %}Mi Cuenta{% endif %}
+            </div>
+            <div class="drawer-section-content">
+                {% if app.user %}
+                    <a class="drawer-item" href="{{ path('account') }}"><i class="bi bi-person me-2"></i>Mi Perfil</a>
+                    <a class="drawer-item" href="{{ path('account_orders') }}"><i class="bi bi-bag-check me-2"></i>Mis Pedidos</a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="drawer-divider"></div>
+                        <a class="drawer-item" href="/admin"><i class="bi bi-speedometer2 me-2"></i>Administración</a>
+                    {% endif %}
+                    <div class="drawer-divider"></div>
+                    <a class="drawer-item drawer-item-danger" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a>
+                {% else %}
+                    <a class="drawer-item" href="{{ path('app_login') }}"><i class="bi bi-box-arrow-in-right me-2"></i>Ingresar</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SECCIÓN CATEGORÍAS -->
+        <div class="drawer-section">
+            <div class="drawer-section-title">
+                <i class="bi bi-tags me-2"></i>Categorías
+            </div>
+            <div class="drawer-section-content">
+                <a class="drawer-item fw-semibold" href="{{ path('product') }}">
+                    <i class="bi bi-grid me-2"></i><b>Todas las categorías</b>
+                </a>
+                <div class="drawer-divider"></div>
+                {% for category in allCategories %}
+                    <a class="drawer-item" href="{{ path('product', {'categories[]': category.id}) }}">
+                        <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <style>
-/* =============================================
-   NAVBAR BASE & DESKTOP
-   ============================================= */
+/* ── Base ── */
 .navbar-custom {
-    background: var(--primary-color) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    background: var(--primary-color);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 4px 24px rgba(0,0,0,.15);
     z-index: 1030;
 }
 .navbar-inner {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 2rem;
+    gap: 1.25rem;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0.65rem 2rem;
+    padding: .65rem 2rem;
 }
 
-.navbar-collapsible {
-    display: flex;
+/* Desktop: logo a la izquierda, items a la derecha */
+@media (min-width: 992px) {
+    .navbar-center {
+        margin-left: auto;
+    }
+}
+
+/* ── Hamburguesa (oculto en desktop) ── */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.navbar-brand-custom {
-    text-decoration: none;
+    gap: 5px;
+    width: 44px; height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 0;
     flex-shrink: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    display: flex;
-    align-items: center;
+    transition: background .2s;
 }
-.navbar-brand-custom:hover { opacity: 0.8; transform: scale(1.02); }
-.navbar-logo {
-    border-radius: 50%;
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+.hamburger-btn:hover { background: rgba(255,255,255,.15); }
+.hamburger-btn:active { background: rgba(255,255,255,.12); }
+.hamburger-line {
+    display: block;
+    width: 22px; height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform .25s, opacity .2s;
 }
-.brand-text { font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
+.hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* ── Logo ── */
+.navbar-brand-custom {
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: opacity .2s, transform .2s;
+}
+.navbar-brand-custom:hover { opacity: .8; transform: scale(1.02); }
+.navbar-logo {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,.2);
+    display: block;
+}
+.brand-text { font-size: 1.5rem; font-weight: 800; color: #fff; }
+
+/* ── Centro ── */
 .navbar-center {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: .75rem;
 }
-
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    flex-shrink: 0;
-}
-
-.search-wrapper { width: 350px; min-width: 0; }
-.search-modern-custom { position: relative; display: flex; align-items: center; }
+.search-wrapper { width: 260px; }
+.search-box { position: relative; display: flex; align-items: center; }
 .search-icon {
-    position: absolute; left: 14px;
-    color: rgba(255, 255, 255, 0.7); 
-    font-size: 0.9rem;
+    position: absolute; left: 11px;
+    color: rgba(255,255,255,.65); font-size: .78rem;
     pointer-events: none;
-    transition: color 0.2s;
 }
-.search-modern-custom input {
+.search-box input {
     width: 100%;
-    padding: 0.55rem 1rem 0.55rem 2.6rem;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Misma altura que .nav-pill-btn: padding .5rem + line-height 1.25 + font .875rem = ~34px */
+    padding: .63rem .85rem .63rem 2.1rem;
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.12);
     border-radius: 999px;
-    font-size: 0.9rem;
-    color: #fff;
+    color: #fff; font-size: .875rem; line-height: 1.25;
     outline: none;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background .2s, border-color .2s;
+}
+.search-box input::placeholder { color: rgba(255,255,255,.5); }
+.search-box input:focus {
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.28);
 }
 
+/* ── Botón Categorías (desktop) ── */
 .nav-pill-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.12);
     color: #fff;
     border-radius: 999px;
-    padding: 0.5rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: .5rem 1.15rem;
+    font-size: .875rem; font-weight: 600;
+    white-space: nowrap; cursor: pointer;
+    transition: background .2s;
+}
+.nav-pill-btn:hover, .dropdown.show .nav-pill-btn {
+    background: rgba(255,255,255,.25);
 }
 
+/* ── Derecha (usuario + carrito) ── */
+.navbar-right {
+    display: flex; align-items: center;
+    gap: .6rem;
+}
+
+/* Usuario */
 .nav-user-btn {
-    display: flex; align-items: center; gap: 0.6rem;
+    display: flex; align-items: center; gap: .5rem;
     text-decoration: none; color: #fff;
     border-radius: 999px;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
+    padding: .5rem 0.5rem;
     border: 1px solid transparent;
-    font-size: 0.9rem; font-weight: 600;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: .9rem; font-weight: 600;
+    transition: background .2s;
 }
-
-.cart-btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: 50%;
-    color: #fff; border: 1px solid transparent; text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.nav-user-btn:hover, .dropdown.show .nav-user-btn {
+    background: rgba(255,255,255,.15);
+    border-color: rgba(255,255,255,.12);
 }
-
-.cart-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cart-badge-custom {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    background: #fff;
-    color: var(--primary-color);
-    font-size: 0.75rem;
-    font-weight: 900;
-    min-width: 19px;
-    height: 19px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2px;
-    border: 2px solid var(--primary-color);
-    line-height: 1;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    z-index: 5;
-}
-
 .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #fff;
-    color: var(--primary-color);
-    font-size: 0.85rem;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: #fff;
 }
-
-.user-avatar-lg {
-    width: 44px;
-    height: 44px;
-    font-size: 1.1rem;
-}
-
+.user-avatar-lg { width: 44px; height: 44px; font-size: 1.2rem; }
 .dropdown-user-header {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 1rem 1.25rem;
-    list-style: none;
+    display: flex; align-items: center; gap: .85rem;
+    padding: 1rem 1.25rem; list-style: none;
 }
 
-/* =============================================
-   DROPDOWNS & ANIMATIONS
-   ============================================= */
-.dropdown-menu-styled {
-    border: 1px solid rgba(0,0,0,0.05) !important;
-    border-radius: 16px !important;
-    padding: 0.6rem !important;
-    min-width: 240px;
-    margin-top: 10px !important;
-    overflow: hidden;
-    z-index: 1050;
-}
-
-.dropdown-item-styled {
-    border-radius: 10px;
-    font-size: 0.9rem;
-    padding: 0.6rem 1rem !important;
-    color: #4b5563;
-    transition: all 0.2s ease;
+/* Login */
+.btn-login {
     display: flex; align-items: center;
+    text-decoration: none; color: #fff;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+    padding: .45rem 1.1rem;
+    font-size: .875rem; font-weight: 600;
+    white-space: nowrap;
+    transition: background .2s, color .2s;
+}
+.btn-login:hover { background: #fff; color: var(--primary-color); }
+
+/* Carrito */
+.cart-btn {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 50%;
+    color: #fff; text-decoration: none;
+    border: 1px solid transparent;
+    transition: background .2s;
+}
+.cart-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+.cart-badge {
+    position: absolute; top: 1px; right: 1px;
+    background: #fff; color: var(--primary-color);
+    font-size: .63rem; font-weight: 900;
+    min-width: 17px; height: 17px;
+    border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 3px;
+    border: 1.5px solid var(--primary-color);
+}
+
+/* ── Dropdown ── */
+.navbar-center .dropdown,
+.navbar-right .dropdown {
+    position: relative;
+}
+
+.nav-dropdown {
+    border: 1px solid rgba(0,0,0,.06) !important;
+    border-radius: 14px !important;
+    padding: .5rem !important;
+    min-width: 220px;
+    margin-top: 0 !important;
+    z-index: 1050;
+    overflow: hidden;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: auto !important;
+}
+
+/* Dropdown usuario: alineado a la derecha del botón */
+.dropdown-menu-right.nav-dropdown {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.nav-user-btn, .cart-btn, .btn-login, .categories-btn, .search-toggle-btn {
+    outline: none !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease;
+}
+.nav-user-btn:active, .cart-btn:active, .btn-login:active,
+.categories-btn:active, .search-toggle-btn:active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+*:focus { outline: none !important; }
+
+.nav-dropdown-item {
+    display: flex; align-items: center;
+    border-radius: 9px;
+    padding: .6rem 1rem;
+    font-size: .875rem; color: #374151;
+    text-decoration: none;
+    transition: background .15s, color .15s, transform .15s;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
 }
+.nav-dropdown-item span,
+.nav-dropdown-item b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.nav-dropdown-item:hover { background: #f3f4f6; color: #111; transform: translateX(3px); }
+.nav-dropdown-item.text-danger:hover { background: #fef2f2; color: #ef4444; }
+.shadow-xl { box-shadow: 0 16px 48px rgba(0,0,0,.14) !important; }
+.arrow-icon { font-size: .75rem; opacity: .7; transition: transform .25s; }
+.dropdown.show .arrow-icon { transform: rotate(180deg); opacity: 1; }
 
 @media (min-width: 992px) {
     .dropdown-animated {
         display: block !important;
-        visibility: hidden;
-        opacity: 0;
-        transform: translateY(-10px) scale(0.96);
+        visibility: hidden; opacity: 0;
+        transform: translateY(-8px) scale(.97);
         pointer-events: none;
-        transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
+        transition: opacity .2s, transform .2s cubic-bezier(.16,1,.3,1), visibility .2s;
     }
     .dropdown.show .dropdown-animated {
-        visibility: visible;
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: auto;
+        visibility: visible; opacity: 1;
+        transform: none; pointer-events: auto;
     }
+    .search-toggle-btn { display: none !important; }
+    .categories-icon-mobile { display: none !important; }
 }
 
-/* =============================================
-   ESTILOS RESPONSIVE (MÓVIL) - AL FINAL PARA PRIORIDAD
-   ============================================= */
+/* ══════════════════════════════
+   SEARCH OVERLAY (mobile)
+══════════════════════════════ */
+.search-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 2000;
+    padding: .75rem 1rem;
+    background: var(--primary-color);
+    border-bottom: 1px solid rgba(255,255,255,.15);
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    animation: slideDown .2s cubic-bezier(.16,1,.3,1);
+}
+.search-overlay.active { display: block; }
+.search-overlay-form {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.search-overlay-icon {
+    color: rgba(255,255,255,.6);
+    font-size: .9rem; flex-shrink: 0;
+}
+.search-overlay-form input {
+    flex: 1;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    padding: .55rem 1rem;
+    color: #fff; font-size: .95rem;
+    outline: none;
+}
+.search-overlay-form input::placeholder { color: rgba(255,255,255,.5); }
+.search-close-btn {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; cursor: pointer; flex-shrink: 0;
+    transition: background .2s;
+}
+.search-close-btn:hover { background: rgba(255,255,255,.28); }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════
+   MOBILE DRAWER
+══════════════════════════════ */
+.mobile-drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 1040;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity .3s;
+}
+.mobile-drawer-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.mobile-drawer {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 300px;
+    background: #fff;
+    z-index: 1050;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(.16,1,.3,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 8px 0 40px rgba(0,0,0,.2);
+}
+.mobile-drawer.active {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: var(--primary-color);
+    flex-shrink: 0;
+}
+.drawer-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+}
+.drawer-close-btn {
+    background: rgba(255,255,255,.15);
+    border: none;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s;
+    font-size: .9rem;
+}
+.drawer-close-btn:hover { background: rgba(255,255,255,.28); }
+
+.drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: .75rem 0;
+}
+
+/* Sección del drawer (siempre expandida) */
+.drawer-section {
+    margin-bottom: .25rem;
+}
+
+.drawer-section-title {
+    display: flex;
+    align-items: center;
+    padding: .75rem 1.25rem .5rem;
+    font-size: .7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #9ca3af;
+}
+
+.drawer-section-content {
+    /* Siempre visible, sin colapso */
+}
+
+.drawer-item {
+    display: flex;
+    align-items: center;
+    padding: .65rem 1.25rem;
+    font-size: .9rem;
+    color: #374151;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+    border-radius: 0;
+}
+.drawer-item:hover {
+    background: #f3f4f6;
+    color: #111;
+}
+.drawer-item.fw-semibold { font-weight: 600; }
+.drawer-item-danger { color: #ef4444 !important; }
+.drawer-item-danger:hover { background: #fef2f2 !important; }
+
+.drawer-divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin: .35rem 1.25rem;
+}
+
+/* ══════════════════════════════
+   MOBILE  ≤ 991px
+══════════════════════════════ */
 @media (max-width: 991px) {
     .navbar-inner {
-        padding: 0.5rem 1.25rem;
-        justify-content: space-between !important;
-    }
-    
-    .navbar-logo { width: 48px; height: 48px; }
-
-    .navbar-collapsible {
-        position: fixed;
-        top: 80px; left: 0; width: 100%; height: calc(100vh - 80px);
-        background: var(--primary-color);
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        padding: 2rem 1.5rem; 
-        gap: 1rem; /* ESPACIADO ENTRE BLOQUES PRINCIPALES */
-        transform: translateX(-100%);
-        visibility: hidden;
-        overflow-y: auto;
-        z-index: 1040;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
-    }
-
-    #nav-toggle:checked ~ .navbar-collapsible {
-        transform: translateX(0);
-        visibility: visible;
-    }
-
-    /* CONTENEDOR CENTRAL: BUSCADOR + CATEGORÍAS */
-    .navbar-center {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        gap: 1rem !important; /* AIRE ENTRE BUSCADOR Y CATEGORÍAS */
-    }
-    
-    .search-wrapper {
-        order: 1;
-        width: 100% !important;
-        margin: 0 !important;
-    }
-    
-    .navbar-center .dropdown {
-        order: 2;
-        width: 100% !important;
-        margin: 0 !important;
-    }
-
-    .search-modern-custom input {
-        border-radius: 16px !important; /* REDONDEADO COMPLETO */
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        height: 54px;
-        width: 100% !important;
-    }
-
-    .nav-pill-btn {
-        width: 100% !important;
-        height: 54px;
-        border-radius: 16px !important; /* REDONDEADO COMPLETO */
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        background: rgba(255, 255, 255, 0.15) !important;
-        justify-content: center;
-        font-size: 1rem;
-    }
-
-    .dropdown.show .nav-pill-btn {
-        border-radius: 16px 16px 0 0 !important; /* Solo plano abajo si está abierto */
-    }
-
-    /* CONTENEDOR DERECHO: USUARIO + CARRITO */
-    .navbar-right {
-        order: 3;
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        margin-top: 0 !important;
-        background: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        gap: 1rem !important; /* AIRE ENTRE USUARIO Y CARRITO */
-    }
-    
-    .navbar-right > .dropdown,
-    .navbar-right > .cart-btn {
-        flex: 1 !important;
-        height: 60px;
+        padding: .5rem 1rem;
+        gap: .5rem;
         display: flex;
-        justify-content: center;
         align-items: center;
-        border-radius: 14px !important;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        margin: 0 !important;
     }
 
-    .navbar-right > .cart-btn:active,
-    .navbar-right > .dropdown.show {
-        background: rgba(255,255,255,0.12);
+    .hamburger-btn { display: flex; order: 1; }
+
+    /* Logo solo a la derecha */
+    .navbar-brand-custom {
+        margin-left: auto;
+        order: 10;
+    }
+    .navbar-logo { width: 38px; height: 38px; }
+
+    /* Centro: icono búsqueda pegado a hamburguesa */
+    .navbar-center {
+        order: 3;
+        flex: 0 0 auto;
+        gap: 0;
     }
 
-    .navbar-right i {
-        font-size: 1.5rem !important;
+    /* Carrito junto al grupo izquierdo */
+    .navbar-right {
+        order: 2;
+        gap: 0;
     }
 
-    .user-avatar {
-        width: 36px !important;
-        height: 36px !important;
-        background: #fff !important;
-        color: var(--primary-color) !important;
-        font-size: 1rem !important;
-        border: 2px solid rgba(255,255,255,0.2) !important;
-        border-radius: 50% !important;
+    /* Ocultar elementos desktop en mobile */
+    .search-wrapper,
+    .user-name,
+    .arrow-icon,
+    .btn-login-label,
+    .categories-label,
+    .categories-arrow,
+    .desktop-categories,
+    .desktop-user,
+    .desktop-login { 
+        display: none !important; 
     }
 
-    .btn-login, .nav-user-btn, .cart-btn {
-        width: 100% !important;
-        height: 54px !important;
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 16px !important; /* FORMA REDONDEADA */
-        padding: 0 1.5rem !important;
+    /* Iconos modo móvil */
+    .cart-btn,
+    .search-toggle-btn {
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 12px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: center !important; /* TEXTO CENTRADO */
+        justify-content: center !important;
         color: #fff !important;
-        text-decoration: none;
+    }
+    .cart-btn:active, .search-toggle-btn:active {
+        background: rgba(255,255,255,.12) !important;
     }
 
-    .dropdown.show .nav-user-btn {
-        border-radius: 16px 16px 0 0 !important;
+    /* Search overlay en mobile */
+    .search-overlay {
+        left: 1rem !important;
+        right: 1rem !important;
+        width: calc(100% - 2rem) !important;
+        top: 8px !important;
+        border-radius: 16px !important;
+        padding: 0.5rem 1rem !important;
     }
-
-    .navbar-collapsible .dropdown-menu-styled {
-        position: static !important;
-        width: 100% !important; 
-        max-width: none !important;
-        margin: 0 !important; 
-        display: none;
-        background: #fff !important;
-        border-radius: 0 0 16px 16px !important;
-        padding: 0.5rem !important;
-        box-shadow: none !important;
-        border: 1px solid rgba(0,0,0,0.1) !important;
-        border-top: none !important;
-        transform: none !important;
-        top: 0 !important;
-    }
-
-    /* El dropdown del usuario debe ser absoluto para no romper la fila 50/50 */
-    .navbar-right .dropdown-menu-styled {
-        position: absolute !important;
-        top: 100% !important;
-        left: 0 !important;
-        width: 100% !important;
-        margin-top: 0 !important; /* Pegado total inferior */
-        border-radius: 0 0 16px 16px !important;
-        border: 1px solid #eee !important;
-        border-top: none !important;
-        z-index: 2000;
-        transform: none !important;
-    }
-
-    .navbar-collapsible .dropdown.show .dropdown-menu-styled {
-        display: block !important;
-    }
-
-    .navbar-collapsible .dropdown-item-styled {
-        font-size: 0.8rem !important;
-        padding: 0.6rem 0.75rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-    
-    .user-name-label { display: none; }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Search overlay ── */
+    const searchToggle = document.getElementById('searchToggle');
+    const searchClose = document.getElementById('searchClose');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchOverlayInput');
+
+    if (searchToggle && searchOverlay) {
+        searchToggle.addEventListener('click', function () {
+            searchOverlay.classList.add('active');
+            setTimeout(() => { if (searchInput) searchInput.focus(); }, 100);
+        });
+    }
+    if (searchClose && searchOverlay) {
+        searchClose.addEventListener('click', function () {
+            searchOverlay.classList.remove('active');
+        });
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && searchOverlay && searchOverlay.classList.contains('active')) {
+            searchOverlay.classList.remove('active');
+        }
+    });
+
+    /* ── Mobile Drawer ── */
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+
+    function openDrawer() {
+        mobileDrawer.classList.add('active');
+        drawerOverlay.classList.add('active');
+        hamburgerBtn.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        mobileDrawer.classList.remove('active');
+        drawerOverlay.classList.remove('active');
+        hamburgerBtn.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && mobileDrawer && mobileDrawer.classList.contains('active')) {
+            closeDrawer();
+        }
+    });
+
+    /* ── Hover highlight (desktop) ── */
+    const items = ['.nav-user-btn', '.cart-btn', '.btn-login', '.search-toggle-btn', '.categories-btn'];
+    items.forEach(sel => {
+        document.querySelectorAll(sel).forEach(el => {
+            el.addEventListener('mousedown', () => el.style.backgroundColor = 'rgba(255,255,255,0.12)');
+            el.addEventListener('mouseup', () => el.style.backgroundColor = '');
+            el.addEventListener('mouseleave', () => el.style.backgroundColor = '');
+        });
+    });
+});
+</script>
