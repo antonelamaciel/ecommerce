@@ -12,6 +12,7 @@
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #7c7772;
+    --c-accent: #2563eb;
     --radius: 20px;
     --radius-sm: 12px;
     --shadow: 0 4px 20px rgba(0,0,0,.03);
@@ -29,95 +30,306 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Sidebar Filters ── */
+  /* ── SIDEBAR FILTERS - MODERN MINIMAL DESIGN ── */
   .shop-sidebar {
-    background: var(--c-surface);
-    border-radius: var(--radius);
+    background: #ffffff;
     padding: 2rem;
-    border: 1px solid var(--c-border);
-    box-shadow: var(--shadow);
+    border-radius: 16px;
+    border: 1px solid #ececec;
     position: sticky;
     top: 100px;
   }
+
+  .filter-header {
+    margin-bottom: .2rem;
+    padding-bottom: 1.25rem;
+  }
+
   .filter-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    letter-spacing: -0.02em;
-  }
-  /* Style symfony filters */
-  .shop-sidebar form div { margin-bottom: 1rem; }
-  .shop-sidebar form label { 
-    display: block; 
-    font-size: 0.85rem; 
-    font-weight: 600; 
-    color: var(--c-muted); 
-    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    margin: 0 0 0.5rem 0;
+    color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
-  .shop-sidebar input, .shop-sidebar select {
+
+  .active-filters-badge {
+    display: inline-block;
+    background: #000;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  /* Filter Sections */
+  .filter-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .filter-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .shop-sidebar form label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Search Input */
+  .shop-sidebar input[type="text"],
+  .shop-sidebar input[type="search"] {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--c-border);
+    padding: 0.8rem 1rem;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
     outline: none;
-    transition: var(--transition);
+    transition: all 0.2s ease;
+    background: #fafafa;
+    font-size: 0.9rem;
+    font-family: var(--font-main);
+    color: var(--c-ink);
   }
-  .shop-sidebar input:focus { border-color: var(--c-ink); }
+
+  .shop-sidebar input[type="text"]:focus,
+  .shop-sidebar input[type="search"]:focus {
+    border-color: #000;
+    background: #fff;
+  }
+
+  .shop-sidebar input[type="text"]::placeholder {
+    color: #bbb;
+    font-size: 0.875rem;
+  }
+
+  /* Filter Buttons */
+  .filter-buttons {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .btn-filter-submit {
     width: 100%;
-    margin-top: 1rem;
-    background: var(--c-ink);
+    background: #000;
     color: #fff;
     border: none;
-    padding: 0.8rem;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
+    padding: 0.95rem;
+    border-radius: 8px;
+    font-weight: 500;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    letter-spacing: 0.03em;
   }
-  .btn-filter-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  
-  /* ── Categories Checkboxes ── */
-  #categories .form-check {
-    display: flex;
-    justify-content: space-between;
+
+  .btn-filter-submit:hover {
+    background: #2a2a2a;
+  }
+
+  .btn-filter-submit:active {
+    transform: scale(0.98);
+  }
+
+  .btn-clear-filters {
+    width: 100%;
+    background: transparent;
+    color: #999;
+    border: none;
+    padding: 0.6rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-size: 0.8rem;
+  }
+
+  .btn-clear-filters:hover {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  /* ── CATEGORIES - PERFECTLY ALIGNED ── */
+  .category-item {
+    margin-bottom: 0;
+  }
+
+  .category-main-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    flex-direction: row-reverse;
-    padding-left: 0;
-    margin-bottom: 0.8rem;
-    cursor: pointer;
-    transition: var(--transition);
+    padding: 0.75rem 0;
+    gap: 0.75rem;
+    min-height: 40px;
+    border-bottom: 1px solid #f8f8f8;
   }
-  #categories .form-check-input {
-    margin: 0;
-    position: static;
+
+  .category-main-row:hover {
+    background: #fafafa;
+    margin: 0 -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 6px;
+  }
+
+  .category-checkbox-wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 12px;
     cursor: pointer;
+  }
+
+  /* Checkbox Styling */
+  .form-check-input {
     width: 18px;
     height: 18px;
-    border-radius: 4px;
-    border: 1px solid var(--c-border);
-  }
-  #categories .form-check-input:checked {
-    background-color: var(--c-ink);
-    border-color: var(--c-ink);
-  }
-  #categories .form-check-label {
-    flex: 1;
-    margin-right: 1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
     cursor: pointer;
-    text-transform: none;
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: var(--c-ink);
-    letter-spacing: 0;
+    border: 2px solid #d0d0d0;
+    border-radius: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #fff !important;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    
   }
-  #categories .form-check:hover .form-check-label {
-    color: var(--c-muted);
+
+  .form-check-input:hover {
+    border-color: #000;
+  }
+
+  .form-check-input:checked {
+    background-color: #000 !important;
+    border-color: #000;
+  }
+
+  .form-check-input:checked::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  /* Label Styling */
+  .form-check-label {
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    user-select: none;
+    margin-left: 1.5rem;
+  }
+
+  .form-check-input:checked ~ .form-check-label {
+    font-weight: 500;
+    color: #000;
+  }
+
+  /* Toggle Button */
+  .sub-toggle-btn {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    padding: 0.4rem;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+  }
+
+  .sub-toggle-btn:hover {
+    color: #000;
+    background: #f5f5f5;
+  }
+
+  .sub-toggle-btn.active {
+    color: #000;
+  }
+
+  .sub-toggle-btn.active i {
+    transform: rotate(180deg);
+  }
+
+  .sub-toggle-btn i {
+    transition: transform 0.3s ease;
+    font-size: 0.7rem;
+  }
+
+  /* Subcategories */
+  .sub-list {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+    background: #fafafa;
+    margin: 0;
+    border-radius: 8px;
+  }
+
+  .sub-list.show {
+    max-height: 600px;
+    opacity: 1;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .sub-check {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 0.65rem 1rem 0.65rem 1.5rem;
+    cursor: pointer;
+    min-height: 36px;
+    transition: background 0.2s ease;
+  }
+
+  .sub-check:hover {
+    background: #f0f0f0;
+  }
+
+  .sub-check .form-check-input {
+    width: 16px;
+    height: 16px;
+  }
+
+  .sub-check .form-check-label {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .sub-check .form-check-input:checked ~ .form-check-label {
+    color: #000;
+    font-weight: 500;
   }
 
   /* ── Header ── */
@@ -169,27 +381,41 @@
   }
   .pcard:hover .pcard__img { transform: scale(1.08); }
 
-  .pcard__cart-btn {
-    position: absolute;
-    top: 1.25rem; right: 1.25rem;
-    width: 44px; height: 44px;
-    background: #fff;
-    color: var(--secondary-color, var(--c-ink));
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: var(--transition);
-    border: 1px solid var(--c-border);
-    text-decoration: none !important;
+  .pcard__actions {
+    display: flex;
   }
-  .pcard__cart-btn:hover {
+  .pcard__buy-btn {
     background: var(--secondary-color, var(--c-ink));
-    color: #fff;
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-    border-color: var(--secondary-color, var(--c-ink));
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none !important;
+    transition: var(--transition);
+    flex: 1;
+  }
+  .pcard__buy-btn:hover {
+    filter: brightness(1.1);
+  }
+  .pcard__detail-btn {
+    background: var(--c-ink);
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none !important;
+    transition: var(--transition);
+    flex: 1;
+    border-left: 1px solid rgba(255,255,255,0.15);
+  }
+  .pcard__detail-btn:hover {
+    filter: brightness(1.25);
   }
 
   .pcard__body {
@@ -212,6 +438,27 @@
     font-size: 1.2rem; font-weight: 700; color: var(--c-ink);
   }
 
+  /* Mobile Filter Toggle Button */
+  .mobile-filter-toggle {
+    background: var(--c-ink);
+    color: white;
+    border: none;
+    padding: 0.85rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    width: 100%;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .mobile-filter-toggle:hover {
+    opacity: 0.9;
+  }
+  .mobile-filter-toggle i {
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+  }
+
   /* Fade-in */
   @keyframes fadeUp {
     from { opacity:0; transform:translateY(20px); }
@@ -222,6 +469,14 @@
     .col:nth-child({{ i }}){ animation-delay: {{ i * 0.05 }}s; }
   {% endfor %}
 
+  /* Mobile Responsive */
+  @media (max-width: 991px) {
+    .shop-sidebar {
+      position: static;
+      border-radius: 12px;
+    }
+  }
+
   @media (max-width: 767px) {
     .pcard__body {
       padding: 0.5rem 0.75rem 1rem;
@@ -231,29 +486,109 @@
     .pcard__subtitle { font-size: 0.75rem; }
     .pcard__price { font-size: 1rem; }
     .pcard__img-wrap { margin: 0.25rem; }
-    .pcard__cart-btn {
-        width: 32px; height: 32px;
-        top: 0.75rem; right: 0.75rem;
-        font-size: 0.9rem;
+    .pcard__buy-btn, .pcard__detail-btn {
+        padding: 0.7rem 0.25rem;
+        font-size: 0.7rem;
+        letter-spacing: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+    .shop-sidebar {
+      padding: 1.5rem;
+    }
+    .filter-section {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    .category-main-row {
+      padding: 0.65rem 0;
+      min-height: 36px;
+    }
+    .sub-check {
+      padding: 0.6rem 1rem 0.6rem 1.25rem;
     }
   }
 </style>
 
 <div class="container py-5">
     <!-- Mobile Filter Toggle -->
-    <button class="btn btn-dark d-lg-none w-100 mb-4 rounded-pill py-3 fw-bold shadow-sm" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
-        <i class="bi bi-filter-right me-2"></i> Filtrar productos
+    <button class="mobile-filter-toggle d-lg-none mb-4" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+        <i class="bi bi-funnel-fill"></i>
+        <span>Filtrar productos</span>
     </button>
 
     <div class="row g-5">
         <!-- Sidebar -->
         <aside class="col-lg-3">
             <div class="collapse d-lg-block shop-sidebar" id="filterCollapse">
-                <h3 class="filter-title d-none d-lg-block">Personaliza tu búsqueda</h3>
-                <h3 class="filter-title d-lg-none">Filtros</h3>
+                <div class="filter-header">
+                    <h3 class="filter-title">Filtros</h3>
+                </div>
+                
                 {{ form_start(form) }}
-                    {{ form_widget(form) }}
-                    <button type="submit" class="btn-filter-submit">Aplicar filtros</button>
+                    <!-- Search Input -->
+                    <div class="filter-section">
+                        {{ form_label(form.string, 'Buscar') }}
+                        {{ form_widget(form.string, {'attr': {'placeholder': 'Buscar productos...'}}) }}
+                    </div>
+
+                    <!-- Categories Section -->
+                    <div id="filter-categories-container" class="filter-section">
+                        <label class="d-block mb-3">Categorías</label>
+                        {% for catField in form.categories %}
+                            {% set categoryChoice = form.categories.vars.choices[catField.vars.name] %}
+                            {% set categoryObj = categoryChoice.data %}
+                            <div class="category-item" data-category-id="{{ categoryObj.id }}">
+                                <div class="category-main-row" data-target="sub-{{ categoryObj.id }}" style="cursor: pointer;">
+                                    <div class="category-checkbox-wrapper">
+                                        {{ form_widget(catField, {'attr': {'class': 'form-check-input parent-cat-check'}}) }}
+                                        {{ form_label(catField, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                    </div>
+                                    
+                                    {% set hasSubcategories = false %}
+                                    {% for subField in form.subcategories %}
+                                        {% set subChoice = form.subcategories.vars.choices[subField.vars.name] %}
+                                        {% if subChoice.data.category.id == categoryObj.id %}
+                                            {% set hasSubcategories = true %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if hasSubcategories %}
+                                        <button type="button" class="sub-toggle-btn" data-target="sub-{{ categoryObj.id }}">
+                                            <i class="bi bi-chevron-down text-dark"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if hasSubcategories %}
+                                    <div class="sub-list" id="sub-{{ categoryObj.id }}">
+                                        {% for subField in form.subcategories %}
+                                            {% set subChoice = form.subcategories.vars.choices[subField.vars.name] %}
+                                            {% if subChoice.data.category.id == categoryObj.id %}
+                                                <div class="sub-check">
+                                                    {{ form_widget(subField, {'attr': {'class': 'form-check-input sub-cat-check'}}) }}
+                                                    {{ form_label(subField, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {# Hidden rest of form #}
+                    <div class="d-none">
+                        {{ form_rest(form) }}
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="filter-buttons">
+                        <button type="submit" class="btn-filter-submit">Aplicar filtros</button>
+                        <button type="button" class="btn-clear-filters" id="clearFiltersBtn">Limpiar todo</button>
+                    </div>
                 {{ form_end(form) }}
             </div>
         </aside>
@@ -263,7 +598,7 @@
             <header class="shop-header d-flex justify-content-between align-items-end">
                 <div>
                     <h1 class="shop-title">Nuestros productos</h1>
-                    <span class="shop-count">{{ products|length }} items encontrados</span>
+                    <span class="shop-count">{{ products|length }} producto{{ products|length != 1 ? 's' : '' }} encontrado{{ products|length != 1 ? 's' : '' }}</span>
                 </div>
             </header>
             
@@ -271,10 +606,6 @@
                 {% for product in products %}
                     <div class="col mb-3">
                         <article class="pcard">
-                            <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__cart-btn" title="Agregar al carrito">
-                                <i class="bi bi-bag-plus"></i>
-                            </a>
-                            
                             <div class="pcard__img-wrap">
                                 <a href="{{ path('product_show', {slug: product.slug}) }}">
                                     <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" data-extra-images="{{ product.images|default([])|json_encode }}">
@@ -290,6 +621,18 @@
                                     <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
                                 </div>
                             </div>
+                            <div class="pcard__actions">
+                                <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__buy-btn">
+                                    <i class="bi bi-bag-plus d-md-none"></i>
+                                    <span class="d-none d-md-inline">Añadir al carrito</span>
+                                    <span class="d-inline d-md-none">Añadir</span>
+                                </a>
+                                <a href="{{ path('product_show', {slug: product.slug}) }}" class="pcard__detail-btn">
+                                    <i class="bi bi-eye d-md-none"></i>
+                                    <span class="d-none d-md-inline">Ver detalles del producto</span>
+                                    <span class="d-inline d-md-none">Ver</span>
+                                </a>
+                            </div>
                         </article>
                     </div>
                 {% endfor %}
@@ -298,4 +641,177 @@
     </div>
 </div>
   
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ══════════════════════════════════════════════════════════════
+    // TOGGLE SUBCATEGORIES - Solo con el botón chevron
+    // ══════════════════════════════════════════════════════════════
+    const toggleButtons = document.querySelectorAll('.sub-toggle-btn');
+    
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const targetId = this.dataset.target;
+            const subList = document.getElementById(targetId);
+            
+            if (subList) {
+                const isShowing = subList.classList.contains('show');
+                subList.classList.toggle('show');
+                this.classList.toggle('active');
+                
+                // Smooth scroll into view if opening and not visible
+                if (!isShowing) {
+                    setTimeout(() => {
+                        const rect = subList.getBoundingClientRect();
+                        const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+                        if (!isVisible) {
+                            subList.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    }, 100);
+                }
+            }
+        });
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // CHECKBOX INTERACTIONS - Independientes
+    // ══════════════════════════════════════════════════════════════
+    
+    // Permitir que los checkboxes funcionen normalmente
+    const categoryCheckboxWrappers = document.querySelectorAll('.category-checkbox-wrapper');
+    categoryCheckboxWrappers.forEach(wrapper => {
+        wrapper.addEventListener('click', function(e) {
+            // Solo activar checkbox si no se hizo click directamente en él
+            if (e.target.classList.contains('form-check-input')) {
+                return; // Dejar que el checkbox maneje su propio click
+            }
+            
+            e.preventDefault();
+            const checkbox = this.querySelector('.form-check-input');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+    });
+
+    const subChecks = document.querySelectorAll('.sub-check');
+    subChecks.forEach(subCheck => {
+        subCheck.addEventListener('click', function(e) {
+            if (e.target.classList.contains('form-check-input')) {
+                return;
+            }
+            
+            e.preventDefault();
+            const checkbox = this.querySelector('.form-check-input');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // PARENT CATEGORY LOGIC - Desmarcar subcategorías si se desmarca padre
+    // ══════════════════════════════════════════════════════════════
+    const parentCheckboxes = document.querySelectorAll('.parent-cat-check');
+    parentCheckboxes.forEach(check => {
+        check.addEventListener('change', function() {
+            const categoryItem = this.closest('.category-item');
+            const subChecks = categoryItem.querySelectorAll('.sub-cat-check');
+            
+            // Si se desmarca el padre, desmarcar todas las subcategorías
+            if (!this.checked) {
+                subChecks.forEach(sc => sc.checked = false);
+            }
+            
+            updateActiveFiltersCount();
+        });
+    });
+
+    // Cuando cambia una subcategoría, actualizar contador
+    const subCatChecks = document.querySelectorAll('.sub-cat-check');
+    subCatChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            updateActiveFiltersCount();
+        });
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // AUTO-EXPAND SUBCATEGORIES - Si hay alguna seleccionada
+    // ══════════════════════════════════════════════════════════════
+    const subLists = document.querySelectorAll('.sub-list');
+    subLists.forEach(list => {
+        const checks = list.querySelectorAll('.sub-cat-check');
+        let anyChecked = Array.from(checks).some(c => c.checked);
+        
+        if (anyChecked) {
+            list.classList.add('show');
+            const categoryItem = list.closest('.category-item');
+            const toggle = categoryItem.querySelector('.sub-toggle-btn');
+            if (toggle) toggle.classList.add('active');
+        }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // HELPER FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    function updateActiveFiltersCount() {
+        const allCheckedBoxes = document.querySelectorAll('.parent-cat-check:checked, .sub-cat-check:checked');
+        const searchInput = document.querySelector('input[type="text"], input[type="search"]');
+        const hasSearchText = searchInput && searchInput.value.trim().length > 0;
+        
+        const totalFilters = allCheckedBoxes.length + (hasSearchText ? 1 : 0);
+        const badge = document.getElementById('activeFiltersCount');
+        
+        if (totalFilters > 0) {
+            badge.textContent = totalFilters;
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // CLEAR FILTERS BUTTON
+    // ══════════════════════════════════════════════════════════════
+    const clearBtn = document.getElementById('clearFiltersBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            // Desmarcar todos los checkboxes
+            document.querySelectorAll('.form-check-input').forEach(cb => cb.checked = false);
+            
+            // Limpiar campo de búsqueda
+            const searchInput = document.querySelector('input[type="text"], input[type="search"]');
+            if (searchInput) searchInput.value = '';
+            
+            // Cerrar todos los desplegables
+            document.querySelectorAll('.sub-list.show').forEach(list => {
+                list.classList.remove('show');
+            });
+            document.querySelectorAll('.sub-toggle-btn.active').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            updateActiveFiltersCount();
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // INITIAL STATE
+    // ══════════════════════════════════════════════════════════════
+    updateActiveFiltersCount();
+
+    // Update count when search input changes
+    const searchInput = document.querySelector('input[type="text"], input[type="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('input', updateActiveFiltersCount);
+    }
+});
+</script>
 {% endblock %}

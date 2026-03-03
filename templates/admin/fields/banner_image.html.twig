@@ -1,7 +1,13 @@
-{% if field.formattedValue %}
-    <a target="_blank">
-        <img src="{{ field.formattedValue }}" style="max-height: 50px; border-radius: 4px;">
-    </a>
+{# templates/admin/fields/banner_image.html.twig #}
+{% set imageValue = field.value ?: entity.instance.image|default(null) %}
+
+{% if imageValue %}
+    <div class="d-inline-block">
+        <a href="{{ asset('uploads/' ~ imageValue) }}" target="_blank">
+            <img src="{{ asset('uploads/' ~ imageValue) }}" 
+                 style="max-width: 100px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+        </a>
+    </div>
 {% else %}
-    <span class="text-muted">Sin imagen</span>
+    <span class="badge badge-secondary">Sin imagen</span>
 {% endif %}

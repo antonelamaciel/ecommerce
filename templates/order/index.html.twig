@@ -195,8 +195,19 @@
                                 <i class="bi bi-truck"></i>
                                 Elija su transportista
                             </div>
-                            <div class="custom-form-rows">
+                            <div class="custom-form-rows" id="carrier-selection-container">
                                 {{ form_widget(form.carriers) }}
+                            </div>
+
+                            <!-- --- CALCULADOR DE ENVÍOS EN CHECKOUT --- -->
+                            <div id="checkout-shipping-calc" class="mt-4 p-3 rounded-3 border bg-light d-none">
+                                <h6 class="fw-bold small mb-2"><i class="bi bi-calculator me-2"></i>Calcular envío por Código Postal</h6>
+                                <p class="extra-small text-muted mb-3" id="zip-preview">Seleccionando dirección...</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-calculate-checkout">
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    Actualizar cotización
+                                </button>
+                                <div id="checkout-calc-result" class="mt-2 fw-bold text-success small"></div>
                             </div>
 
                             <div class="mt-4">
@@ -204,6 +215,79 @@
                             </div>
                         {{ form_end(form) }}
                     {% endset %}
+
+                    <script>
+                        const userAddresses = {{ addressesJson|raw }};
+                        const storeLocation = {
+                            province: "{{ personalize.province }}",
+                            city: "{{ personalize.city }}",
+                            address: "{{ personalize.address }}"
+                        };
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const carrierRadios = document.querySelectorAll('input[name="order[carriers]"]');
+                            const addressRadios = document.querySelectorAll('input[name="order[addresses]"]');
+                            const calcBox = document.getElementById('checkout-shipping-calc');
+                            const zipPreview = document.getElementById('zip-preview');
+                            const btnCalc = document.getElementById('btn-calculate-checkout');
+                            const resultDiv = document.getElementById('checkout-calc-result');
+                            const btnSubmit = document.querySelector('.btn-order-next');
+
+                            const getSelectedAddress = () => {
+                                for(let r of addressRadios) { if(r.checked) return userAddresses[r.value]; }
+                                return null;
+                            };
+
+                            const updateUI = () => {
+                                let selectedCarrierId = null;
+                                let isLongDistance = false;
+                                
+                                for(let r of carrierRadios) {
+                                    if(r.checked) {
+                                        selectedCarrierId = r.value;
+                                        // Buscamos si la etiqueta contiene "Larga Distancia" (podríamos haber pasado los carriers también)
+                                        const label = r.closest('.form-check').textContent;
+                                        if(label.toLowerCase().includes('larga distancia')) isLongDistance = true;
+                                        break;
+                                    }
+                                }
+
+                                const addr = getSelectedAddress();
+                                if(isLongDistance && addr) {
+                                    calcBox.classList.remove('d-none');
+                                    zipPreview.innerHTML = `Calculando para CP: <b class="text-dark">\${addr.postal}</b> (\${addr.city})`;
+                                    btnSubmit.disabled = !resultDiv.textContent; // Desactivar si no se ha calculado
+                                } else {
+                                    calcBox.classList.add('d-none');
+                                    btnSubmit.disabled = false;
+                                }
+                            };
+
+                            carrierRadios.forEach(r => r.addEventListener('change', updateUI));
+                            addressRadios.forEach(r => r.addEventListener('change', updateUI));
+
+                            btnCalc.addEventListener('click', function() {
+                                const addr = getSelectedAddress();
+                                const spinner = btnCalc.querySelector('.spinner-border');
+                                
+                                spinner.classList.remove('d-none');
+                                btnCalc.disabled = true;
+
+                                // Simulación de cálculo basado en distancia
+                                setTimeout(() => {
+                                    spinner.classList.add('d-none');
+                                    btnCalc.disabled = false;
+                                    
+                                    // Cálculo simplificado: Si es la misma provincia que el local 800, sino 1500
+                                    const basePrice = (addr.city.toLowerCase() === storeLocation.city.toLowerCase()) ? 600 : 1200;
+                                    resultDiv.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Costo estimado: $\${basePrice.toLocaleString('es-AR')},00 ARS`;
+                                    btnSubmit.disabled = false;
+                                }, 1000);
+                            });
+
+                            updateUI();
+                        });
+                    </script>
                     
                     {# 
                        We use raw and manual styling for the Symfony radio outputs 

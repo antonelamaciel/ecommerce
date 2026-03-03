@@ -24,8 +24,10 @@ class ContactController extends AbstractController
             $datas = $form->getData();
             $content = "De parte de : {$datas['firstname']} {$datas['lastname']} <br> Mensaje : {$datas['content']} <br> Email: {$datas['email']}";
             
+            $recipientEmail = ($personalize && $personalize->getEmail()) ? $personalize->getEmail() : 'antonelamaciel2024@gmail.com';
+            
             $mail = new Mail();
-            $success = $mail->send('antonelamaciel2024@gmail.com', 'Antonela', "Nuevo mensaje de contacto - $companyName", $content);
+            $success = $mail->send($recipientEmail, $companyName, "Nuevo mensaje de contacto - $companyName", $content);
 
             if ($success) {
                 $this->addFlash('success_contact', '¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaremos muy pronto.');

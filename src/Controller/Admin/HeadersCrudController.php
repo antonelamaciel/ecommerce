@@ -22,6 +22,7 @@ class HeadersCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Banner')
             ->setEntityLabelInPlural('Banners')
             ->setDefaultSort(['id' => 'DESC'])
+            ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
         ;
     }
     
@@ -33,11 +34,20 @@ class HeadersCrudController extends AbstractCrudController
             TextareaField::new('content', 'Contenido'),
             TextField::new('btnTitle', 'Texto del botón'),
             TextField::new('btnUrl', 'Enlace del botón'),
-            ImageField::new('image')
+            
+            ImageField::new('image', 'Subir/Cambiar Banner')
                 ->setBasePath('uploads/')
                 ->setUploadDir('public/uploads/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
+                ->onlyOnForms(),
+
+            TextField::new('image_preview', 'Banner actual')
+                ->onlyOnForms()
+                ->setFormTypeOption('mapped', false),
+
+            ImageField::new('image', 'Banner')
                 ->setTemplatePath('admin/fields/banner_image.html.twig')
+                ->hideOnForm(),
         ];
     }
     

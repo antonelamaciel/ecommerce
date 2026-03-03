@@ -1,0 +1,497 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Arrepentimiento de compra - {{ personalize.companyName ?? 'Ecommerce' }}{% endblock %}
+
+{% block body %}
+
+<style>
+:root {
+  --primary: {{ personalize.primarycolor ?? '#1a1a1a' }};
+  --surface: #ffffff;
+  --bg-light: #f8fafb;
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --success: #10b981;
+  --error: #ef4444;
+  --radius: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.cancellation-page {
+  padding: 3rem 0;
+}
+
+.cancellation-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.cancellation-header {
+  background: var(--primary);
+  padding: 3rem 2rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.header-title {
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+}
+
+.header-subtitle {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.9;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+/* Info Box */
+.info-box {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+}
+
+.info-icon {
+  font-size: 1.75rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.info-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.info-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Form Styles */
+.cancellation-form {
+  padding: 2.5rem;
+}
+
+.form-intro {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.form-label i {
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: var(--bg-light);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: var(--text);
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  background: var(--surface);
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
+}
+
+/* Submit & Loading Wrapper */
+.submit-wrapper {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 1.1rem 2rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.btn-submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  filter: brightness(1.1);
+}
+
+.btn-submit:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cancel-process {
+  display: none;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-process:hover {
+  background: #fff;
+  color: var(--error);
+  border-color: var(--error);
+}
+
+/* Success Message */
+.success-message {
+  display: none;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.success-message.show {
+  display: block;
+}
+
+.success-icon {
+  width: 70px;
+  height: 70px;
+  background: var(--success);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #065f46;
+  margin-bottom: 0.5rem;
+}
+
+.success-text {
+  color: #065f46;
+  opacity: 0.8;
+  font-size: 1rem;
+}
+
+/* Footer Link */
+.footer-link {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.footer-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.footer-link a:hover {
+  color: var(--primary);
+}
+
+/* Loading State */
+.btn-submit.loading .spinner {
+  display: block;
+}
+
+.spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .cancellation-card { margin: 0 1rem; }
+}
+</style>
+
+<div class="cancellation-page">
+  <div class="container">
+    <div class="cancellation-card">
+      <div class="cancellation-header">
+        <div class="header-icon">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </div>
+        <h4 class="header-title text-white">Solicitud de Arrepentimiento de Compra</h4>
+        <p class="header-subtitle">Gestión de Devoluciones Legales, Según la resolución 424/2020 de la Ley N° 24.240 y 1.110, ponemos a tu disposición el «Botón del Arrepentimiento»</p>
+      </div>
+
+      <div class="cancellation-form-wrapper p-4 p-md-5">
+        <div id="formSection">
+            <div class="info-box mb-4">
+              <div class="info-icon">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div>
+                <h2 class="info-title">Marco Legal</h2>
+                <p class="info-text">
+                  La solicitud tendrá validez si es realizada dentro de los plazos determinados en la <a href="https://www.boletinoficial.gob.ar/detalleAviso/primera/235729/20201005">Resolución 424/2020</a> de la Secretaría de Comercio Interior y no se traten de productos exceptuados como productos personalizados y todos los comprendidos en el <a href="https://leyfacil.com.ar/codigo-civil-y-comercial/articulo-1116/">art. 1116 del Código Civil y Comercial</a>.
+                </p>
+              </div>
+            </div>
+
+            <p class="text-center text-muted mb-4 small fw-500">
+              Ingresa los detalles de tu pedido para comenzar el proceso.
+            </p>
+
+            <form method="POST" action="{{ path('app_cancellation') }}" id="cancellationForm">
+              <div class="row g-3">
+                <div class="col-md-6 text-start">
+                  <div class="form-group">
+                    <label for="name" class="form-label">
+                      <i class="bi bi-person"></i>
+                      Nombre y Apellido
+                    </label>
+                    <input type="text" name="name" id="name" class="form-input" placeholder="Juan Pérez" required>
+                  </div>
+                </div>
+
+                <div class="col-md-6 text-start">
+                  <div class="form-group">
+                    <label for="phone" class="form-label">
+                      <i class="bi bi-telephone"></i>
+                      Teléfono
+                    </label>
+                    <input type="tel" name="phone" id="phone" class="form-input" placeholder="11 1234-5678" required>
+                  </div>
+                </div>
+
+                <div class="col-12 text-start">
+                  <div class="form-group">
+                    <label for="email" class="form-label">
+                      <i class="bi bi-envelope"></i>
+                      Email (con el que se realizo la compra)
+                    </label>
+                    <input type="email" name="email" id="email" class="form-input" placeholder="correo@ejemplo.com" required>
+                  </div>
+                </div>
+
+                <div class="col-12 text-start">
+                  <div class="form-group">
+                    <label for="order_id" class="form-label">
+                      <i class="bi bi-hash"></i>
+                      ID del Pedido
+                    </label>
+                    <input type="text" name="order_id" id="order_id" class="form-input" placeholder="Ej: #10234" required>
+                  </div>
+                </div>
+
+                <div class="col-12 text-start">
+                  <div class="form-group mb-0">
+                    <label for="reason" class="form-label">
+                      <i class="bi bi-chat-left-text"></i>
+                      Detalles: inconveniente, producto(s) a devolver, dirección de retiro, otras observaciones. 
+                    </label>
+                    <textarea name="reason" id="reason" class="form-input" rows="3" placeholder="Tu mensaje..."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="submit-wrapper">
+                <button type="submit" class="btn-submit" id="submitBtn">
+                  <div class="spinner"></div>
+                  <span class="btn-text">Solicitar Devolución</span>
+                </button>
+                <button type="button" class="btn-cancel-process" id="abortBtn">
+                  <i class="bi bi-x-circle me-1"></i> Cancelar envío
+                </button>
+              </div>
+            </form>
+        </div>
+
+        <div class="success-message" id="successMessage">
+          <div class="success-icon">
+            <i class="bi bi-check-lg"></i>
+          </div>
+          <h3 class="success-title">¡Mail enviado con éxito!</h3>
+          <p class="success-text">
+            Hemos recibido tu solicitud. Un representante se pondrá en contacto contigo a la brevedad.
+          </p>
+          <div class="mt-4 pt-2">
+            <a href="{{ path('home') }}" class="btn btn-outline-success border-2 rounded-pill px-4 fw-bold">Volver al inicio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-link">
+      <a href="{{ path('home') }}">
+        <i class="bi bi-arrow-left"></i>
+        Regresar a la tienda
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('cancellationForm');
+  const formSection = document.getElementById('formSection');
+  const submitBtn = document.getElementById('submitBtn');
+  const abortBtn = document.getElementById('abortBtn');
+  const successMessage = document.getElementById('successMessage');
+  const btnText = submitBtn.querySelector('.btn-text');
+  
+  let controller;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // UI Loading State
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    btnText.textContent = 'Procesando devolución...';
+    abortBtn.style.display = 'block';
+
+    // Abort Controller for Cancellation
+    controller = new AbortController();
+    const signal = controller.signal;
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      signal: signal
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        formSection.style.display = 'none';
+        successMessage.classList.add('show');
+        // No redirection as requested
+      } else {
+        alert(data.message || 'Error al enviar la solicitud');
+        resetUI();
+      }
+    })
+    .catch(error => {
+      if (error.name === 'AbortError') {
+        console.log('Envío cancelado por el usuario');
+      } else {
+        console.error('Error:', error);
+        alert('Hubo un error al procesar tu solicitud.');
+      }
+      resetUI();
+    });
+  });
+
+  abortBtn.addEventListener('click', function() {
+    if (controller) {
+      controller.abort();
+      resetUI();
+    }
+  });
+
+  function resetUI() {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    btnText.textContent = 'Solicitar Devolución';
+    abortBtn.style.display = 'none';
+  }
+});
+</script>
+
+{% endblock %}

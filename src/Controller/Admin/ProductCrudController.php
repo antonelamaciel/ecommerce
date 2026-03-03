@@ -9,11 +9,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ProductCrudController extends AbstractCrudController
 {
@@ -25,30 +30,55 @@ class ProductCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions 
     {
         return $actions
-            ->add('index', 'detail')
-            ;
+            ->add('index', 'detail');
     }
 
-  
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name','Nombre'),
+            TextField::new('name', 'Nombre'),
             SlugField::new('slug')->setTargetFieldName('name'),
-            ImageField::new('image', 'Imagen Principal')
+            
+            // --- PORTADA ---
+            ImageField::new('image', 'Subir/Cambiar Portada')
                 ->setBasePath('uploads/')
                 ->setUploadDir('public/uploads/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setRequired(false),
-            ImageField::new('images', 'Otras Imágenes (hasta 10)')
+                ->setRequired(false)
+                ->onlyOnForms(),
+
+            TextField::new('image_preview', 'Portada actual')
+                ->onlyOnForms()
+                ->setTemplatePath('admin/fields/banner_image.html.twig')
+                ->setFormTypeOption('mapped', false),
+
+            ImageField::new('image', 'Portada')
+                ->setTemplatePath('admin/fields/banner_image.html.twig')
+                ->hideOnForm(),
+            
+            // --- GALERÍA ---
+            ImageField::new('images', 'Subir muchas imágenes (Selecciona varias con Ctrl)')
                 ->setBasePath('uploads/')
                 ->setUploadDir('public/uploads/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setFormTypeOption('multiple', true)
-                ->hideOnIndex()
+                ->setFormTypeOptions([
+                    'multiple' => true,
+                    'attr' => ['multiple' => 'multiple']
+                ])
+                ->onlyOnForms()
                 ->setRequired(false),
+
+            TextField::new('images_gallery', 'Fotos actuales en galería')
+                ->onlyOnForms()
+                ->setTemplatePath('admin/fields/product_gallery.html.twig')
+                ->setFormTypeOption('mapped', false),
+            
+            CollectionField::new('images', 'Galería completa')
+                ->setTemplatePath('admin/fields/product_gallery.html.twig')
+                ->hideOnForm(),
+
             TextField::new('subtitle', 'Subtítulo'),
-            TextareaField::new('description')->hideOnIndex(),
+            TextareaField::new('description', 'Descripción')->hideOnIndex(),
             MoneyField::new('price', 'Precio')->setCurrency('ARS'),
             AssociationField::new('category', 'Categoría'),
             AssociationField::new('subcategories', 'Subcategorías')
@@ -63,6 +93,7 @@ class ProductCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Producto')
             ->setEntityLabelInPlural('Productos')
+            ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
         ;
     }
 
@@ -70,48 +101,34 @@ class ProductCrudController extends AbstractCrudController
     {
         return $assets->addHtmlContentToHead(<<<HTML
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        const catInput = document.querySelector('select[name="Product[category]"]');
-        const subInput = document.querySelector('select[name="Product[subcategories][]"]');
-        
-        if (catInput && subInput && subInput.tomselect) {
-            const ts = subInput.tomselect;
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Lógica de Subcategorías ---
+        setTimeout(function() {
+            const catInput = document.querySelector('select[name="Product[category]"]');
+            const subInput = document.querySelector('select[name="Product[subcategories][]"]');
             
-            // Function to load subcategories
-            const loadSubcategories = function(catId, initialLoad = false) {
-                if (!catId) {
-                    ts.clear();
-                    ts.clearOptions();
-                    return;
-                }
-                
-                fetch('/admin/ajax/subcategories/' + catId)
-                    .then(r => r.json())
-                    .then(data => {
-                        const currentValues = ts.getValue();
-                        ts.clearOptions();
-                        ts.addOptions(data);
-                        if (initialLoad) {
-                            ts.setValue(currentValues);
-                        }
-                    });
-            };
-
-            // On change
-            catInput.addEventListener('change', function() {
-                ts.clear();
-                loadSubcategories(this.value, false);
-            });
-            
-            // On load
-            if (catInput.value) {
-                loadSubcategories(catInput.value, true);
+            if (catInput && subInput && subInput.tomselect) {
+                const ts = subInput.tomselect;
+                const loadSubcategories = function(catId, initialLoad = false) {
+                    if (!catId) { ts.clear(); ts.clearOptions(); return; }
+                    fetch('/admin/ajax/subcategories/' + catId)
+                        .then(r => r.json())
+                        .then(data => {
+                            const currentValues = ts.getValue();
+                            ts.clearOptions(); ts.addOptions(data);
+                            if (initialLoad) ts.setValue(currentValues);
+                        });
+                };
+                catInput.addEventListener('change', function() { ts.clear(); loadSubcategories(this.value, false); });
+                if (catInput.value) loadSubcategories(catInput.value, true);
             }
-        }
-    }, 500);
-});
+        }, 500);
+    });
 </script>
+<style>
+    .product-gallery-item img { transition: transform 0.2s; }
+    .product-gallery-item:hover img { transform: scale(1.1); z-index: 10; position: relative; }
+</style>
 HTML
         );
     }

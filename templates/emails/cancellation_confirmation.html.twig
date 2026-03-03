@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Arrepentimiento de compra - {{ personalize.companyName ?? 'Ecommerce' }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header border-0 p-0">
+                    <div class="p-5 text-center" style="background: var(--primary-color, #1a1a1a); color: white;">
+                        <div class="mb-3">
+                            <i class="bi bi-arrow-counterclockwise" style="font-size: 3rem;"></i>
+                        </div>
+                        <h1 class="h2 fw-800 mb-2">Arrepentimiento de compra</h1>
+                        <p class="mb-0 opacity-75 small text-uppercase tracking-widest fw-600">Gestión de Devoluciones</p>
+                    </div>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <div class="d-flex align-items-start gap-3 p-4 mb-5 rounded-4" style="background-color: #f8fafc; border-left: 4px solid var(--primary-color);">
+                        <div class="text-primary mt-1">
+                            <i class="bi bi-shield-check" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-2" style="color: var(--c-ink);">Protección al Consumidor</h5>
+                            <p class="mb-0 text-muted small line-height-relaxed">
+                                Según la resolución 424/2020 de la Ley N° 24.240 y 1.110, ponemos a tu disposición el <strong>«Botón del Arrepentimiento»</strong> para que puedas desistir de tu compra de forma simple y transparente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="text-center mb-5 fw-500" style="color: var(--c-muted);">
+                        Por favor, completa los siguientes datos para que podamos gestionar tu devolución de manera inmediata.
+                    </p>
+
+                    <form method="POST" action="{{ path('app_cancellation') }}" id="cancellationForm">
+                        <div class="row g-4">
+                            <div class="col-md-6 text-start">
+                                <label for="name" class="form-label font-label"><i class="bi bi-person me-2"></i>Nombre y Apellido</label>
+                                <input type="text" name="name" id="name" class="form-control premium-input" placeholder="Tu nombre completo" required>
+                            </div>
+                            <div class="col-md-6 text-start">
+                                <label for="phone" class="form-label font-label"><i class="bi bi-telephone me-2"></i>Teléfono</label>
+                                <input type="tel" name="phone" id="phone" class="form-control premium-input" placeholder="Cod. área + número" required>
+                            </div>
+                            <div class="col-12 text-start">
+                                <label for="email" class="form-label font-label"><i class="bi bi-envelope me-2"></i>Email</label>
+                                <input type="email" name="email" id="email" class="form-control premium-input" placeholder="correo@ejemplo.com" required>
+                            </div>
+                            <div class="col-12 text-start">
+                                <label for="order_id" class="form-label font-label"><i class="bi bi-hash me-2"></i>ID del Pedido</label>
+                                <input type="text" name="order_id" id="order_id" class="form-control premium-input" placeholder="Ej: #10234" required>
+                            </div>
+                            
+                            <div class="col-12 mt-5 text-center">
+                                <button type="submit" class="btn-cancel-submit w-100 py-3 shadow-lg">
+                                    <span class="btn-text">SOLICITAR DEVOLUCIÓN</span>
+                                    <i class="bi bi-send-fill ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-5 text-center fade-in">
+                <a href="{{ path('home') }}" class="text-decoration-none text-muted small fw-500 hover-black transition-all">
+                    <i class="bi bi-house-door me-2"></i>Volver a la tienda principal
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+    .fw-600 { font-weight: 600; }
+    .fw-500 { font-weight: 500; }
+    .tracking-widest { letter-spacing: 0.1em; }
+    .line-height-relaxed { line-height: 1.7; }
+    
+    .font-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--c-muted);
+    }
+
+    .premium-input {
+        padding: 0.85rem 1.25rem;
+        background-color: #f8fafc;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .premium-input:focus {
+        background-color: #fff;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+        outline: none;
+    }
+
+    .btn-cancel-submit {
+        background-color: var(--primary-color, #000);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-cancel-submit:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.1);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+    }
+
+    .btn-cancel-submit:active {
+        transform: translateY(-1px);
+    }
+
+    .hover-black:hover { color: #000 !important; }
+    .transition-all { transition: all 0.3s ease; }
+    .fade-in { animation: fadeIn 0.8s ease-out; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+<script>
+    document.getElementById('cancellationForm').addEventListener('submit', function() {
+        const btn = this.querySelector('button');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>PROCESANDO...';
+        btn.setAttribute('disabled', 'disabled');
+        btn.style.opacity = '0.8';
+    });
+</script>
+{% endblock %}

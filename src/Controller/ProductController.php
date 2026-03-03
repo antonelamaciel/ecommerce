@@ -35,15 +35,17 @@ class ProductController extends AbstractController
     }
 
     #[Route('/articles/{slug}', name: 'product_show')]
-    public function show(ProductRepository $repository, string $slug): Response
+    public function show(ProductRepository $repository, \App\Repository\CarrierRepository $carrierRepository, string $slug): Response
     {
         $product = $repository->findOneBySlug($slug);
+        $carriers = $carrierRepository->findAll();
 
         if (!$product) {
             return $this->redirectToRoute('product');
         }
         return $this->render('product/show.html.twig', [
             'product' => $product,
+            'carriers' => $carriers
         ]);
     }
 }

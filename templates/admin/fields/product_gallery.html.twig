@@ -1,0 +1,20 @@
+{# templates/admin/fields/product_gallery.html.twig #}
+{% set images = field.value ?: entity.instance.images|default([]) %}
+
+{% if images is iterable and images|length > 0 %}
+    <div class="product-gallery-container d-flex flex-wrap gap-2">
+        {% for img in images %}
+            <div class="product-gallery-item">
+                <a href="{{ asset('uploads/' ~ img) }}" target="_blank" class="ea-lightbox-image">
+                    <img src="{{ asset('uploads/' ~ img) }}" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #eee; transition: transform 0.2s;">
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    <style>
+        .product-gallery-item:hover img { transform: scale(1.1); z-index: 5; }
+    </style>
+{% else %}
+    <span class="text-muted" style="font-size: 0.9rem;">Sin imágenes adicionales</span>
+{% endif %}

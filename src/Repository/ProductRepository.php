@@ -38,6 +38,14 @@ class ProductRepository extends ServiceEntityRepository
             ;    
         }
 
+        if (!empty($search->getSubcategories())) {
+            $query = $query
+                ->join('p.subcategories', 's')
+                ->andWhere('s.id IN (:subcategories)')
+                ->setParameter('subcategories', $search->getSubcategories())
+            ;
+        }
+
         if (!empty($search->getString())) {
             $query = $query
                 ->andWhere('p.name LIKE :string')
@@ -46,7 +54,6 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         return $query->getQuery()->getResult();
-        
     }
 
 }

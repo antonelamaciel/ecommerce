@@ -18,19 +18,28 @@
         <p id="qv-price" class="fs-4 fw-bold mb-3" style="color: var(--secondary-color, var(--c-ink, #000));">$ 0,00 ARS</p>
         
         <form id="qv-form" method="GET" action="">
-          <div class="d-flex justify-content-center align-items-center mb-4 mx-auto" style="max-width: 150px; border: 1px solid #dee2e6; border-radius: 99px; padding: 0.2rem;">
-            <button type="button" class="btn rounded-circle fw-bold text-muted border-0" id="qv-minus" style="width: 35px; height: 35px; background: transparent;">-</button>
-            <input type="number" id="qv-qty" name="qty" value="1" min="1" class="form-control text-center mx-2 border-0 fw-bold bg-transparent p-0" style="width: 50px; pointer-events: none;" readonly>
-            <button type="button" class="btn rounded-circle fw-bold text-muted border-0" id="qv-plus" style="width: 35px; height: 35px; background: transparent;">+</button>
+          <div class="d-flex flex-column gap-2 w-100 mt-2">
+            
+            <div class="d-flex align-items-center gap-2">
+              <button type="submit" id="qv-submit" class="btn btn-dark rounded-pill fw-bold py-2 py-sm-3 d-flex align-items-center justify-content-center flex-grow-1" style="background: var(--secondary-color, var(--c-ink, #000)); border: none; font-size: 0.95rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="bi bi-cart-plus mr-2"></i>
+                <span class="d-none d-sm-inline ml-2" style="font-weight: 800;">Comprar</span>
+                <span class="d-inline d-sm-none" style="font-weight: 800;">Comprar</span>
+              </button>
+              
+              <div class="d-flex justify-content-center align-items-center flex-shrink-0" id="qv-qty-controls" style="border: 1px solid #dee2e6; border-radius: 99px; padding: 0.2rem; height: 100%;">
+                <button type="button" class="btn rounded-circle fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="qv-minus" style="width: 32px; height: 32px; background: transparent; font-size: 0.9rem; padding: 0;">-</button>
+                <input type="number" id="qv-qty" name="qty" value="1" min="1" class="form-control text-center mx-1 border-0 fw-bold bg-transparent p-0" style="width: 35px; pointer-events: none; font-size: 0.9rem; box-shadow: none;" readonly>
+                <button type="button" class="btn rounded-circle fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="qv-plus" style="width: 32px; height: 32px; background: transparent; font-size: 0.9rem; padding: 0;">+</button>
+              </div>
+            </div>
+            
+            <a id="qv-details-btn" href="#" class="mt-2 btn btn-outline-dark rounded-pill fw-bold py-2 py-sm-3 d-flex align-items-center justify-content-center" style="font-size: 0.95rem; transition: all 0.2s;">
+              <i class="bi bi-eye mr-2"></i>
+              <span class="d-none d-sm-inline">Ver detalles del producto</span>
+              <span class="d-inline d-sm-none">Ver detalles</span>
+            </a>
           </div>
-          
-          <button type="submit" id="qv-submit" class="btn btn-dark w-100 rounded-pill py-3 mb-3 fw-bold" style="background: var(--secondary-color, var(--c-ink, #000)); border: none; font-size: 1.1rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-            <i class="bi bi-cart-plus me-2"></i> Añadir al carrito
-          </button>
-          
-          <a id="qv-details-btn" href="#" class="btn btn-outline-dark w-100 rounded-pill py-2 fw-bold" style="transition: all 0.2s;">
-            Ver detalles del producto
-          </a>
         </form>
       </div>
     </div>
@@ -60,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  const cartBtns = document.querySelectorAll('.pcard__cart-btn');
+  const cartBtns = document.querySelectorAll('.pcard__buy-btn');
   const qvImage = document.getElementById('qv-image');
   const qvName = document.getElementById('qv-name');
   const qvPrice = document.getElementById('qv-price');
@@ -143,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
           qvDetailsBtn.href = nameEl.href;
           qvForm.action = btn.href;
           qvQty.value = 1;
-          qvSubmit.innerHTML = '<i class="bi bi-cart-plus me-2"></i> Añadir al carrito';
+          qvSubmit.innerHTML = '<i class="bi bi-cart-plus mr-2"></i> Comprar';
           qvSubmit.disabled = false;
           
           qvThumbnails.innerHTML = '';
@@ -243,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(err => {
       console.error(err);
-      qvSubmit.innerHTML = '<i class="bi bi-cart-plus me-2"></i> Añadir al carrito';
+      qvSubmit.innerHTML = '<i class="bi bi-cart-plus mr-2"></i> Comprar';
       qvSubmit.disabled = false;
     });
   });

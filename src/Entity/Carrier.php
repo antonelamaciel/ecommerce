@@ -19,12 +19,27 @@ class Carrier
     #[ORM\Column(type: 'text')]
     private $description;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'float', nullable: true)]
     private $price;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private $type = 'standard'; // 'standard', 'long_distance', 'special'
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -53,19 +68,29 @@ class Carrier
 
     public function getPrice(): ?float
     {
-        return $this->price;
+        return $this->price ?? 0.0;
     }
 
-    public function setPrice(float $price): self
+    public function setPrice(?float $price): self
     {
-        $this->price = $price;
+        $this->price = $price ?? 0.0;
 
         return $this;
     }
 
     public function getCarrierLabel(): ?string
     {
-        $price = number_format($this->price/100, 2);
-        return "{$this->name}: [br]{$this->description}[br] $price ARS ";
+        $label = "{$this->name}: [br]{$this->description}[br]";
+        if ($this->type === 'long_distance') {
+            $label .= " Cálculo por CP";
+        } elseif ($this->type === 'special') {
+            $label .= " A convenir";
+        } elseif ($this->type === 'pickup') {
+            $label .= " Gratis";
+        } else {
+            $price = number_format(($this->price ?? 0)/100, 2);
+            $label .= " $price ARS";
+        }
+        return $label;
     }
 }

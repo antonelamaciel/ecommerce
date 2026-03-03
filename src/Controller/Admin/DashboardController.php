@@ -35,32 +35,44 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Administrador de Mi Ecommerce');
-
+            ->setTitle('<b>MONKAI</b> <small>Admin</small>')
+            ->renderContentMaximized();
     }
 
-public function configureMenuItems(): iterable
-{
-    yield MenuItem::linkToDashboard('Panel de Control', 'fa fa-home');
+    public function configureAssets(): \EasyCorp\Bundle\EasyAdminBundle\Config\Assets
+    {
+        return parent::configureAssets()
+            ->addCssFile('assets/css/admin-minimal.css');
+    }
 
-    yield MenuItem::section('Ventas');
-    yield MenuItem::linkToCrud('Pedidos', 'fas fa-shopping-cart', Order::class);
+    public function configureMenuItems(): iterable
+    {
+        yield MenuItem::linkToDashboard('Inicio', 'fa fa-th-large');
+        yield MenuItem::linkToUrl('Ver Web', 'fas fa-external-link-alt', '/');
 
-    yield MenuItem::section('Catálogo');
-    yield MenuItem::linkToCrud('Productos', 'fas fa-tag', Product::class);
-    yield MenuItem::linkToCrud('Categorías', 'fas fa-list', Category::class);
+        yield MenuItem::subMenu('Ventas', 'fas fa-shopping-basket')->setSubItems([
+            MenuItem::linkToCrud('Pedidos', 'fas fa-clipboard-list', Order::class),
+            MenuItem::linkToCrud('Clientes', 'fas fa-users', User::class),
+        ]);
 
-    yield MenuItem::section('Clientes');
-    yield MenuItem::linkToCrud('Usuarios', 'fas fa-user', User::class);
+        yield MenuItem::subMenu('Catálogo', 'fas fa-tags')->setSubItems([
+            MenuItem::linkToCrud('Productos', 'fas fa-box', Product::class),
+            MenuItem::linkToCrud('Categorías', 'fas fa-folder-open', Category::class),
+        ]);
 
-    yield MenuItem::section('Envíos');
-    yield MenuItem::linkToCrud('Transportistas', 'fas fa-truck', Carrier::class);
-    yield MenuItem::linkToCrud('Envíos y Devoluciones', 'fas fa-box-open', ShippingReturn::class);
+        yield MenuItem::subMenu('Logística', 'fas fa-truck-moving')->setSubItems([
+            MenuItem::linkToCrud('Envíos', 'fas fa-truck', Carrier::class),
+            MenuItem::linkToCrud('Devoluciones', 'fas fa-undo-alt', ShippingReturn::class),
+        ]);
 
-    yield MenuItem::section('Contenido y Configuración');
-    yield MenuItem::linkToCrud('Empresa', 'fas fa-building', Personalize::class);
-    yield MenuItem::linkToCrud('Banners', 'fas fa-image', Headers::class);
-    yield MenuItem::linkToCrud('Preguntas Frecuentes', 'fas fa-question-circle', FAQ::class);
-    yield MenuItem::linkToCrud('Nosotros', 'fas fa-info-circle', About::class);
-}
+        yield MenuItem::subMenu('Diseño', 'fas fa-palette')->setSubItems([
+            MenuItem::linkToCrud('Empresa', 'fas fa-store-alt', Personalize::class),
+            MenuItem::linkToCrud('Banners', 'fas fa-images', Headers::class),
+        ]);
+
+        yield MenuItem::subMenu('Soporte', 'fas fa-comment-dots')->setSubItems([
+            MenuItem::linkToCrud('FAQs', 'fas fa-question-circle', FAQ::class),
+            MenuItem::linkToCrud('Nosotros', 'fas fa-id-card', About::class),
+        ]);
+    }
 }

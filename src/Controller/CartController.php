@@ -17,14 +17,18 @@ class CartController extends AbstractController
      * @return Response
      */
     #[Route('/mon-panier', name: 'cart')]
-    public function index(Cart $cart): Response
+    public function index(Cart $cart, \App\Repository\CarrierRepository $carrierRepository, \App\Repository\PersonalizeRepository $personalizeRepository): Response
     {
         $cartProducts = $cart->getDetails();
+        $carriers = $carrierRepository->findAll();
+        $personalize = $personalizeRepository->findOneBy([]);
 
         return $this->render('cart/index.html.twig', [
             'cart' => $cartProducts['products'],
             'totalQuantity' => $cartProducts['totals']['quantity'],
-            'totalPrice' =>$cartProducts['totals']['price']
+            'totalPrice' =>$cartProducts['totals']['price'],
+            'carriers' => $carriers,
+            'personalize' => $personalize
         ]);
     }
 

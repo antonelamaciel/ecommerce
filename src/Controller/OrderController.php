@@ -43,10 +43,20 @@ class OrderController extends AbstractController
             'user' => $user     //Permet de passer l'utilisateur courant dans le tableau d'options du OrderType
         ]); 
 
+        $addressesJson = [];
+        foreach ($user->getAddresses() as $address) {
+            $addressesJson[$address->getId()] = [
+                'city' => $address->getCity(),
+                'postal' => $address->getPostal(),
+                'address' => $address->getAddress()
+            ];
+        }
+
         return $this->renderForm('order/index.html.twig', [
             'form' => $form,
             'cart' => $cartProducts,
-            'totalPrice' =>$cartProducts['totals']['price']
+            'totalPrice' =>$cartProducts['totals']['price'],
+            'addressesJson' => json_encode($addressesJson)
         ]);
     }
 

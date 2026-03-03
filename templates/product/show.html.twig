@@ -106,7 +106,7 @@
     display: flex;
     align-items: baseline;
     gap: 1rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 0.5rem;
   }
   .pdetail-price {
     font-size: 2.5rem;
@@ -151,9 +151,9 @@
     margin-bottom: 2rem;
   }
   .pdetail-add-grid {
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
   .btn-pdetail-cart {
     background: var(--secondary-color, var(--primary-color, var(--c-ink)));
@@ -181,7 +181,7 @@
     border: 1px solid var(--c-border);
     color: var(--c-muted);
     border-radius: var(--radius-md);
-    padding: 0.5rem;
+    padding: 1.2rem;
     font-weight: 500;
     text-decoration: none;
     display: flex;
@@ -216,8 +216,43 @@
   }
 
   @media (max-width: 991px) {
-    .pdetail-img-card { position: static; margin-bottom: 3rem; }
-    .pdetail-add-grid { grid-template-columns: 1fr; }
+    .product-detail { padding-top: 1rem; padding-bottom: 2rem; }
+    .custom-breadcrumb { margin-bottom: 1rem; font-size: 0.8rem; }
+    
+    .pdetail-img-card { padding: 0.5rem; margin-bottom: 1rem; }
+    .pdetail-img-wrap { height: 260px; min-height: 200px; }
+    
+    .pdetail-header { margin-bottom: 0.5rem; }
+    .pdetail-title { font-size: 1.5rem; margin-bottom: 0.25rem; line-height: 1.2; }
+    .pdetail-subtitle { font-size: 0.9rem; }
+    
+    .pdetail-price-box { margin-bottom: 0.75rem; gap: 0.5rem; }
+    .pdetail-price { font-size: 1.5rem; }
+    
+    .pdetail-description { margin-bottom: 1.5rem; }
+    .pdetail-section-title { margin-bottom: 0.5rem; font-size: 0.8rem; }
+    .pdetail-content { font-size: 0.9rem; line-height: 1.5; }
+    
+    .pdetail-add-grid { flex-wrap: nowrap; gap: 0.5rem; }
+    #qty-control { padding: 0.1rem !important; }
+    #qty-control button { width: 28px !important; height: 28px !important; font-size: 0.85rem; }
+    #pd-qty { width: 24px !important; font-size: 0.9rem !important; }
+    .btn-pdetail-cart { padding: 0.6rem 0.75rem; font-size: 0.9rem; }
+    .btn-pdetail-back { padding: 0.6rem 0.75rem; font-size: 0.85rem; white-space: nowrap; }
+    .pdetail-actions { margin-bottom: 1rem; }
+    
+    .pdetail-features { gap: 0.75rem; padding-top: 1rem; flex-direction: column; align-items: flex-start; }
+    .feature-item { font-size: 0.85rem; gap: 0.5rem; }
+    
+    #pd-prev-img, #pd-next-img { display: none !important; }
+    .pdetail-img-wrap { margin-left: 0 !important; margin-right: 0 !important; max-width: 100%; }
+    
+    /* Botón medios de pago más ajustado */
+    .mb-4.d-flex.align-items-center { margin-bottom: 1rem !important; }
+    .btn.btn-success { padding: 0.5rem 1rem; font-size: 0.85rem; }
+    
+    /* Calculador envios */
+
   }
 </style>
 
@@ -276,7 +311,13 @@
 
             <div class="pdetail-price-box">
                 <span class="pdetail-price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
-                <span class="pdetail-tax-badge">IVA incluido</span>
+            </div>
+
+            <div class="mb-4 d-flex align-items-center">
+                <a href="#" class="btn btn-success d-flex align-items-center" data-toggle="modal" data-target="#paymentMethodsModal">
+                    <i class="bi bi-credit-card mr-2"></i>
+                    Ver medios de pago
+                </a>
             </div>
 
             <div class="pdetail-description">
@@ -287,28 +328,28 @@
             </div>
 
             <div class="pdetail-actions">
-                <form id="product-add-form" action="{{ path('add_to_cart', {id: product.id}) }}" method="GET">
-                    <div class="pdetail-add-grid">
-                        <div class="d-flex align-items-center" style="border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 0.2rem;">
-                            <button type="button" class="btn fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="pd-minus" style="width: 40px; height: 100%; background: transparent;">-</button>
-                            <input type="number" id="pd-qty" name="qty" value="1" min="1" class="form-control text-center border-0 fw-bold bg-transparent p-0 flex-grow-1" style="pointer-events: none; font-size: 1.1rem; box-shadow: none;" readonly>
-                            <button type="button" class="btn fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="pd-plus" style="width: 40px; height: 100%; background: transparent;">+</button>
-                        </div>
-                        
-                        <button type="submit" id="pd-submit" class="btn-pdetail-cart m-0 w-100">
-                            <i class="bi bi-bag-plus-fill"></i>
-                            Comprar ahora
-                        </button>
+                <form id="product-add-form" action="{{ path('add_to_cart', {id: product.id}) }}" method="GET" class="d-flex gap-2 align-items-center w-100">
+                    <div class="d-flex align-items-center flex-shrink-0" id="qty-control" style="border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 0.2rem;">
+                        <button type="button" class="btn fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="pd-minus" style="width: 36px; height: 36px; background: transparent;">-</button>
+                        <input type="number" id="pd-qty" name="qty" value="1" min="1" class="form-control text-center border-0 fw-bold bg-transparent p-0" style="pointer-events: none; font-size: 1rem; box-shadow: none; width: 32px;" readonly>
+                        <button type="button" class="btn fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="pd-plus" style="width: 36px; height: 36px; background: transparent;">+</button>
                     </div>
+                    
+                    <button type="submit" id="pd-submit" class="btn-pdetail-cart ml-2 m-0 flex-grow-1">
+                        <i class="bi bi-bag-plus-fill"></i>
+                        <span class="d-none d-md-inline">Comprar ahora</span>
+                        <span class="d-inline d-md-none">Comprar</span>
+                    </button>
                 </form>
 
-                <a href="{{ path('home') }}" class="btn-pdetail-back">
+                <a href="{{ path('product') }}" class="btn-pdetail-back mt-2 w-100">
                     <i class="bi bi-arrow-left"></i>
-                    Volver a la tienda
+                    <span class="d-none d-md-inline">Volver a la tienda</span>
+                    <span class="d-inline d-md-none">Volver</span>
                 </a>
             </div>
 
-            <div class="pdetail-features">
+            <div class="pdetail-features mt-4">
                 <div class="feature-item">
                     <i class="bi bi-truck"></i>
                     <span>Envío express</span>
@@ -322,6 +363,7 @@
                     <span>Decepción cero</span>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -439,4 +481,60 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Modal Medios de Pago -->
+<div class="modal fade" id="paymentMethodsModal" tabindex="-1" aria-labelledby="paymentMethodsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="paymentMethodsModalLabel">Medios de Pago Disponibles</h5>
+                <button type="button" class="close mr-2" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex flex-column gap-3">
+                    
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
+                        <i class="bi bi-wallet2 text-primary fs-1 mr-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0">Efectivo</h6>
+                            <small class="text-muted">Al retirar el producto</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
+                        <i class="bi bi-credit-card-2-front text-info fs-1 mr-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0">Mercado Pago</h6>
+                            <small class="text-muted">Tarjeta de crédito o débito, dinero en cuenta</small>
+                        </div>
+                    </div>
+
+                    {% if personalize and personalize.aliasCbu %}
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border border-primary border-opacity-25">
+                        <i class="bi bi-bank text-primary fs-1 mr-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Transferencia Bancaria</h6>
+                            <small class="text-muted d-block">Alias / CBU:
+                            <span class="badge badge-primary user-select-all" style="font-size: 0.9rem;">{{ personalize.aliasCbu }}</span></small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" class="text-decoration-none text-dark">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border border-success border-opacity-25" style="transition: all 0.2s;">
+                            <i class="bi bi-whatsapp text-success fs-1 mr-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Acordar con el vendedor</h6>
+                                <small class="text-muted">Coordiná el pago directamente por WhatsApp <i class="bi bi-box-arrow-up-right ms-1"></i></small>
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

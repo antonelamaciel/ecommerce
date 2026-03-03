@@ -212,6 +212,9 @@
     {% if totalQuantity > 0 %}
         <header class="cart-header">
             <div>
+                <a href="{{ path('home') }}" class="text-muted text-decoration-none d-inline-flex align-items-center mb-3 fw-semibold hover-text-dark" style="font-size: 0.9rem; transition: all 0.2s;">
+                    <i class="bi bi-arrow-left mr-2"></i> Volver al inicio
+                </a>
                 <h1 class="cart-title">Mi Carrito</h1>
                 <p class="text-muted mt-2">Tienes {{ totalQuantity }} artículo(s) listo(s) para comprar</p>
             </div>
@@ -276,12 +279,15 @@
                         <span class="fw-bold">$ {{ (totalPrice / 100)|number_format(2,',','.') }} ARS</span>
                     </div>
                     <div class="summary-row">
-                        <span>Envío estimado</span>
-                        <span class="text-success fw-bold">Gratis</span>
-                    </div>
-                    <div class="summary-row">
                         <span>Impuestos incluidos</span>
                         <span class="text-muted">Incluidos en total</span>
+                    </div>
+
+                    <div class="mt-4 mb-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-2 py-2" data-toggle="modal" data-target="#shippingMethodsModal">
+                            <i class="bi bi-truck"></i>
+                            Ver métodos de envío
+                        </button>
                     </div>
 
                     <div class="summary-row total">
@@ -315,5 +321,74 @@
             </a>
         </div>
     {% endif %}
+</div>
+
+<!-- Modal Métodos de Envío -->
+<div class="modal fade" id="shippingMethodsModal" tabindex="-1" aria-labelledby="shippingMethodsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="shippingMethodsModalLabel">Nuestros Métodos de Envío</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex flex-column gap-4">
+                    <!-- Retiro en sucursal -->
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="bg-primary p-2 rounded-circle" style="color:white;">
+                            <i class="bi bi-geo-alt-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Retiro en sucursal</h6>
+                            <p class="small text-muted mb-1">Dirección: {{ personalize.address }}, {{ personalize.city }}, {{ personalize.province }}</p>
+                            <span class="badge badge-success">GRATIS</span>
+                        </div>
+                    </div>
+
+                    <!-- Moto Uber / WhatsApp -->
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="bg-success p-2 rounded-circle" style="color:white;">
+                            <i class="bi bi-whatsapp fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Moto / Uber / Mensajería</h6>
+                            <p class="small text-muted mb-1">A acordar con el vendedor directamente por chat.</p>
+                            <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" class="btn btn-sm btn-success rounded-pill px-3">
+                                Chatear ahora
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Otros métodos -->
+                    {% if carriers|length > 0 %}
+                        <hr class="my-1 opacity-10">
+                        <h6 class="fw-bold small text-muted text-uppercase" style="letter-spacing: 1px;">Otros transportistas</h6>
+                        {% for carrier in carriers %}
+                            {% if carrier.type != 'pickup' and carrier.type != 'special' %}
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-truck text-muted"></i>
+                                        <span class="small font-weight-bold">{{ carrier.name }}</span>
+                                    </div>
+                                    <span class="small font-weight-bold">
+                                        {% if carrier.type == 'long_distance' %}
+                                            Calculado por CP
+                                        {% else %}
+                                            $ {{ (carrier.price / 100)|number_format(2,',','.') }} ARS
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

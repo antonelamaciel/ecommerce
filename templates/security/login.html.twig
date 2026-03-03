@@ -1,43 +1,235 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inicio de sesión{% endblock %}
+{% block title %}Inicio de sesión | {{ personalize.companyName ?? 'MONKAI' }}{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<div class="login-page-modern py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-5">
+                {# Header Section #}
+                <div class="text-center mb-5">
+                    {% if personalize and personalize.logo %}
+                        <div class="mb-4">
+                            <a href="/">
+                                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" class="img-fluid" style="max-height: 60px; border-radius: 50%;">
+                            </a>
+                        </div>
+                    {% endif %}
+                    <h1 class="display-5 fw-bold text-dark mb-3">Bienvenido</h1>
+                    <p class="text-muted lead px-lg-2">Accede a tu cuenta</p>
+                </div>
 
-    {% if app.user %}
-        <div class="mb-3">
-            Ha iniciado sesión como {{ app.user.username }}, <a href="{{ path('app_logout') }}">Cerrar sesión</a>
+                {# Form Section #}
+                <div class="form-container-premium">
+                    <form method="post" id="loginForm">
+                        {% if error %}
+                            <div class="alert alert-danger border-0 shadow-sm py-3 px-4 mb-4 rounded-4 d-flex align-items-center">
+                                <i class="bi bi-exclamation-circle-fill fs-4 me-3"></i>
+                                <div class="small fw-500">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            </div>
+                        {% endif %}
+
+                        {% if app.user %}
+                            <div class="alert alert-light border shadow-sm py-3 px-4 mb-4 rounded-4 text-center">
+                                <p class="mb-2">Has iniciado sesión como <strong>{{ app.user.username }}</strong></p>
+                                <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm rounded-pill px-4">Cerrar sesión</a>
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <label for="inputEmail" class="form-label fw-bold mini-label text-muted text-uppercase mb-2">Correo Electrónico</label>
+                            <div class="input-wrapper-lux">
+                                <i class="bi bi-envelope"></i>
+                                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control-lux" placeholder="tucorreo@correo.com" autocomplete="email" required autofocus>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="inputPassword" class="form-label fw-bold mini-label text-muted text-uppercase mb-2">Contraseña</label>
+                            <div class="input-wrapper-lux">
+                                <i class="bi bi-lock"></i>
+                                <input type="password" name="password" id="inputPassword" class="form-control-lux" placeholder="Ingresa tu contraseña ..." autocomplete="current-password" required>
+                                <button type="button" class="btn-toggle-lux" onclick="togglePassword('inputPassword', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <div class="custom-control custom-checkbox custom-lux">
+                                <input type="checkbox" class="custom-control-input" name="_remember_me" id="rememberMe">
+                                <label class="custom-control-label text-muted" for="rememberMe">Permanecer conectado</label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary-lux w-100 py-3 shadow-lg" type="submit">
+                            Iniciar Sesión <i class="bi bi-arrow-right ms-2 font-weight-bold ml-2"></i>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-5">
+                        <p class="text-muted">¿Eres nuevo aquí? <a href="{{ path('register') }}" class="fw-bold text-decoration-none" style="color: var(--primary-color); border-bottom: 2px solid rgba(0,0,0,0.05);">Crea una cuenta</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% endif %}
+    </div>
+</div>
 
-    <h2 class="h3 mb-3 font-weight-normal">Ingrese sus credenciales</h2>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label class=" mt-4" for="inputPassword">Contraseña</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+<style>
+    .login-page-modern {
+        background-color: #fcfcfd;
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
 
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
+    .mini-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.1rem;
+    }
 
-    {#
-        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-        See https://symfony.com/doc/current/security/remember_me.html
+    .input-wrapper-lux {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
 
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" name="_remember_me"> Remember me
-            </label>
-        </div>
-    #}
+    .input-wrapper-lux i:not(.bi-eye) {
+        position: absolute;
+        left: 1.25rem;
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
 
-    <button class="btn btn-lg btn-outline-success mt-4" type="submit">
-        Inicio de sesión
-    </button>
-</form>
-<p class="mt-3">¿No está inscrito? <a href="{{ path('register') }}">Cree una cuenta aquí</a></p>
+    .form-control-lux {
+        width: 100%;
+        padding: 1.1rem 1.25rem 1.1rem 3.5rem;
+        background-color: #ffffff;
+        border: 2px solid #f1f5f9;
+        border-radius: 1rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1e293b;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .form-control-lux:focus {
+        border-color: var(--primary-color);
+        background-color: #ffffff;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 0 0 4px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
+
+    .btn-toggle-lux {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 0;
+        width: 3rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+        z-index: 5;
+    }
+
+    .btn-toggle-lux i {
+        font-size: 1.2rem;
+        width: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-toggle-lux:hover {
+        color: var(--primary-color);
+    }
+
+    .btn-primary-lux {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 1rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        letter-spacing: -0.01em;
+    }
+
+    .btn-primary-lux:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.3);
+        filter: brightness(1.05);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-primary-lux:active {
+        transform: translateY(-1px);
+    }
+
+    /* Custom Checkbox */
+    .custom-lux .custom-control-label::before {
+        border-radius: 6px;
+        border-color: #cbd5e1;
+    }
+
+    .custom-lux .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 767px) {
+        .login-page-modern {
+            padding-top: 2rem !important;
+            background-color: #ffffff;
+        }
+        
+        .display-5 {
+            font-size: 2rem;
+        }
+
+        .lead {
+            font-size: 1rem;
+        }
+
+        .form-control-lux {
+            padding: 1rem 1.25rem 1rem 3.25rem;
+            font-size: 0.95rem;
+        }
+
+        .mb-5 {
+            margin-bottom: 2rem !important;
+        }
+    }
+</style>
+
+{% block javascripts %}
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const icon = button.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+</script>
+{% endblock %}
 {% endblock %}

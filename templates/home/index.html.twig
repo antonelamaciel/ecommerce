@@ -106,31 +106,20 @@
   .pcard:hover .pcard__img { transform: scale(1.08); }
 
   /* Quick-add button (Cart) */
-  .pcard__cart-btn {
-    position: absolute;
-    top: 1.25rem; 
-    right: 1.25rem;
-    width: 44px; 
-    height: 44px;
-    background: #fff;
-    color: var(--secondary-color, var(--c-ink));
-    border-radius: 50%;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    font-size: 1.2rem;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: var(--transition);
-    border: 1px solid var(--c-border);
-    text-decoration: none !important;
-  }
-  .pcard__cart-btn:hover {
+  .pcard__buy-btn {
     background: var(--secondary-color, var(--c-ink));
-    color: #fff;
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-    border-color: var(--secondary-color, var(--c-ink));
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none !important;
+    transition: var(--transition);
+  }
+  .pcard__buy-btn:hover {
+    filter: brightness(1.1);
   }
 
   /* Body */
@@ -211,10 +200,9 @@
     .pcard__subtitle { font-size: 0.75rem; }
     .pcard__price { font-size: 1rem; }
     .pcard__img-wrap { margin: 0.25rem; }
-    .pcard__cart-btn {
-        width: 32px; height: 32px;
-        top: 0.75rem; right: 0.75rem;
-        font-size: 0.9rem;
+    .pcard__buy-btn {
+        padding: 0.75rem;
+        font-size: 0.75rem;
     }
     .pcard__badge {
         top: 0.75rem; left: 0.75rem;
@@ -273,9 +261,6 @@
     {% for product in top_products %}
       <article class="pcard">
         <span class="pcard__badge">Popular</span>
-        <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__cart-btn" title="Agregar al carrito">
-          <i class="bi bi-bag-plus"></i>
-        </a>
         
         <div class="pcard__img-wrap">
           <a href="{{ path('product_show', {slug: product.slug}) }}">
@@ -292,6 +277,9 @@
             <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
           </div>
         </div>
+        <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__buy-btn">
+          Comprar
+        </a>
       </article>
     {% endfor %}
   </div>
@@ -311,10 +299,6 @@
   <div class="products-grid" id="all-products-grid">
     {% for product in all_products %}
       <article class="pcard">
-        <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__cart-btn" title="Agregar al carrito">
-          <i class="bi bi-bag-plus"></i>
-        </a>
-
         <div class="pcard__img-wrap">
           <a href="{{ path('product_show', {slug: product.slug}) }}">
             <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" data-extra-images="{{ product.images|default([])|json_encode }}">
@@ -330,6 +314,9 @@
             <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
           </div>
         </div>
+        <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__buy-btn">
+          Comprar
+        </a>
       </article>
     {% endfor %}
   </div>

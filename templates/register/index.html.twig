@@ -1,5 +1,234 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Registro | {{ personalize.companyName ?? 'MONKAI' }}{% endblock %}
+
 {% block body %}
-    {{form(form)}}
+<div class="register-page-modern py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+                {# Header Section #}
+                <div class="text-center mb-5">
+                    {% if personalize and personalize.logo %}
+                        <div class="mb-4">
+                            <a href="/">
+                                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" class="img-fluid" style="max-height: 50px; border-radius: 50%;">
+                            </a>
+                        </div>
+                    {% endif %}
+                    <h1 class="display-5 fw-bold text-dark mb-3">Crea tu cuenta</h1>
+                    <p class="text-muted lead px-md-5">Registrate en {{ personalize.companyName ?? 'MONKAI' }}.</p>
+                </div>
+
+                {# Form Section #}
+                <div class="form-grid-premium">
+                    {{ form_start(form) }}
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label mini-label fw-bold text-muted text-uppercase mb-2">Nombre</label>
+                                <div class="input-wrapper-lux">
+                                    <i class="bi bi-person"></i>
+                                    {{ form_widget(form.firstname, {'attr': {'class': 'form-control-lux', 'placeholder': 'Ingresa tu nombre ...'}}) }}
+                                </div>
+                                {{ form_errors(form.firstname) }}
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label mini-label fw-bold text-muted text-uppercase mb-2">Apellido</label>
+                                <div class="input-wrapper-lux">
+                                    <i class="bi bi-person-badge"></i>
+                                    {{ form_widget(form.lastname, {'attr': {'class': 'form-control-lux', 'placeholder': 'Ingresa tu apellido ...'}}) }}
+                                </div>
+                                {{ form_errors(form.lastname) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label mini-label fw-bold text-muted text-uppercase mb-2">Correo Electrónico</label>
+                            <div class="input-wrapper-lux">
+                                <i class="bi bi-envelope"></i>
+                                {{ form_widget(form.email, {'attr': {'class': 'form-control-lux', 'placeholder': 'tucorreo@correo.com'}}) }}
+                            </div>
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label mini-label fw-bold text-muted text-uppercase mb-2">Contraseña</label>
+                                <div class="input-wrapper-lux">
+                                    <i class="bi bi-lock"></i>
+                                    {{ form_widget(form.password.first, {'attr': {'class': 'form-control-lux', 'placeholder': 'Ingresa tu contraseña ...'}}) }}
+                                    <button type="button" class="btn-toggle-lux" onclick="togglePassword('{{ form.password.first.vars.id }}', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                {{ form_errors(form.password.first) }}
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label mini-label fw-bold text-muted text-uppercase mb-2">Confirmar</label>
+                                <div class="input-wrapper-lux">
+                                    <i class="bi bi-shield-check"></i>
+                                    {{ form_widget(form.password.second, {'attr': {'class': 'form-control-lux', 'placeholder': 'Ingresa tu contraseña ...'}}) }}
+                                    <button type="button" class="btn-toggle-lux" onclick="togglePassword('{{ form.password.second.vars.id }}', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                {{ form_errors(form.password.second) }}
+                            </div>
+                        </div>
+
+                        <div class="mt-5 text-center px-lg-5">
+                            <button class="btn btn-primary-lux w-100 py-3 shadow-lg mb-4" type="submit">
+                                Finalizar Registro <i class="bi bi-check2-circle ml-2"></i>
+                            </button>
+                        </div>
+                        
+                        {# Hidden submit #}
+                        <div class="d-none">{{ form_widget(form.submit) }}</div>
+                    {{ form_end(form) }}
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted">¿Ya tienes una cuenta? <a href="{{ path('app_login') }}" class="fw-bold text-decoration-none" style="color: var(--primary-color);">Inicia Sesión aquí</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .register-page-modern {
+        background-color: #fcfcfd;
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .mini-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.05rem;
+    }
+
+    .input-wrapper-lux {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-wrapper-lux i:not(.bi-eye) {
+        position: absolute;
+        left: 1.25rem;
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+
+    .form-control-lux {
+        width: 100%;
+        padding: 1rem 1.25rem 1rem 3.25rem;
+        background-color: #ffffff;
+        border: 2px solid #f1f5f9;
+        border-radius: 1rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1e293b;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-control-lux:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.05), 0 0 0 4px rgba(16, 185, 129, 0.1);
+        outline: none;
+    }
+
+    .btn-toggle-lux {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 0;
+        width: 3rem;
+        height: 100%;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-toggle-lux i {
+        font-size: 1.2rem;
+        width: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary-lux {
+        background: var(--primary-color);
+        color: white !important;
+        border: none;
+        border-radius: 1rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        letter-spacing: -0.01em;
+    }
+
+    .btn-primary-lux:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        filter: brightness(1.05);
+    }
+
+    .invalid-feedback {
+        font-size: 0.8rem;
+        color: #e11d48;
+        padding-left: 1rem;
+        margin-top: 0.4rem;
+    }
+
+    @media (max-width: 767px) {
+        .register-page-modern {
+            padding-top: 2rem !important;
+            background-color: #ffffff;
+        }
+
+        .display-5 {
+            font-size: 1.8rem;
+        }
+
+        .form-control-lux {
+            padding: 0.9rem 1rem 0.9rem 3rem;
+            font-size: 0.9rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.25rem !important;
+        }
+
+        .mini-label {
+            font-size: 0.7rem;
+            margin-bottom: 0.4rem !important;
+        }
+    }
+</style>
+
+{% block javascripts %}
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const icon = button.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+</script>
+{% endblock %}
 {% endblock %}

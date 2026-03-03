@@ -42,12 +42,12 @@ class OrderCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
-            DateTimeField::new('createdAt', 'Creado el'),
-            TextField::new('user.fullname', 'Comprador'),
+            IdField::new('id', 'ID del pedido')->hideOnForm(),
+            DateTimeField::new('createdAt', 'Fecha del pedido'),
+            TextField::new('user.fullname', 'Cliente'),
             MoneyField::new('total')->setCurrency('ARS')->hideOnForm(),
             MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS'),
-            ChoiceField::new('state', 'Estado')->setChoices([
+            ChoiceField::new('state', 'Estado del pedido')->setChoices([
                 'No pagado' => 0,
                 'Pagado' => 1,
                 'En preparación' => 2,
