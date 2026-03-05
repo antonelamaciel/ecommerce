@@ -345,8 +345,9 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
         
-        qvSubmit.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Agregado!';
-        qvSubmit.classList.replace('btn-dark', 'btn-success');
+        const originalHtml = qvSubmit.innerHTML;
+        qvSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
+        qvSubmit.style.background = '#198754';
         
         setTimeout(() => {
           if (bsModal) {
@@ -355,7 +356,11 @@ document.addEventListener('DOMContentLoaded', function() {
               $('#quickViewModal').modal('hide');
           }
           // reset color
-          setTimeout(() => qvSubmit.classList.replace('btn-success', 'btn-dark'), 300);
+          setTimeout(() => {
+              qvSubmit.style.background = '';
+              qvSubmit.innerHTML = originalHtml;
+              qvSubmit.disabled = false;
+          }, 300);
         }, 1000);
       }
     })

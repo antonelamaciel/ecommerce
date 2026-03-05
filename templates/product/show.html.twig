@@ -29,6 +29,32 @@
     color: var(--c-ink);
   }
 
+
+  /* ── Check Animation ── */
+  @keyframes checkPop {
+    0% { transform: scale(0); opacity: 0; }
+    40% { transform: scale(1.4); opacity: 1; }
+    60% { transform: scale(0.9); }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .check-animated {
+    display: inline-flex;
+    animation: checkPop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* ── Qty Reset Animation ── */
+  @keyframes qtyReset {
+    0% { transform: scale(1); background: transparent; border-color: var(--c-border); }
+    25% { transform: scale(1.3); background: rgba(25, 135, 84, 0.15); border-color: #198754; }
+    50% { transform: scale(0.9); }
+    75% { transform: scale(1.1); }
+    100% { transform: scale(1); background: transparent; border-color: var(--c-border); }
+  }
+  .qty-reset-animate {
+    animation: qtyReset 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
   .product-detail {
     padding-top: 3rem;
     padding-bottom: 5rem;
@@ -314,8 +340,24 @@
   .pcard__price {
     font-size: 1.1rem;
     font-weight: 700;
+  }
+
+  /* Quick-add button (Cart) */
+  .pcard__buy-btn {
+    background: var(--secondary-color, var(--c-ink));
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none !important;
+    transition: var(--transition);
     margin-top: auto;
-    padding-top: 0.5rem;
+  }
+  .pcard__buy-btn:hover {
+    filter: brightness(1.1);
   }
 
   /* Scroll container */
@@ -514,85 +556,6 @@
                     }
                 </style>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const parentBtns = document.querySelectorAll('.parent-option-btn');
-                        const valueContainers = document.querySelectorAll('.option-values-container');
-                        const selections = {}; // Track selections like { "Color": "Rojo", "Talle": "L" }
-                        const variantsInput = document.createElement('input');
-                        variantsInput.type = 'hidden';
-                        variantsInput.name = 'variants';
-                        
-                        const form = document.querySelector('#product-add-form');
-                        if (form) form.appendChild(variantsInput);
-
-                        function updateVariantsString() {
-                            const str = Object.entries(selections)
-                                .sort((a, b) => a[0].localeCompare(b[0]))
-                                .map(([group, val]) => `${group}: ${val}`)
-                                .join(', ');
-                            variantsInput.value = str;
-                        }
-
-                        parentBtns.forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                parentBtns.forEach(b => b.classList.remove('active'));
-                                valueContainers.forEach(c => c.classList.add('d-none'));
-
-                                this.classList.add('active');
-                                const targetId = this.getAttribute('data-target');
-                                const targetContainer = document.getElementById(targetId);
-                                if (targetContainer) {
-                                    targetContainer.classList.remove('d-none');
-                                    
-                                    // Reset all selections when switching parent groups
-                                    document.querySelectorAll('.product-option-value-btn').forEach(b => b.classList.remove('active'));
-                                    for (let key in selections) delete selections[key];
-
-                                    const groupName = targetContainer.dataset.groupName;
-                                    const firstAvailable = targetContainer.querySelector('.product-option-value-btn.available');
-                                    if (firstAvailable) {
-                                        firstAvailable.classList.add('active');
-                                        selections[groupName] = firstAvailable.dataset.valueName;
-                                    }
-                                    updateVariantsString();
-                                }
-                            });
-                        });
-
-                        document.querySelectorAll('.product-option-value-btn').forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                const container = this.closest('.option-values-container');
-                                const groupName = container.dataset.groupName;
-                                
-                                // Reset ALL selections across ALL groups (exclusive selection)
-                                document.querySelectorAll('.product-option-value-btn').forEach(b => b.classList.remove('active'));
-                                for (let key in selections) delete selections[key];
-                                
-                                // Activate current and update selection
-                                this.classList.add('active');
-                                selections[groupName] = this.dataset.valueName;
-                                updateVariantsString();
-                            });
-                        });
-
-                        // Initialize selections: only auto-select the first available option of the ACTIVE group
-                        function autoSelectFirst() {
-                            const activeContainer = Array.from(valueContainers).find(c => !c.classList.contains('d-none'));
-                            if (activeContainer) {
-                                const groupName = activeContainer.dataset.groupName;
-                                const firstAvailable = activeContainer.querySelector('.product-option-value-btn.available');
-                                if (firstAvailable) {
-                                    firstAvailable.classList.add('active');
-                                    selections[groupName] = firstAvailable.dataset.valueName;
-                                }
-                            }
-                            updateVariantsString();
-                        }
-                        
-                        autoSelectFirst();
-                    });
-                </script>
             {% endif %}
 
             <div class="pdetail-description">
@@ -657,7 +620,7 @@
             <!-- Scroll Container -->
             <div class="related-scroll-container" id="rp-container">
                 {% for related in relatedProducts %}
-                <a href="{{ path('product_show', {slug: related.slug}) }}" class="pcard">
+                <article class="pcard">
                     {% for rBundle in related.bundles %}
                       {% if rBundle.topRightBadge %}
                         {% set badgeText = rBundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : 
@@ -667,24 +630,45 @@
                     {% endfor %}
 
                     <div class="pcard__img-wrap">
-                        <img class="pcard__img" src="/uploads/{{ related.image }}" alt="{{ related.name }}">
+                        <a href="{{ path('product_show', {slug: related.slug}) }}">
+                            <img class="pcard__img" src="/uploads/{{ related.image }}" alt="{{ related.name }}" data-extra-images="{{ related.images|default([])|json_encode }}">
+                        </a>
                     </div>
                     <div class="pcard__body">
                         <h3 class="pcard__name">
-                          {{ related.name }}
-                          {% if related.bundles|length > 0 %}
-                            {% for rBundle in related.bundles %}
-                              {% set pillText = 'Descuento' %}
-                              {% if rBundle.type == 'oferta_sorpresa' %}{% set pillText = 'Oferta sorpresa!' %}{% endif %}
-                              {% if rBundle.type == 'ultimos_stock' %}{% set pillText = 'Últimos en stock!' %}{% endif %}
-                              {% if rBundle.type == 'pocas_unidades' %}{% set pillText = '¡Pocas unidades!' %}{% endif %}
-                              <span class="bundle-pill bundle-pill--{{ rBundle.type }}" style="font-size: 0.6rem; padding: 0.15rem 0.4rem; animation: pillShake 6s infinite;">{{ pillText }}</span>
-                            {% endfor %}
-                          {% endif %}
+                          <a href="{{ path('product_show', {slug: related.slug}) }}">
+                            {{ related.name }}
+                            {% if related.bundles|length > 0 %}
+                                {% for rBundle in related.bundles %}
+                                {% set pillText = 'Descuento' %}
+                                {% if rBundle.type == 'oferta_sorpresa' %}{% set pillText = 'Oferta sorpresa!' %}{% endif %}
+                                {% if rBundle.type == 'ultimos_stock' %}{% set pillText = 'Últimos en stock!' %}{% endif %}
+                                {% if rBundle.type == 'pocas_unidades' %}{% set pillText = '¡Pocas unidades!' %}{% endif %}
+                                <span class="bundle-pill bundle-pill--{{ rBundle.type }}" style="font-size: 0.6rem; padding: 0.15rem 0.4rem; animation: pillShake 6s infinite;">{{ pillText }}</span>
+                                {% endfor %}
+                            {% endif %}
+                          </a>
                         </h3>
                         <span class="pcard__subtitle">{{ related.subtitle }}</span>
                         <div class="pcard__price">$ {{ (related.price / 100)|number_format(2, ',', '.') }} ARS</div>
                     </div>
+                    
+                    {% set firstVariant = null %}
+                    {% for option in related.options %}
+                        {% if option.isAvailable and not firstVariant %}
+                            {% for value in option.productOptionValues %}
+                                {% if value.isAvailable and not firstVariant %}
+                                     {% set firstVariant = option.name ~ ': ' ~ value.name %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% set variantString = firstVariant %}
+                    
+                    <a href="{{ path('add_to_cart', {id: related.id, variants: variantString}) }}" class="pcard__buy-btn">
+                        Agregar
+                    </a>
+
                     <div class="pcard__options-store d-none">
                         {% if related.options|length > 0 %}
                             <div class="product-options-interactive-store mb-2 mt-2 w-100">
@@ -725,7 +709,7 @@
                             </div>
                         {% endif %}
                     </div>
-                </a>
+                </article>
                 {% endfor %}
             </div>
 
@@ -741,6 +725,78 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ── Selections Logic (Integrated) ──
+    const parentBtns = document.querySelectorAll('.parent-option-btn');
+    const valueContainers = document.querySelectorAll('.option-values-container');
+    const selections = {}; // Track selections like { "Color": "Rojo", "Talle": "L" }
+    const variantsInput = document.createElement('input');
+    variantsInput.type = 'hidden';
+    variantsInput.name = 'variants';
+    
+    const optionForm = document.querySelector('#product-add-form');
+    if (optionForm) optionForm.appendChild(variantsInput);
+
+    function updateVariantsString() {
+        const str = Object.entries(selections)
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .map(([group, val]) => `${group}: ${val}`)
+            .join(', ');
+        variantsInput.value = str;
+    }
+
+    if (parentBtns.length > 0) {
+        parentBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                parentBtns.forEach(b => b.classList.remove('active'));
+                valueContainers.forEach(c => c.classList.add('d-none'));
+
+                this.classList.add('active');
+                const targetId = this.getAttribute('data-target');
+                const targetContainer = document.getElementById(targetId);
+                if (targetContainer) {
+                    targetContainer.classList.remove('d-none');
+                    document.querySelectorAll('.product-option-value-btn').forEach(b => b.classList.remove('active'));
+                    for (let key in selections) delete selections[key];
+
+                    const groupName = targetContainer.dataset.groupName;
+                    const firstAvailable = targetContainer.querySelector('.product-option-value-btn.available');
+                    if (firstAvailable) {
+                        firstAvailable.classList.add('active');
+                        selections[groupName] = firstAvailable.dataset.valueName;
+                    }
+                    updateVariantsString();
+                }
+            });
+        });
+
+        document.querySelectorAll('.product-option-value-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const container = this.closest('.option-values-container');
+                const groupName = container.dataset.groupName;
+                document.querySelectorAll('.product-option-value-btn').forEach(b => b.classList.remove('active'));
+                for (let key in selections) delete selections[key];
+                this.classList.add('active');
+                selections[groupName] = this.dataset.valueName;
+                updateVariantsString();
+            });
+        });
+
+        function autoSelectFirst() {
+            const activeContainer = Array.from(valueContainers).find(c => !c.classList.contains('d-none'));
+            if (activeContainer) {
+                const groupName = activeContainer.dataset.groupName;
+                const firstAvailable = activeContainer.querySelector('.product-option-value-btn.available');
+                if (firstAvailable) {
+                    firstAvailable.classList.add('active');
+                    selections[groupName] = firstAvailable.dataset.valueName;
+                }
+            }
+            updateVariantsString();
+        }
+        autoSelectFirst();
+    }
+
+    // ── Rest of the product page handlers ──
     const mainImg = document.getElementById('main-product-img');
     const thumbnails = document.querySelectorAll('.pd-thumbnail');
     const pdPrevImg = document.getElementById('pd-prev-img');
@@ -817,7 +873,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const originalBtnHtml = pdSubmit.innerHTML;
-            pdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Añadiendo...';
             pdSubmit.disabled = true;
 
             fetch(actionUrl.toString(), {
@@ -838,14 +893,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
-                    pdSubmit.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Agregado!';
+                    // Preserve original width to avoid layout jump
+                    const btnWidth = pdSubmit.offsetWidth;
+                    pdSubmit.style.minWidth = btnWidth + 'px';
+                    
+                    pdSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
                     pdSubmit.style.background = '#198754'; // Bootstrap success color
+                    
+                    // Reset quantity selector with animation
+                    if (pdQty) {
+                        pdQty.value = 1;
+                        const qtyContainer = document.getElementById('qty-control');
+                        if (qtyContainer) {
+                            qtyContainer.classList.remove('qty-reset-animate');
+                            void qtyContainer.offsetWidth; // Trigger reflow
+                            qtyContainer.classList.add('qty-reset-animate');
+                        }
+                    }
+
+                    // Deselect all options
+                    for (let key in selections) delete selections[key];
+                    document.querySelectorAll('.product-option-value-btn').forEach(btn => btn.classList.remove('active'));
+                    updateVariantsString();
                     
                     setTimeout(() => {
                         pdSubmit.style.background = '';
+                        pdSubmit.style.minWidth = '';
                         pdSubmit.innerHTML = originalBtnHtml;
                         pdSubmit.disabled = false;
-                    }, 2000);
+                    }, 1000);
                 }
             })
             .catch(err => {
@@ -855,6 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
 
     // Related Products Scroll
     const rpContainer = document.getElementById('rp-container');

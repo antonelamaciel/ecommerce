@@ -168,6 +168,19 @@
             100% { transform: rotate(0deg); }
         }
 
+        /* ── Check Animation (Energetic 1s) ── */
+        @keyframes checkPop {
+            0% { transform: scale(0); opacity: 0; }
+            40% { transform: scale(1.4); opacity: 1; }
+            60% { transform: scale(0.9); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .check-animated {
+            display: inline-flex;
+            animation: checkPop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
         @media (max-width: 575px) {
             .bundle-pill {
                 font-size: 0.55rem;
@@ -335,7 +348,119 @@
     </script>
     {% block javascripts %}{% endblock %}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+            // Global AJAX Cart Add logic for .pcard__buy-btn
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.pcard__buy-btn');
+                if (!btn || btn.getAttribute('id') === 'pd-submit') return; // pd-submit has its own logic
+                
+                e.preventDefault();
+                const url = new URL(btn.href);
+                url.searchParams.set('ajax', '1');
+                
+                const originalHtml = btn.innerHTML;
+                btn.classList.add('disabled');
+                btn.style.pointerEvents = 'none';
+
+                fetch(url.toString(), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update cart badges
+                        const badges = document.querySelectorAll('.cart-badge');
+                        if (badges.length > 0) {
+                            badges.forEach(b => b.textContent = data.cartCount);
+                        }
+                        
+                        // Check animation
+                        const oldBg = btn.style.background;
+                        btn.style.background = '#198754';
+                        btn.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.25rem;"></i></span>';
+                        
+                        setTimeout(() => {
+                            btn.style.background = oldBg;
+                            btn.innerHTML = originalHtml;
+                            btn.classList.remove('disabled');
+                            btn.style.pointerEvents = 'auto';
+                        }, 1000);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    btn.classList.remove('disabled');
+                    btn.style.pointerEvents = 'auto';
+                });
+            });
+
+            // Quick View Modal AJAX Add to Cart
+            document.addEventListener('DOMContentLoaded', function() {
+                const quickViewModal = document.getElementById('quickViewModal');
+                if (quickViewModal) {
+                    quickViewModal.addEventListener('submit', function(e) {
+                        const qvForm = e.target.closest('#quickViewModal form');
+                        if (!qvForm) return;
+
+                        e.preventDefault();
+                        const qvSubmit = qvForm.querySelector('#pd-submit');
+                        const originalHtml = qvSubmit.innerHTML;
+                        const bsModal = bootstrap.Modal.getInstance(quickViewModal);
+
+                        qvSubmit.disabled = true;
+                        qvSubmit.style.pointerEvents = 'none';
+
+                        const formData = new FormData(qvForm);
+                        formData.append('ajax', '1');
+
+                        fetch(qvForm.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const badges = document.querySelectorAll('.cart-badge');
+                                if (badges.length > 0) {
+                                    badges.forEach(b => b.textContent = data.cartCount);
+                                }
+
+                                qvSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
+                                qvSubmit.style.background = '#198754';
+                                
+                                setTimeout(() => {
+                                    if (bsModal) {
+                                        bsModal.hide();
+                                    } else if (window.jQuery) {
+                                        $('#quickViewModal').modal('hide');
+                                    }
+                                    // reset state
+                                    setTimeout(() => {
+                                        qvSubmit.style.background = '';
+                                        qvSubmit.innerHTML = originalHtml;
+                                        qvSubmit.disabled = false;
+                                        qvSubmit.style.pointerEvents = 'auto';
+                                    }, 300);
+                                }, 1000);
+                            } else {
+                                // Handle error or display message
+                                console.error('Error adding to cart from quick view:', data.error);
+                                qvSubmit.disabled = false;
+                                qvSubmit.style.pointerEvents = 'auto';
+                                qvSubmit.innerHTML = originalHtml;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                            qvSubmit.disabled = false;
+                            qvSubmit.style.pointerEvents = 'auto';
+                            qvSubmit.innerHTML = originalHtml;
+                        });
+                    });
+                }
+            });
+
+            // Cookie Banner Logic
             const banner = document.getElementById('cookieBanner');
             const acceptBtn = document.getElementById('acceptCookies');
 
@@ -360,17 +485,19 @@
                 document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
             }
 
-            if (!getCookie('cookie_consent')) {
-                banner.style.display = 'flex';
-            }
+            if (banner && acceptBtn) {
+                if (!getCookie('cookie_consent')) {
+                    banner.style.display = 'flex';
+                }
 
-            acceptBtn.addEventListener('click', function() {
-                setCookie('cookie_consent', 'true', 365);
-                banner.style.opacity = '0';
-                setTimeout(() => {
-                    banner.style.display = 'none';
-                }, 300);
-            });
+                acceptBtn.addEventListener('click', function() {
+                    setCookie('cookie_consent', 'true', 365);
+                    banner.style.opacity = '0';
+                    setTimeout(() => {
+                        banner.style.display = 'none';
+                    }, 300);
+                });
+            }
         });
     </script>
 </body>
