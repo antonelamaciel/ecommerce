@@ -46,9 +46,22 @@ class Product
     #[ORM\ManyToMany(targetEntity: Subcategory::class, inversedBy: 'products')]
     private $subcategories;
 
+    #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'products')]
+    private $bundles;
+
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductOption::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $options;
+
     public function __construct()
     {
         $this->subcategories = new ArrayCollection();
+        $this->bundles = new ArrayCollection();
+        $this->options = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->name ?? '';
     }
 
     public function getId(): ?int
@@ -184,6 +197,63 @@ class Product
     public function removeSubcategory(Subcategory $subcategory): self
     {
         $this->subcategories->removeElement($subcategory);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Bundle[]
+     */
+    public function getBundles(): Collection
+    {
+        return $this->bundles;
+    }
+
+    public function addBundle(Bundle $bundle): self
+    {
+        if (!$this->bundles->contains($bundle)) {
+            $this->bundles[] = $bundle;
+            $bundle->addProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBundle(Bundle $bundle): self
+    {
+        if ($this->bundles->removeElement($bundle)) {
+            $bundle->removeProduct($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductOption>
+     */
+    public function getOptions(): Collection
+    {
+        return $this->options;
+    }
+
+    public function addOption(ProductOption $option): static
+    {
+        if (!$this->options->contains($option)) {
+            $this->options->add($option);
+            $option->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOption(ProductOption $option): static
+    {
+        if ($this->options->removeElement($option)) {
+            // set the owning side to null (unless already changed)
+            if ($option->getProduct() === $this) {
+                $option->setProduct(null);
+            }
+        }
 
         return $this;
     }

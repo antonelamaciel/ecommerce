@@ -94,6 +94,127 @@
         body {
             overflow-x: hidden;
         }
+
+        /* ── Global Bundle Pills (Responsive) ── */
+        .bundle-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 99px;
+            margin-left: 0.4rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            color: #fff;
+            text-align: center;
+            line-height: 1.2;
+            animation: pillShake 5s infinite;
+        }
+        .bundle-pill--oferta_sorpresa { background-color: #198754; }
+        .bundle-pill--ultimos_stock { background-color: #dc3545; }
+        .bundle-pill--pocas_unidades { background-color: #ffc107; color: #000; }
+        
+        /* ── Top Right Badges (Envío, Recomendado, etc) ── */
+        .top-badge-right {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            z-index: 10;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .top-badge-right--envio_gratis { background-color: #198754; }
+        .top-badge-right--recomendado { background-color: #ffb100; color: #111; }
+        .top-badge-right--mas_vendido { background-color: #dc3545; }
+
+        /* ── Diagonal line for unavailable options ── */
+        .option-unavailable {
+            position: relative;
+            background-color: #f8f8f8 !important;
+            color: #adb5bd !important;
+            border-color: #e0e0e0 !important;
+            text-decoration: none !important;
+            opacity: 0.8;
+            overflow: hidden;
+        }
+        .option-unavailable::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: -10%;
+            width: 120%;
+            height: 1.5px;
+            background-color: #b0b0b0;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        @keyframes pillShake {
+            0%, 85% { transform: rotate(0deg); }
+            88% { transform: rotate(-5deg) scale(1.05); }
+            91% { transform: rotate(5deg) scale(1.05); }
+            94% { transform: rotate(-5deg) scale(1.05); }
+            97% { transform: rotate(5deg) scale(1.05); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @media (max-width: 575px) {
+            .bundle-pill {
+                font-size: 0.55rem;
+                padding: 0.2rem 0.4rem;
+                margin-left: 0.2rem;
+                white-space: normal;
+                display: inline-block;
+            }
+        }
+        /* ── Cookie Banner Styles ── */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 1.5rem;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-top: 3px solid var(--primary-color);
+        }
+        .cookie-banner__text {
+            font-size: 0.95rem;
+            color: #444;
+            flex: 1;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .cookie-banner {
+                padding: 1rem;
+                text-align: center;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .cookie-banner__text {
+                font-size: 0.85rem;
+            }
+            .cookie-banner button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -163,6 +284,14 @@
         }
     </style>
 
+    <div id="cookieBanner" class="cookie-banner">
+        <p class="cookie-banner__text">
+            <i class="bi bi-info-circle-fill me-2" style="color: var(--primary-color);"></i>
+            Utilizamos cookies propias y de terceros para mejorar tu experiencia de navegación y ofrecerte contenidos de interés. Al continuar navegando, aceptas nuestra política de cookies.
+        </p>
+        <button id="acceptCookies" class="btn btn-dark rounded-pill px-4 fw-bold">Entendido</button>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="{{asset('assets/js/bootstrap.bundle.js')}}"></script>
     <script>
@@ -205,5 +334,44 @@
         }
     </script>
     {% block javascripts %}{% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const banner = document.getElementById('cookieBanner');
+            const acceptBtn = document.getElementById('acceptCookies');
+
+            function getCookie(name) {
+                let nameEQ = name + "=";
+                let ca = document.cookie.split(';');
+                for(let i=0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0)==' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+
+            function setCookie(name, value, days) {
+                let expires = "";
+                if (days) {
+                    let date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
+            }
+
+            if (!getCookie('cookie_consent')) {
+                banner.style.display = 'flex';
+            }
+
+            acceptBtn.addEventListener('click', function() {
+                setCookie('cookie_consent', 'true', 365);
+                banner.style.opacity = '0';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 300);
+            });
+        });
+    </script>
 </body>
 </html>

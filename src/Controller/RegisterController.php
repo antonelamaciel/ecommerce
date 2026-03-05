@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
  */
 class RegisterController extends AbstractController
 {
-    #[Route('/inscription', name: 'register')]
+    #[Route('/register', name: 'register')]
     public function index(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginAuthenticator $authenticator, EntityManagerInterface $em): Response
     {
         $user = new User();

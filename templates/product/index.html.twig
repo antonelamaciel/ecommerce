@@ -606,6 +606,14 @@
                 {% for product in products %}
                     <div class="col mb-3">
                         <article class="pcard">
+                            {% for bundle in product.bundles %}
+                              {% if bundle.topRightBadge %}
+                                {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : 
+                                                   (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
+                                <span class="top-badge-right top-badge-right--{{ bundle.topRightBadge }}">{{ badgeText }}</span>
+                              {% endif %}
+                            {% endfor %}
+
                             <div class="pcard__img-wrap">
                                 <a href="{{ path('product_show', {slug: product.slug}) }}">
                                     <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" data-extra-images="{{ product.images|default([])|json_encode }}">
@@ -614,17 +622,39 @@
 
                             <div class="pcard__body">
                                 <h3 class="pcard__name">
-                                    <a href="{{ path('product_show', {slug: product.slug}) }}">{{ product.name }}</a>
+                                    <a href="{{ path('product_show', {slug: product.slug}) }}">
+                                        {{ product.name }}
+                                        {% if product.bundles|length > 0 %}
+                                            {% for bundle in product.bundles %}
+                                                {% set pillText = 'Descuento Especial' %}
+                                                {% if bundle.type == 'oferta_sorpresa' %}{% set pillText = 'Oferta sorpresa!' %}{% endif %}
+                                                {% if bundle.type == 'ultimos_stock' %}{% set pillText = 'Últimos en stock!' %}{% endif %}
+                                                {% if bundle.type == 'pocas_unidades' %}{% set pillText = '¡Apúrate, quedan pocas unidades!' %}{% endif %}
+                                                <span class="bundle-pill bundle-pill--{{ bundle.type }}" title="{{ bundle.title }}">{{ pillText }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </a>
                                 </h3>
                                 <span class="pcard__subtitle">{{ product.subtitle }}</span>
                                 <div class="pcard__footer">
                                     <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
                                 </div>
                             </div>
+                            {% set firstVariant = null %}
+                            {% for option in product.options %}
+                                {% if option.isAvailable and not firstVariant %}
+                                    {% for value in option.productOptionValues %}
+                                        {% if value.isAvailable and not firstVariant %}
+                                             {% set firstVariant = option.name ~ ': ' ~ value.name %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set variantString = firstVariant %}
                             <div class="pcard__actions">
-                                <a href="{{ path('add_to_cart', {id: product.id}) }}" class="pcard__buy-btn">
-                                    <i class="bi bi-bag-plus d-md-none"></i>
-                                    <span class="d-none d-md-inline">Añadir al carrito</span>
+                                <a href="{{ path('add_to_cart', {id: product.id, variants: variantString}) }}" class="pcard__buy-btn">
+                                    <i class="bi bi-cart-plus d-md-none"></i>
+                                    <span class="d-none d-md-inline">Comprar ahora</span>
                                     <span class="d-inline d-md-none">Añadir</span>
                                 </a>
                                 <a href="{{ path('product_show', {slug: product.slug}) }}" class="pcard__detail-btn">
@@ -632,6 +662,46 @@
                                     <span class="d-none d-md-inline">Ver detalles del producto</span>
                                     <span class="d-inline d-md-none">Ver</span>
                                 </a>
+                            </div>
+                            <div class="pcard__options-store d-none">
+                                {% if product.options|length > 0 %}
+                                    <div class="product-options-interactive-store mb-2 mt-2 w-100">
+                                        {# Parents Row #}
+                                        <div class="d-flex flex-wrap gap-1 justify-content-center mb-2 qv-parents-row">
+                                            {% for option in product.options %}
+                                                {% if option.isAvailable %}
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-dark rounded-pill px-3 qv-parent-btn {% if loop.first %}active{% endif %}" 
+                                                            data-target="qv-option-list-{{ product.id }}-{{ option.id }}"
+                                                            style="font-size: 0.7rem; border: 1.5px solid #ddd; font-weight: 700;">
+                                                        {{ option.name }}
+                                                    </button>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+
+                                        {# Children Containers #}
+                                        {% for option in product.options %}
+                                            {% if option.isAvailable %}
+                                                <div class="qv-option-values {% if not loop.first %}d-none{% endif %}" 
+                                                     id="qv-option-list-{{ product.id }}-{{ option.id }}"
+                                                     data-group-name="{{ option.name }}">
+                                                    <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                                        {% for value in option.productOptionValues %}
+                                                            <button type="button" 
+                                                                  class="btn btn-sm qv-value-btn {{ value.isAvailable ? '' : 'option-unavailable' }}" 
+                                                                  data-value-name="{{ value.name }}"
+                                                                  {% if not value.isAvailable %}disabled{% endif %}
+                                                                  style="border: 1px solid {{ value.isAvailable ? 'var(--primary-color, #333)' : '#ccc' }}; color: {{ value.isAvailable ? '#000' : '#adb5bd' }}; background: transparent; font-size: 0.75rem; padding: 0.2rem 0.5rem; transition: all 0.2s;">
+                                                                {{ value.name }}
+                                                            </button>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </article>
                     </div>

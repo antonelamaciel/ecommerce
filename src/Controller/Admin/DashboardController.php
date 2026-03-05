@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Bundle;
 use App\Entity\Carrier;
 use App\Entity\Category;
 use App\Entity\Headers;
@@ -58,6 +59,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Catálogo', 'fas fa-tags')->setSubItems([
             MenuItem::linkToCrud('Productos', 'fas fa-box', Product::class),
             MenuItem::linkToCrud('Categorías', 'fas fa-folder-open', Category::class),
+            MenuItem::linkToCrud('Promociones', 'fas fa-fire', Bundle::class),
         ]);
 
         yield MenuItem::subMenu('Logística', 'fas fa-truck-moving')->setSubItems([

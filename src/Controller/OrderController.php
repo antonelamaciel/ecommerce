@@ -22,7 +22,7 @@ class OrderController extends AbstractController
      * @param Cart $cart
      * @return Response
      */
-    #[Route('/commande', name: 'order')]
+    #[Route('/order', name: 'order')]
     public function index(SessionInterface $session, Cart $cart): Response
     {
         $user = $this->getUser();
@@ -69,7 +69,7 @@ class OrderController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    #[Route('/commande/recap', name: 'order_add', methods: 'POST')]
+    #[Route('/order/summary', name: 'order_add', methods: 'POST')]
     public function summary(Cart $cart, Request $request, EntityManagerInterface $em): Response
     {
          //Récupération du panier en session
@@ -113,6 +113,7 @@ class OrderController extends AbstractController
                 $orderDetails
                     ->setBindedOrder($order)
                     ->setProduct($item['product']->getName())
+                    ->setVariants($item['variants'])
                     ->setQuantity($item['quantity'])
                     ->setPrice($item['product']->getPrice())
                     ->setTotal($item['product']->getPrice() * $item['quantity'])

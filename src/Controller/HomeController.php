@@ -11,20 +11,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function index(ProductRepository $productRepository, HeadersRepository $headersRepository): Response
+    public function index(ProductRepository $productRepository, HeadersRepository $headersRepository, \App\Repository\BundleRepository $bundleRepository): Response
     {
         $products = $productRepository->findByIsInHome(1);
         $allProducts = $productRepository->findAll();
         $headers = $headersRepository->findAll();
+        
+        $qb = $bundleRepository->createQueryBuilder('b');
+        $qb->where($qb->expr()->isNotNull('b.countdownHours'))
+           ->setMaxResults(1);
+        $countdownBundle = $qb->getQuery()->getOneOrNullResult();
+
         return $this->render('home/index.html.twig', [
-            'carousel' => true,  //Le caroussel ne s'affiche que sur la page d'accueil (voir base.twig)
+            'carousel' => true,
             'top_products' => $products,
             'all_products' => $allProducts,
-            'headers' => $headers
+            'headers' => $headers,
+            'countdownBundle' => $countdownBundle
         ]);
     }
 
-    #[Route('a-propos', name: 'about')]
+    #[Route('/about', name: 'about')]
     public function about(\App\Repository\AboutRepository $repository): Response
     {
         $contents = $repository->findBy(['isPublished' => true], ['priority' => 'ASC']);

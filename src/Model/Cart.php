@@ -6,10 +6,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Permet de gérer un panier en session plutot que de tout implémenter dans le controller
+ * Modifié pour supporter les variantes (opciones e hijas)
  */
 class Cart 
 {
     private $session;
+    private $repository;
 
     public function __construct(SessionInterface $session, ProductRepository $repository)
     {
@@ -17,103 +19,103 @@ class Cart
         $this->repository = $repository;
     }
 
-
     /**
-     * Crée un tableau associatif id => quantité et le stocke en session
+     * Ajoute un produit au panier avec ses variantes
      *
      * @param int $id
+     * @param int $qty
+     * @param string|null $variants
      * @return void
      */
-    public function add(int $id, int $qty = 1):void
+    public function add(int $id, int $qty = 1, string $variants = null): void
     {
-        $cart = $this->session->get('cart', []);
+        $cart = $this->session->get('cart_v2', []);
+        
+        // Trim and normalize variants string
+        $variants = $variants ? trim($variants) : null;
+        if ($variants === '') $variants = null;
+        
+        // Créer une clé unique basée sur l'ID du produit et ses variantes
+        $compositeId = $variants ? $id . '-' . md5($variants) : (string)$id;
 
-        if (empty($cart[$id])) {
-            $cart[$id] = $qty;
+        if (empty($cart[$compositeId])) {
+            $cart[$compositeId] = [
+                'id' => $id,
+                'qty' => $qty,
+                'variants' => $variants
+            ];
         } else {
-            $cart[$id] += $qty;
+            $cart[$compositeId]['qty'] += $qty;
         }
 
-        $this->session->set('cart', $cart);
-
+        $this->session->set('cart_v2', $cart);
     }
 
     /**
-     * Récupère le panier en session
-     *
-     * @return array
+     * Récupère le panier
      */
     public function get(): array
     {
-        return $this->session->get('cart');
+        return $this->session->get('cart_v2', []);
     }
 
-
     /**
-     * Supprime entièrement le panier en session
-     *
-     * @return void
+     * Supprime entièrement le panier
      */
     public function remove(): void
     {
-        $this->session->remove('cart');
+        $this->session->remove('cart_v2');
     }
 
-
     /**
-     * Supprime entièrement un produit du panier (quelque soit sa quantité)
+     * Supprime un item du panier via sa clé composite
      *
-     * @param int $id
+     * @param string $compositeId
      * @return void
      */
-    public function removeItem(int $id): void
+    public function removeItem(string $compositeId): void
     {
-        $cart = $this->session->get('cart', []);
-        unset($cart[$id]);
-        $this->session->set('cart', $cart);
+        $cart = $this->session->get('cart_v2', []);
+        unset($cart[$compositeId]);
+        $this->session->set('cart_v2', $cart);
     }
 
-
     /**
-     * Diminue de 1 la quantité d'un produit
+     * Diminue la quantité d'un item
      *
-     * @param int $id
+     * @param string $compositeId
      * @return void
      */
-    public function decreaseItem(int $id): void
+    public function decreaseItem(string $compositeId): void
     {
-        $cart = $this->session->get('cart', []);
-        if ($cart[$id] < 2) {
-            unset($cart[$id]);
-        } else {
-            $cart[$id]--;
+        $cart = $this->session->get('cart_v2', []);
+        if (isset($cart[$compositeId])) {
+            if ($cart[$compositeId]['qty'] < 2) {
+                unset($cart[$compositeId]);
+            } else {
+                $cart[$compositeId]['qty']--;
+            }
         }
-        $this->session->set('cart', $cart);
+        $this->session->set('cart_v2', $cart);
     }
 
-
     /**
-     * Récupère la quantité totale de produits dans le panier
-     *
-     * @return int
+     * Quantité totale d'articles
      */
     public function getFullQuantity(): int
     {
-        $cart = $this->session->get('cart', []);
+        $cart = $this->session->get('cart_v2', []);
         $quantity = 0;
 
-        foreach ($cart as $id => $qty) {
-            $quantity += $qty;
+        foreach ($cart as $item) {
+            $quantity += $item['qty'];
         }
 
         return $quantity;
     }
 
     /**
-     * Récupère le panier en session, puis récupère les objets produits de la bdd
-     * et calcule les totaux
-     *
-     * @return array
+     * Détails complets du panier pour affichage
      */
     public function getDetails(): array
     {
@@ -125,17 +127,19 @@ class Cart
             ],
         ];
 
-        $cart = $this->session->get('cart', []);
+        $cart = $this->session->get('cart_v2', []);
         if ($cart) {
-            foreach ($cart as $id => $quantity) {
-                $currentProduct = $this->repository->find($id);
+            foreach ($cart as $compositeId => $item) {
+                $currentProduct = $this->repository->find($item['id']);
                 if ($currentProduct) {
                     $cartProducts['products'][] = [
                         'product' => $currentProduct,
-                        'quantity' => $quantity
+                        'quantity' => $item['qty'],
+                        'variants' => $item['variants'],
+                        'compositeId' => $compositeId
                     ];
-                    $cartProducts['totals']['quantity'] += $quantity;
-                    $cartProducts['totals']['price'] += $quantity * $currentProduct->getPrice();
+                    $cartProducts['totals']['quantity'] += $item['qty'];
+                    $cartProducts['totals']['price'] += $item['qty'] * $currentProduct->getPrice();
                 }
             }
         }

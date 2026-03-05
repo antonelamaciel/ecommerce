@@ -234,18 +234,25 @@
                         
                         <div class="cart-item__info">
                             <h3 class="cart-item__name">
-                                <a href="{{ path('product_show', {slug: item.product.slug}) }}">{{ item.product.name }}</a>
+                                <a href="{{ path('product_show', {slug: item.product.slug}) }}">
+                                    {{ item.quantity }} x {{ item.product.name }}
+                                </a>
                             </h3>
-                            <span class="cart-item__details">{{ item.product.subtitle }}</span>
+                            {% if item.variants %}
+                                <div class="cart-item__variants" style="font-size: 0.9rem; color: var(--c-muted); margin-top: 2px;">
+                                    <i class="bi bi-gear-fill me-1" style="font-size: 0.8rem;"></i> {{ item.variants }}
+                                </div>
+                            {% endif %}
+                            <span class="cart-item__details mt-1 d-block">{{ item.product.subtitle }}</span>
                         </div>
 
                         <div class="cart-item__actions">
                             <div class="qty-ctrl">
-                                <a href="{{ path('decrease_item', {id: item.product.id}) }}" class="qty-btn" title="Quitar uno">
+                                <a href="{{ path('decrease_item', {id: item.compositeId}) }}" class="qty-btn" title="Quitar uno">
                                     <i class="bi bi-dash-lg"></i>
                                 </a>
                                 <span class="qty-val">{{ item.quantity }}</span>
-                                <a href="{{ path('add_to_cart', {id: item.product.id}) }}" class="qty-btn" title="Añadir uno">
+                                <a href="{{ path('add_to_cart', {id: item.product.id, qty: 1, variants: item.variants}) }}" class="qty-btn" title="Añadir uno">
                                     <i class="bi bi-plus-lg"></i>
                                 </a>
                             </div>
@@ -255,7 +262,7 @@
                                 <span class="price-unit">$ {{ (item.product.price / 100)|number_format(2,',','.') }} ARS / ud.</span>
                             </div>
 
-                            <a href="{{ path('remove_cart_item', {id: item.product.id}) }}" class="btn-remove-item" title="Eliminar artículo">
+                            <a href="{{ path('remove_cart_item', {id: item.compositeId}) }}" class="btn-remove-item" title="Eliminar artículo">
                                 <i class="bi bi-x-circle-fill"></i>
                             </a>
                         </div>

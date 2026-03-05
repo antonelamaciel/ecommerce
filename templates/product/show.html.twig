@@ -254,6 +254,122 @@
     /* Calculador envios */
 
   }
+
+  /* ── Related Products ── */
+  .pcard {
+    background: var(--c-surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--c-border);
+    text-decoration: none;
+    color: var(--c-ink);
+  }
+  .pcard:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,.08);
+    transform: translateY(-6px);
+  }
+  .pcard__img-wrap {
+    aspect-ratio: 1/1;
+    background: #fdfcfb;
+    margin: 0.5rem;
+    border-radius: calc(var(--radius-md) - 6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .pcard__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 1.5rem;
+    transition: transform .6s ease;
+  }
+  .pcard:hover .pcard__img { transform: scale(1.08); }
+  
+  .pcard__body {
+    padding: 0.5rem 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    text-align: center;
+  }
+  .pcard__name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .pcard__subtitle {
+    font-size: 0.8rem;
+    color: var(--c-muted);
+  }
+  .pcard__price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+
+  /* Scroll container */
+  .related-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 1rem 0.5rem 2rem 0.5rem;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  .related-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Edge */
+  }
+  .related-scroll-container > .pcard {
+    scroll-snap-align: start;
+    width: 220px;
+    flex-shrink: 0;
+  }
+  .scroll-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    transition: var(--transition);
+  }
+  .scroll-btn:hover {
+    background: var(--c-ink);
+    color: #fff;
+  }
+  .scroll-btn-left { left: -20px; }
+  .scroll-btn-right { right: -20px; }
+  
+  @media (max-width: 991px) {
+    .related-scroll-container > .pcard {
+      width: 160px;
+    }
+    .pcard__name { font-size: 0.85rem; }
+    .pcard__price { font-size: 1rem; }
+    .pcard__img { padding: 1rem; }
+  }
 </style>
 
 <div class="container product-detail">
@@ -283,7 +399,14 @@
                     <button type="button" id="pd-prev-img" class="btn text-white rounded-circle shadow flex-shrink-0 d-flex align-items-center justify-content-center" style="width:42px; height:42px; min-width:42px; background: var(--primary-color, #333); border: none; transition: opacity 0.2s;"><i class="bi bi-chevron-left fs-5"></i></button>
                     {% endif %}
                     
-                    <div class="pdetail-img-wrap flex-grow-1 w-100 mx-3">
+                    <div class="pdetail-img-wrap flex-grow-1 w-100 mx-3" style="position: relative;">
+                        {% for bundle in product.bundles %}
+                          {% if bundle.topRightBadge %}
+                            {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : 
+                                               (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
+                            <span class="top-badge-right top-badge-right--{{ bundle.topRightBadge }}" style="font-size: 0.85rem; padding: 0.5rem 0.8rem;">{{ badgeText }}</span>
+                          {% endif %}
+                        {% endfor %}
                         <img id="main-product-img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" class="pdetail-img">
                     </div>
                     
@@ -305,7 +428,19 @@
         <!-- Derecha: Datos -->
         <div class="col-lg-6">
             <header class="pdetail-header">
-                <h1 class="pdetail-title">{{ product.name }}</h1>
+                <h1 class="pdetail-title">
+                  {{ product.name }}
+                  {% if product.bundles|length > 0 %}
+                    <br class="d-md-none">
+                    {% for bundle in product.bundles %}
+                      {% set pillText = 'Descuento Especial' %}
+                      {% if bundle.type == 'oferta_sorpresa' %}{% set pillText = 'Oferta sorpresa!' %}{% endif %}
+                      {% if bundle.type == 'ultimos_stock' %}{% set pillText = 'Últimos en stock!' %}{% endif %}
+                      {% if bundle.type == 'pocas_unidades' %}{% set pillText = '¡Apúrate, quedan pocas unidades!' %}{% endif %}
+                      <span class="bundle-pill bundle-pill--{{ bundle.type }}" title="{{ bundle.title }}" style="font-size: 0.8rem; margin-top: 0.5rem; margin-left: 0;">{{ pillText }}</span>
+                    {% endfor %}
+                  {% endif %}
+                </h1>
                 <p class="pdetail-subtitle">{{ product.subtitle }}</p>
             </header>
 
@@ -319,6 +454,146 @@
                     Ver medios de pago
                 </a>
             </div>
+
+            {% if product.options|length > 0 %}
+                <div class="product-options-interactive mb-4">
+                    {# Parent Options Row #}
+                    <div class="d-flex flex-wrap gap-2 mb-3" id="parent-options-container">
+                        {% for option in product.options %}
+                            {% if option.isAvailable %}
+                                <button type="button" 
+                                        class="btn btn-outline-dark rounded-pill px-4 fw-bold parent-option-btn {% if loop.first %}active{% endif %}" 
+                                        data-target="option-group-{{ option.id }}"
+                                        style="font-size: 0.85rem; border: 1.5px solid #ddd; transition: all 0.2s;">
+                                    {{ option.name }}
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {# Children Values Containers #}
+                    {% for option in product.options %}
+                        {% if option.isAvailable %}
+                            <div class="option-values-container {% if not loop.first %}d-none{% endif %}" 
+                                 id="option-group-{{ option.id }}"
+                                 data-group-name="{{ option.name }}">
+                                <div class="d-flex flex-wrap gap-2 animate__animated animate__fadeInUp animate__faster">
+                                    {% for value in option.productOptionValues %}
+                                        <button type="button" 
+                                              class="btn product-option-value-btn {{ value.isAvailable ? 'available' : 'option-unavailable text-muted' }}" 
+                                              data-value-name="{{ value.name }}"
+                                              {% if not value.isAvailable %}disabled{% endif %}
+                                              style="padding: 0.4rem 0.8rem; border: 1px solid {{ value.isAvailable ? 'var(--primary-color, #333)' : '#ccc' }}; border-radius: 4px; font-weight: 600; font-size: 0.85rem; color: {{ value.isAvailable ? '#000' : '#adb5bd' }}; background: transparent; transition: all 0.2s;">
+                                            {{ value.name }}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <style>
+                    .parent-option-btn.active {
+                        background-color: var(--primary-color, #000) !important;
+                        color: #fff !important;
+                        border-color: var(--primary-color, #000) !important;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    }
+                    .parent-option-btn:hover:not(.active) {
+                        border-color: var(--primary-color, #000) !important;
+                        color: var(--primary-color, #000) !important;
+                    }
+                    .product-option-value-btn.active {
+                        background-color: #000 !important;
+                        color: #fff !important;
+                        border-color: #000 !important;
+                    }
+                    .product-option-value-btn:hover:not(.active):not(:disabled) {
+                        background-color: #f8f9fa;
+                    }
+                </style>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const parentBtns = document.querySelectorAll('.parent-option-btn');
+                        const valueContainers = document.querySelectorAll('.option-values-container');
+                        const selections = {}; // Track selections like { "Color": "Rojo", "Talle": "L" }
+                        const variantsInput = document.createElement('input');
+                        variantsInput.type = 'hidden';
+                        variantsInput.name = 'variants';
+                        
+                        const form = document.querySelector('#product-add-form');
+                        if (form) form.appendChild(variantsInput);
+
+                        function updateVariantsString() {
+                            const str = Object.entries(selections)
+                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .map(([group, val]) => `${group}: ${val}`)
+                                .join(', ');
+                            variantsInput.value = str;
+                        }
+
+                        parentBtns.forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                parentBtns.forEach(b => b.classList.remove('active'));
+                                valueContainers.forEach(c => c.classList.add('d-none'));
+
+                                this.classList.add('active');
+                                const targetId = this.getAttribute('data-target');
+                                const targetContainer = document.getElementById(targetId);
+                                if (targetContainer) {
+                                    targetContainer.classList.remove('d-none');
+                                    
+                                    // Reset all selections when switching parent groups
+                                    document.querySelectorAll('.product-option-value-btn').forEach(b => b.classList.remove('active'));
+                                    for (let key in selections) delete selections[key];
+
+                                    const groupName = targetContainer.dataset.groupName;
+                                    const firstAvailable = targetContainer.querySelector('.product-option-value-btn.available');
+                                    if (firstAvailable) {
+                                        firstAvailable.classList.add('active');
+                                        selections[groupName] = firstAvailable.dataset.valueName;
+                                    }
+                                    updateVariantsString();
+                                }
+                            });
+                        });
+
+                        document.querySelectorAll('.product-option-value-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const container = this.closest('.option-values-container');
+                                const groupName = container.dataset.groupName;
+                                
+                                // Reset ALL selections across ALL groups (exclusive selection)
+                                document.querySelectorAll('.product-option-value-btn').forEach(b => b.classList.remove('active'));
+                                for (let key in selections) delete selections[key];
+                                
+                                // Activate current and update selection
+                                this.classList.add('active');
+                                selections[groupName] = this.dataset.valueName;
+                                updateVariantsString();
+                            });
+                        });
+
+                        // Initialize selections: only auto-select the first available option of the ACTIVE group
+                        function autoSelectFirst() {
+                            const activeContainer = Array.from(valueContainers).find(c => !c.classList.contains('d-none'));
+                            if (activeContainer) {
+                                const groupName = activeContainer.dataset.groupName;
+                                const firstAvailable = activeContainer.querySelector('.product-option-value-btn.available');
+                                if (firstAvailable) {
+                                    firstAvailable.classList.add('active');
+                                    selections[groupName] = firstAvailable.dataset.valueName;
+                                }
+                            }
+                            updateVariantsString();
+                        }
+                        
+                        autoSelectFirst();
+                    });
+                </script>
+            {% endif %}
 
             <div class="pdetail-description">
                 <span class="pdetail-section-title">Sobre este artículo</span>
@@ -366,6 +641,102 @@
 
         </div>
     </div>
+
+    <!-- Related Products Section -->
+    {% if relatedProducts is defined and relatedProducts|length > 0 %}
+    <div class="mt-5 pt-5 border-top">
+        <h3 class="mb-4 fw-bold" style="font-size: 1.5rem; text-align: center;">Productos complementarios</h3>
+        <small class="d-block text-center mb-4">Podrian interesarte, hecha un vistazo</small>
+        
+        <div class="position-relative">
+            <!-- Left Button -->
+            <button class="scroll-btn scroll-btn-left d-none d-md-flex" id="rp-left">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <!-- Scroll Container -->
+            <div class="related-scroll-container" id="rp-container">
+                {% for related in relatedProducts %}
+                <a href="{{ path('product_show', {slug: related.slug}) }}" class="pcard">
+                    {% for rBundle in related.bundles %}
+                      {% if rBundle.topRightBadge %}
+                        {% set badgeText = rBundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : 
+                                           (rBundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
+                        <span class="top-badge-right top-badge-right--{{ rBundle.topRightBadge }}" style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">{{ badgeText }}</span>
+                      {% endif %}
+                    {% endfor %}
+
+                    <div class="pcard__img-wrap">
+                        <img class="pcard__img" src="/uploads/{{ related.image }}" alt="{{ related.name }}">
+                    </div>
+                    <div class="pcard__body">
+                        <h3 class="pcard__name">
+                          {{ related.name }}
+                          {% if related.bundles|length > 0 %}
+                            {% for rBundle in related.bundles %}
+                              {% set pillText = 'Descuento' %}
+                              {% if rBundle.type == 'oferta_sorpresa' %}{% set pillText = 'Oferta sorpresa!' %}{% endif %}
+                              {% if rBundle.type == 'ultimos_stock' %}{% set pillText = 'Últimos en stock!' %}{% endif %}
+                              {% if rBundle.type == 'pocas_unidades' %}{% set pillText = '¡Pocas unidades!' %}{% endif %}
+                              <span class="bundle-pill bundle-pill--{{ rBundle.type }}" style="font-size: 0.6rem; padding: 0.15rem 0.4rem; animation: pillShake 6s infinite;">{{ pillText }}</span>
+                            {% endfor %}
+                          {% endif %}
+                        </h3>
+                        <span class="pcard__subtitle">{{ related.subtitle }}</span>
+                        <div class="pcard__price">$ {{ (related.price / 100)|number_format(2, ',', '.') }} ARS</div>
+                    </div>
+                    <div class="pcard__options-store d-none">
+                        {% if related.options|length > 0 %}
+                            <div class="product-options-interactive-store mb-2 mt-2 w-100">
+                                {# Parents Row #}
+                                <div class="d-flex flex-wrap gap-1 justify-content-center mb-2 qv-parents-row">
+                                    {% for option in related.options %}
+                                        {% if option.isAvailable %}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-dark rounded-pill px-3 qv-parent-btn {% if loop.first %}active{% endif %}" 
+                                                    data-target="qv-option-rel-{{ related.id }}-{{ option.id }}"
+                                                    style="font-size: 0.7rem; border: 1.5px solid #ddd; font-weight: 700;">
+                                                {{ option.name }}
+                                            </button>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                {# Children Containers #}
+                                {% for option in related.options %}
+                                    {% if option.isAvailable %}
+                                        <div class="qv-option-values {% if not loop.first %}d-none{% endif %}" 
+                                             id="qv-option-rel-{{ related.id }}-{{ option.id }}"
+                                             data-group-name="{{ option.name }}">
+                                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                                {% for value in option.productOptionValues %}
+                                                    <button type="button" 
+                                                          class="btn btn-sm qv-value-btn {{ value.isAvailable ? '' : 'option-unavailable' }}" 
+                                                          data-value-name="{{ value.name }}"
+                                                          {% if not value.isAvailable %}disabled{% endif %}
+                                                          style="border: 1px solid {{ value.isAvailable ? 'var(--primary-color, #333)' : '#ccc' }}; color: {{ value.isAvailable ? '#000' : '#adb5bd' }}; background: transparent; font-size: 0.75rem; padding: 0.2rem 0.5rem; transition: all 0.2s;">
+                                                        {{ value.name }}
+                                                    </button>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Right Button -->
+            <button class="scroll-btn scroll-btn-right d-none d-md-flex" id="rp-right">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 
 <script>
@@ -440,6 +811,11 @@ document.addEventListener('DOMContentLoaded', function() {
             actionUrl.searchParams.set('qty', pdQty.value);
             actionUrl.searchParams.set('ajax', '1');
 
+            const vInput = pdForm.querySelector('input[name="variants"]');
+            if (vInput && vInput.value) {
+                actionUrl.searchParams.set('variants', vInput.value);
+            }
+
             const originalBtnHtml = pdSubmit.innerHTML;
             pdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Añadiendo...';
             pdSubmit.disabled = true;
@@ -478,6 +854,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 pdSubmit.disabled = false;
             });
         });
+    }
+
+    // Related Products Scroll
+    const rpContainer = document.getElementById('rp-container');
+    const rpLeft = document.getElementById('rp-left');
+    const rpRight = document.getElementById('rp-right');
+
+    if (rpContainer && rpLeft && rpRight) {
+        const itemWidth = rpContainer.querySelector('.pcard') ? rpContainer.querySelector('.pcard').offsetWidth + 24 : 240;
+        
+        rpLeft.addEventListener('click', () => {
+            rpContainer.scrollBy({ left: -itemWidth, behavior: 'smooth' });
+        });
+        rpRight.addEventListener('click', () => {
+            rpContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+        });
+        
+        // Hide/show buttons based on scroll position
+        const updateButtons = () => {
+            if (rpContainer.scrollLeft <= 0) {
+                rpLeft.style.opacity = '0.5';
+                rpLeft.style.pointerEvents = 'none';
+            } else {
+                rpLeft.style.opacity = '1';
+                rpLeft.style.pointerEvents = 'auto';
+            }
+            
+            if (rpContainer.scrollLeft + rpContainer.clientWidth >= rpContainer.scrollWidth - 1) {
+                rpRight.style.opacity = '0.5';
+                rpRight.style.pointerEvents = 'none';
+            } else {
+                rpRight.style.opacity = '1';
+                rpRight.style.pointerEvents = 'auto';
+            }
+        };
+        
+        rpContainer.addEventListener('scroll', updateButtons);
+        // Initial check
+        setTimeout(updateButtons, 100);
+        window.addEventListener('resize', updateButtons);
     }
 });
 </script>

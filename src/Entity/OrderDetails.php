@@ -29,9 +29,24 @@ class OrderDetails
     #[ORM\Column(type: 'float')]
     private $total;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $variants;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getVariants(): ?string
+    {
+        return $this->variants;
+    }
+
+    public function setVariants(?string $variants): self
+    {
+        $this->variants = $variants;
+
+        return $this;
     }
 
     public function getBindedOrder(): ?Order

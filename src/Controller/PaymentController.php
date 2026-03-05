@@ -18,7 +18,7 @@ class PaymentController extends AbstractController
     /**
      * Etape de vérification avant confirmation du paiement
      */
-    #[Route('/commande/checkout/{reference}', name: 'checkout')]
+    #[Route('/order/checkout/{reference}', name: 'checkout')]
     public function payment(string $reference): Response
     {
         return $this->redirectToRoute('mercadopago_checkout', ['reference' => $reference]);
@@ -27,7 +27,7 @@ class PaymentController extends AbstractController
     /**
      * Méthode appelée lorsque le paiement est validé
      */
-    #[Route('/commande/valide/{stripeSession}', name: 'payment_success')]
+    #[Route('/order/success/{stripeSession}', name: 'payment_success')]
     public function paymentSuccess(OrderRepository $repository, $stripeSession, EntityManagerInterface $em, Cart $cart) 
     {
         // For MP, stripeSession is actually the reference or preference_id. 
@@ -66,7 +66,7 @@ class PaymentController extends AbstractController
     /**
      * Commande annullée (clic sur retour dans la fenêtre)
      */
-    #[Route('/commande/echec/{stripeSession}', name: 'payment_fail')]
+    #[Route('/order/fail/{stripeSession}', name: 'payment_fail')]
     public function paymentFail(OrderRepository $repository, $stripeSession) 
     {
         $order = $repository->findOneByStripeSession($stripeSession);

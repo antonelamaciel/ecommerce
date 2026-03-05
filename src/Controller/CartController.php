@@ -16,7 +16,7 @@ class CartController extends AbstractController
      * @param Cart $cart
      * @return Response
      */
-    #[Route('/mon-panier', name: 'cart')]
+    #[Route('/cart', name: 'cart')]
     public function index(Cart $cart, \App\Repository\CarrierRepository $carrierRepository, \App\Repository\PersonalizeRepository $personalizeRepository): Response
     {
         $cartProducts = $cart->getDetails();
@@ -38,11 +38,13 @@ class CartController extends AbstractController
      * @param int $id
      * @return Repsonse
      */
-    #[Route('/panier/ajouter/{id}', name: 'add_to_cart')]
+    #[Route('/cart/add/{id}', name: 'add_to_cart')]
     public function add(Cart $cart, int $id, Request $request): Response
     {
         $qty = $request->query->getInt('qty', 1);
-        $cart->add($id, $qty);
+        $variants = $request->query->get('variants'); // Ex: "Color: Rojo, Talle: L"
+        
+        $cart->add($id, $qty, $variants);
 
         if ($request->isXmlHttpRequest() || $request->query->get('ajax')) {
             return $this->json([
@@ -57,11 +59,11 @@ class CartController extends AbstractController
     /**
      * Réduit de 1 la quantité pour un article du panier
      * @param Cart $cart
-     * @param int $id
-     * @return Repsonse
+     * @param string $id (Composite key)
+     * @return Response
      */
-    #[Route('/panier/réduire/{id}', name: 'decrease_item')]
-    public function decrease(Cart $cart, int $id): Response
+    #[Route('/cart/decrease/{id}', name: 'decrease_item')]
+    public function decrease(Cart $cart, string $id): Response
     {
         $cart->decreaseItem($id);
         return $this->redirectToRoute('cart');
@@ -71,10 +73,11 @@ class CartController extends AbstractController
      * Supprime une ligne d'articles du panier
      *
      * @param Cart $cart
+     * @param string $id (Composite key)
      * @return Response
      */
-    #[Route('/panier/supprimer/{id}', name: 'remove_cart_item')]
-    public function removeItem(Cart $cart, int $id): Response
+    #[Route('/cart/remove/{id}', name: 'remove_cart_item')]
+    public function removeItem(Cart $cart, string $id): Response
     {
         $cart->removeItem($id);
         return $this->redirectToRoute('cart');
@@ -86,7 +89,7 @@ class CartController extends AbstractController
      * @param Cart $cart
      * @return Response
      */
-    #[Route('/panier/supprimer/', name: 'remove_cart')]
+    #[Route('/cart/clear/', name: 'remove_cart')]
     public function remove(Cart $cart): Response
     {
         $cart->remove();

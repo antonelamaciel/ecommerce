@@ -84,7 +84,15 @@ class ProductCrudController extends AbstractCrudController
             AssociationField::new('subcategories', 'Subcategorías')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->hideOnIndex(),
-            BooleanField::new('isInHome', 'Lo mas buscado')
+            BooleanField::new('isInHome', 'Lo mas buscado'),
+            
+            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Opciones del Producto'),
+            CollectionField::new('options', 'Talles, Colores o Variantes')
+                ->setEntryType(\App\Form\ProductOptionType::class)
+                ->allowAdd()
+                ->allowDelete()
+                ->setHelp('Ej: Escribe "Color: Rojo", y marca si está disponible. Puedes agregar varios.')
+                ->hideOnIndex()
         ];
     }
     
