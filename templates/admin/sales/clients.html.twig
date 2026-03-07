@@ -1,0 +1,17 @@
+{# templates/admin/sales/clients.html.twig #}
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block ea_stats_grid %}
+    <div class="ea-stats-grid">
+        <div class="ea-stat-card">
+            <div class="ea-stat-icon" style="color: #6366f1; background: #f5f3ff;">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="ea-stat-info">
+                <span class="label">Total Clientes</span>
+                <span class="value">{{ paginator.numResults }}</span>
+            </div>
+        </div>
+        {# Solo mostramos el total, eliminamos actividad y estado como pediste #}
+    </div>
+{% endblock ea_stats_grid %}

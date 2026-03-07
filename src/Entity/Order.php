@@ -14,35 +14,35 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdAt;
+    private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $carrierName;
+    private ?string $carrierName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $carrierPrice;
+    private ?string $carrierPrice = null;
 
     #[ORM\Column(type: 'text')]
-    private $delivery;
+    private ?string $delivery = null;
 
     #[ORM\OneToMany(mappedBy: 'bindedOrder', targetEntity: OrderDetails::class)]
-    private $orderDetails;
+    private Collection $orderDetails;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $reference;
+    private ?string $reference = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $stripeSession;
+    private ?string $stripeSession = null;
 
     #[ORM\Column(type: 'integer')]
-    private $state;
+    private ?int $state = null;
 
     public function __construct()
     {

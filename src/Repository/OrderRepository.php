@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Order;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,7 +23,7 @@ class OrderRepository extends ServiceEntityRepository
     /**
     * @return Order[] Returns an array of Order objects
     */
-    public function findPaidOrdersByUser($user)
+    public function findPaidOrdersByUser(User $user): array
     {
         return $this->createQueryBuilder('o')
             ->andWhere('o.state > :val')

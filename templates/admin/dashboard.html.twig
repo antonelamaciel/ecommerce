@@ -1,0 +1,99 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content_title %}Dashboard General{% endblock %}
+
+{% block main %}
+    <div class="ea-modern-wrapper">
+        <div class="row mb-4">
+            <div class="col-12 text-center text-sm-start">
+                <div class="p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--accent-gradient); color: white; border-radius: 18px;">
+                    <h1 class="fw-bold mb-2 h2 text-white">¡Hola Administrador! 👋</h1>
+                    <p class="mb-0 opacity-85 fs-6">Bienvenido a tu panel de gestión <b>MONKAI</b>.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4">
+                <div class="ea-list-container p-4" style="min-height: 200px;">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-lightning-charge me-2 text-primary"></i> Acciones Rápidas</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\ProductCrudController').setAction('new') }}" class="btn btn-outline-primary rounded-3 text-start p-3">
+                            <i class="bi bi-plus-circle me-2"></i> Agregar nuevo producto
+                        </a>
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\OrderCrudController') }}" class="btn btn-outline-primary rounded-3 text-start p-3">
+                            <i class="bi bi-clipboard-list me-2"></i> Ver pedidos pendientes
+                        </a>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+
+        <div class="ea-stats-grid">
+            {# Ventas #}
+            <div class="ea-stat-card">
+                <div class="ea-stat-icon" style="color: #6366f1; background: #f5f3ff;">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="ea-stat-info">
+                    <span class="label">Total Pedidos</span>
+                    <span class="value">{{ total_orders }}</span>
+                </div>
+            </div>
+
+            <div class="ea-stat-card">
+                <div class="ea-stat-icon" style="color: #10b981; background: #ecfdf5;">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="ea-stat-info">
+                    <span class="label">Pagados</span>
+                    <span class="value">{{ paid_orders }}</span>
+                </div>
+            </div>
+
+            <div class="ea-stat-card">
+                <div class="ea-stat-icon" style="color: #f59e0b; background: #fffbeb;">
+                    <i class="fas fa-hourglass-start"></i>
+                </div>
+                <div class="ea-stat-info">
+                    <span class="label">Pendientes</span>
+                    <span class="value">{{ pending_orders }}</span>
+                </div>
+            </div>
+
+            {# Catálogo #}
+            <div class="ea-stat-card">
+                <div class="ea-stat-icon" style="color: #ec4899; background: #fdf2f8;">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div class="ea-stat-info">
+                    <span class="label">Productos</span>
+                    <span class="value">{{ total_products }}</span>
+                </div>
+            </div>
+
+            {# Usuarios #}
+            <div class="ea-stat-card">
+                <div class="ea-stat-icon" style="color: #3b82f6; background: #eff6ff;">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="ea-stat-info">
+                    <span class="label">Clientes</span>
+                    <span class="value">{{ total_users }}</span>
+                </div>
+            </div>
+        </div>
+
+      
+
+         <div class="col-md-6 mb-4">
+                <div class="ea-list-container p-4 d-flex align-items-center justify-content-center" style="min-height: 200px; background: #f8fafc;">
+                    <div class="text-center">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" style="height: 60px; opacity: 0.5; filter: grayscale(1);" onerror="this.style.display='none'">
+                        <p class="text-muted small mt-2">Sistema de Gestión MONKAI v2.0</p>
+                    </div>
+                </div>
+            </div>
+    </div>
+{% endblock %}

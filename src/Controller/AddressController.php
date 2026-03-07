@@ -47,7 +47,7 @@ class AddressController extends AbstractController
     }
 
     #[Route('account/addresses/edit/{id}', name: 'account_address_update')]
-    public function update(Request $request, EntityManagerInterface $em, Address $address = null): Response
+    public function update(Request $request, EntityManagerInterface $em, ?Address $address = null): Response
     {
         if (!$address || $address->getUser() != $this->getUser()) {
             return $this->redirectToRoute('account_address');
@@ -70,7 +70,7 @@ class AddressController extends AbstractController
     }
 
     #[Route('account/addresses/delete/{id}', name: 'account_address_delete')]
-    public function delete(EntityManagerInterface $em, Address $address = null): Response
+    public function delete(EntityManagerInterface $em, ?Address $address = null): Response
     {
         if ($address && $address->getUser() == $this->getUser()) {
             $em->remove($address);

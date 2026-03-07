@@ -431,8 +431,12 @@
     font-size: .85rem; color: var(--c-muted); line-height: 1.4;
   }
   .pcard__footer {
-    display: flex; align-items: center; justify-content: center;
-    margin-top: auto; padding-top: 0.5rem;
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+    margin-top: auto; 
+    padding-top: 0.5rem;
   }
   .pcard__price {
     font-size: 1.2rem; font-weight: 700; color: var(--c-ink);
@@ -637,7 +641,17 @@
                                 </h3>
                                 <span class="pcard__subtitle">{{ product.subtitle }}</span>
                                 <div class="pcard__footer">
-                                    <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                                    {% set maxBundleDiscount = product.getMaxDiscount() %}
+                                    {% if maxBundleDiscount > 0 %}
+                                        {% set discountedPrice = product.price * (1 - maxBundleDiscount / 100) %}
+                                        <span class="pcard__price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 0.8rem; margin-bottom: 2px;">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
+                                        <span class="pcard__price" style="color: #dc3545; line-height: 1;">{{ (discountedPrice / 100)|number_format(2, ',', '.') }}$ {{ maxBundleDiscount }}%OFF</span>
+                                    {% elseif product.oldPrice %}
+                                        <span class="pcard__price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 0.8rem; margin-bottom: 2px;">{{ (product.oldPrice / 100)|number_format(2, ',', '.') }}$</span>
+                                        <span class="pcard__price" style="line-height: 1;">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                                    {% else %}
+                                        <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             {% set firstVariant = null %}

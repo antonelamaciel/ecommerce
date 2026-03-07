@@ -11,26 +11,26 @@ class OrderDetails
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'orderDetails')]
     #[ORM\JoinColumn(nullable: false)]
-    private $bindedOrder;
+    private ?Order $bindedOrder = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $product;
+    private ?string $product = null;
 
     #[ORM\Column(type: 'integer')]
-    private $quantity;
+    private ?int $quantity = null;
 
     #[ORM\Column(type: 'float')]
-    private $price;
+    private ?float $price = null;
 
     #[ORM\Column(type: 'float')]
-    private $total;
+    private ?float $total = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $variants;
+    private ?string $variants = null;
 
     public function getId(): ?int
     {

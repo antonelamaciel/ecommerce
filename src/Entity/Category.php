@@ -24,6 +24,9 @@ class Category
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Subcategory::class, cascade: ['persist'], orphanRemoval: true)]
     private $subcategories;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $approximateWeight = null;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
@@ -107,6 +110,18 @@ class Category
                 $subcategory->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getApproximateWeight(): ?float
+    {
+        return $this->approximateWeight;
+    }
+
+    public function setApproximateWeight(?float $approximateWeight): self
+    {
+        $this->approximateWeight = $approximateWeight;
 
         return $this;
     }

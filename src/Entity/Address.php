@@ -172,6 +172,6 @@ class Address
 
     public function getAddressLabel(): string
     {
-        return "{$this->name}: [br]{$this->address}[br]{$this->city}... ";
+        return "{$this->name}: [br]{$this->address}[br]{$this->city} (CP: {$this->postal})";
     }
 }

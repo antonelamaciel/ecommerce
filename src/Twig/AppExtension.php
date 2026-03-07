@@ -29,11 +29,14 @@ class AppExtension extends AbstractExtension implements GlobalsInterface
             $headerIsLight = $this->isColorLight($personalize->getPrimarycolor());
         }
 
+        $bannerBundles = $this->em->getRepository(\App\Entity\Bundle::class)->findBy(['isBannerActive' => true]);
+
         return [
             'personalize' => $personalize,
             'cartCount' => $this->cart->getFullQuantity(),
             'headerIsLight' => $headerIsLight,
-            'allCategories' => $categories
+            'allCategories' => $categories,
+            'bannerBundles' => $bannerBundles
         ];
     }
 

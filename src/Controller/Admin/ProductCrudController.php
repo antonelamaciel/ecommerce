@@ -37,7 +37,7 @@ class ProductCrudController extends AbstractCrudController
     {
         return [
             TextField::new('name', 'Nombre'),
-            SlugField::new('slug')->setTargetFieldName('name'),
+            SlugField::new('slug')->setTargetFieldName('name')->hideOnIndex(),
             
             // --- PORTADA ---
             ImageField::new('image', 'Subir/Cambiar Portada')
@@ -75,24 +75,29 @@ class ProductCrudController extends AbstractCrudController
             
             CollectionField::new('images', 'Galería completa')
                 ->setTemplatePath('admin/fields/product_gallery.html.twig')
-                ->hideOnForm(),
+                ->hideOnForm()->hideOnIndex(),
 
-            TextField::new('subtitle', 'Subtítulo'),
+            TextField::new('subtitle', 'Subtítulo')->hideOnIndex(),
             TextareaField::new('description', 'Descripción')->hideOnIndex(),
             MoneyField::new('price', 'Precio')->setCurrency('ARS'),
+            MoneyField::new('oldPrice', 'Precio Tachado (ARS)')
+                ->setCurrency('ARS')
+                ->setRequired(false)
+                ->setHelp('Precio anterior que aparecerá tachado.'),
             AssociationField::new('category', 'Categoría'),
             AssociationField::new('subcategories', 'Subcategorías')
-                ->setFormTypeOptions(['by_reference' => false])
-                ->hideOnIndex(),
+                ->setFormTypeOptions(['by_reference' => false])->hideOnIndex(),
             BooleanField::new('isInHome', 'Lo mas buscado'),
             
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Opciones del Producto'),
             CollectionField::new('options', 'Talles, Colores o Variantes')
                 ->setEntryType(\App\Form\ProductOptionType::class)
+                ->setTemplatePath('admin/fields/product_options_detail.html.twig')
                 ->allowAdd()
                 ->allowDelete()
                 ->setHelp('Ej: Escribe "Color: Rojo", y marca si está disponible. Puedes agregar varios.')
                 ->hideOnIndex()
+                ->setCssClass('padded-options-collection')
         ];
     }
     
@@ -102,6 +107,7 @@ class ProductCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Producto')
             ->setEntityLabelInPlural('Productos')
             ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
+            ->overrideTemplate('crud/index', 'admin/sales/products.html.twig')
         ;
     }
 
@@ -110,27 +116,69 @@ class ProductCrudController extends AbstractCrudController
         return $assets->addHtmlContentToHead(<<<HTML
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- Lógica de Subcategorías ---
-        setTimeout(function() {
-            const catInput = document.querySelector('select[name="Product[category]"]');
-            const subInput = document.querySelector('select[name="Product[subcategories][]"]');
+        const initSubcategories = () => {
+            // Usamos selectores más flexibles por si cambia el nombre del formulario
+            const catInput = document.querySelector('select[name*="[category]"]');
+            const subInput = document.querySelector('select[name*="[subcategories]"]');
             
             if (catInput && subInput && subInput.tomselect) {
                 const ts = subInput.tomselect;
-                const loadSubcategories = function(catId, initialLoad = false) {
-                    if (!catId) { ts.clear(); ts.clearOptions(); return; }
-                    fetch('/admin/ajax/subcategories/' + catId)
-                        .then(r => r.json())
-                        .then(data => {
-                            const currentValues = ts.getValue();
-                            ts.clearOptions(); ts.addOptions(data);
-                            if (initialLoad) ts.setValue(currentValues);
-                        });
+                
+                // CRÍTICO: Capturamos los valores seleccionados directamente del HTML al cargar
+                // Esto asegura que no dependamos del estado interno de TomSelect que puede estar inicializándose
+                const originalSelectedValues = Array.from(subInput.options)
+                    .filter(opt => opt.selected)
+                    .map(opt => opt.value);
+
+                const loadSubcategories = async (catId, isInitial = false) => {
+                    if (!catId) {
+                        ts.clear();
+                        ts.clearOptions();
+                        return;
+                    }
+
+                    // Determinar qué valores queremos mantener/restaurar
+                    let valuesToRestore = isInitial ? originalSelectedValues : ts.getValue();
+                    if (!Array.isArray(valuesToRestore)) {
+                        valuesToRestore = valuesToRestore ? [valuesToRestore] : [];
+                    }
+
+                    try {
+                        const response = await fetch('/admin/ajax/subcategories/' + catId);
+                        const data = await response.json();
+                        
+                        // Limpiamos y cargamos las nuevas opciones filtradas por categoría
+                        ts.clearOptions();
+                        ts.addOptions(data);
+                        
+                        // Restauramos los valores. TomSelect solo mostrará aquellos que estén en 'data'
+                        // lo cual es correcto ya que filtramos por categoría.
+                        if (valuesToRestore.length > 0) {
+                            ts.setValue(valuesToRestore);
+                        }
+                    } catch (e) {
+                        console.error("Error en la carga de subcategorías:", e);
+                    }
                 };
-                catInput.addEventListener('change', function() { ts.clear(); loadSubcategories(this.value, false); });
-                if (catInput.value) loadSubcategories(catInput.value, true);
+
+                catInput.addEventListener('change', function() {
+                    // Si el usuario cambia manualmente la categoría, limpiamos las subcategorías anteriores
+                    ts.clear();
+                    loadSubcategories(this.value, false);
+                });
+
+                // Si hay una categoría ya seleccionada (modo edición), cargamos sus subcategorías
+                if (catInput.value) {
+                    loadSubcategories(catInput.value, true);
+                }
+            } else if (catInput && subInput && !subInput.tomselect) {
+                // Si TomSelect todavía no se ha acoplado al <select>, reintentamos
+                setTimeout(initSubcategories, 100);
             }
-        }, 500);
+        };
+
+        // Damos un margen para la inicialización nativa de EasyAdmin
+        setTimeout(initSubcategories, 500);
     });
 </script>
 <style>

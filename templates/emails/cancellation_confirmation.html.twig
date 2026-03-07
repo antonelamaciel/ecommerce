@@ -1,143 +1,129 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Arrepentimiento de compra - {{ personalize.companyName ?? 'Ecommerce' }}{% endblock %}
-
-{% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header border-0 p-0">
-                    <div class="p-5 text-center" style="background: var(--primary-color, #1a1a1a); color: white;">
-                        <div class="mb-3">
-                            <i class="bi bi-arrow-counterclockwise" style="font-size: 3rem;"></i>
-                        </div>
-                        <h1 class="h2 fw-800 mb-2">Arrepentimiento de compra</h1>
-                        <p class="mb-0 opacity-75 small text-uppercase tracking-widest fw-600">Gestión de Devoluciones</p>
-                    </div>
-                </div>
-                <div class="card-body p-4 p-md-5 bg-white">
-                    <div class="d-flex align-items-start gap-3 p-4 mb-5 rounded-4" style="background-color: #f8fafc; border-left: 4px solid var(--primary-color);">
-                        <div class="text-primary mt-1">
-                            <i class="bi bi-shield-check" style="font-size: 1.5rem; color: var(--primary-color);"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-2" style="color: var(--c-ink);">Protección al Consumidor</h5>
-                            <p class="mb-0 text-muted small line-height-relaxed">
-                                Según la resolución 424/2020 de la Ley N° 24.240 y 1.110, ponemos a tu disposición el <strong>«Botón del Arrepentimiento»</strong> para que puedas desistir de tu compra de forma simple y transparente.
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Solicitud de Arrepentimiento</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 50px 40px; text-align: center;">
+                            <div style="font-size: 60px; margin-bottom: 20px;">✓</div>
+                            <h1 style="color: #ffffff; font-size: 28px; font-weight: 800; margin: 0 0 10px 0; letter-spacing: -0.5px;">
+                                Solicitud Recibida
+                            </h1>
+                            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">
+                                Procesaremos tu devolución a la brevedad
                             </p>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
 
-                    <p class="text-center mb-5 fw-500" style="color: var(--c-muted);">
-                        Por favor, completa los siguientes datos para que podamos gestionar tu devolución de manera inmediata.
-                    </p>
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <p style="color: #1f2937; font-size: 16px; line-height: 1.7; margin: 0 0 30px 0;">
+                                Hola <strong>{{ name }}</strong>,
+                            </p>
 
-                    <form method="POST" action="{{ path('app_cancellation') }}" id="cancellationForm">
-                        <div class="row g-4">
-                            <div class="col-md-6 text-start">
-                                <label for="name" class="form-label font-label"><i class="bi bi-person me-2"></i>Nombre y Apellido</label>
-                                <input type="text" name="name" id="name" class="form-control premium-input" placeholder="Tu nombre completo" required>
+                            <p style="color: #4b5563; font-size: 15px; line-height: 1.7; margin: 0 0 30px 0;">
+                                Hemos recibido tu solicitud de arrepentimiento de compra para el pedido <strong>{{ orderId }}</strong>. Tu solicitud está siendo procesada y recibirás una respuesta en un plazo máximo de <strong>10 días hábiles</strong>.
+                            </p>
+
+                            <!-- Info Box -->
+                            <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left: 4px solid #2563eb; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                                <h2 style="color: #1e40af; font-size: 16px; font-weight: 700; margin: 0 0 12px 0;">
+                                    📋 Detalles de tu solicitud
+                                </h2>
+                                <table width="100%" cellpadding="8" cellspacing="0">
+                                    <tr>
+                                        <td style="color: #1e40af; font-weight: 600; font-size: 13px; width: 40%;">
+                                            Pedido:
+                                        </td>
+                                        <td style="color: #1e3a8a; font-size: 14px;">
+                                            <strong>{{ orderId }}</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #1e40af; font-weight: 600; font-size: 13px;">
+                                            Fecha solicitud:
+                                        </td>
+                                        <td style="color: #1e3a8a; font-size: 14px;">
+                                            {{ date|date('d/m/Y H:i') }}
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="col-md-6 text-start">
-                                <label for="phone" class="form-label font-label"><i class="bi bi-telephone me-2"></i>Teléfono</label>
-                                <input type="tel" name="phone" id="phone" class="form-control premium-input" placeholder="Cod. área + número" required>
+
+                            <h2 style="color: #1f2937; font-size: 18px; font-weight: 700; margin: 0 0 15px 0;">
+                                ¿Qué sigue ahora?
+                            </h2>
+
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: table; width: 100%; margin-bottom: 15px;">
+                                    <div style="display: table-cell; vertical-align: top; width: 40px;">
+                                        <div style="background-color: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; font-size: 14px;">1</div>
+                                    </div>
+                                    <div style="display: table-cell; vertical-align: top; padding-left: 15px;">
+                                        <h3 style="color: #1f2937; font-size: 15px; font-weight: 600; margin: 0 0 5px 0;">Revisión de tu solicitud</h3>
+                                        <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0;">Nuestro equipo verificará los datos de tu pedido.</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: table; width: 100%; margin-bottom: 15px;">
+                                    <div style="display: table-cell; vertical-align: top; width: 40px;">
+                                        <div style="background-color: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; font-size: 14px;">2</div>
+                                    </div>
+                                    <div style="display: table-cell; vertical-align: top; padding-left: 15px;">
+                                        <h3 style="color: #1f2937; font-size: 15px; font-weight: 600; margin: 0 0 5px 0;">Coordinación de devolución</h3>
+                                        <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0;">Te contactaremos para coordinar el retiro o devolución del producto.</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: table; width: 100%;">
+                                    <div style="display: table-cell; vertical-align: top; width: 40px;">
+                                        <div style="background-color: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; font-size: 14px;">3</div>
+                                    </div>
+                                    <div style="display: table-cell; vertical-align: top; padding-left: 15px;">
+                                        <h3 style="color: #1f2937; font-size: 15px; font-weight: 600; margin: 0 0 5px 0;">Reembolso</h3>
+                                        <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0;">Una vez recibido el producto, procesaremos tu reembolso completo.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-12 text-start">
-                                <label for="email" class="form-label font-label"><i class="bi bi-envelope me-2"></i>Email</label>
-                                <input type="email" name="email" id="email" class="form-control premium-input" placeholder="correo@ejemplo.com" required>
+
+                            <!-- Legal Info -->
+                            <div style="background-color: #f9fafb; border-radius: 12px; padding: 20px; margin-top: 30px;">
+                                <p style="color: #6b7280; font-size: 13px; line-height: 1.6; margin: 0;">
+                                    <strong style="color: #1f2937;">Marco legal:</strong> Esta devolución se realiza conforme a la Ley de Defensa del Consumidor N° 24.240 (Artículo 34) y la Resolución 424/2020 de la Secretaría de Comercio Interior.
+                                </p>
                             </div>
-                            <div class="col-12 text-start">
-                                <label for="order_id" class="form-label font-label"><i class="bi bi-hash me-2"></i>ID del Pedido</label>
-                                <input type="text" name="order_id" id="order_id" class="form-control premium-input" placeholder="Ej: #10234" required>
-                            </div>
-                            
-                            <div class="col-12 mt-5 text-center">
-                                <button type="submit" class="btn-cancel-submit w-100 py-3 shadow-lg">
-                                    <span class="btn-text">SOLICITAR DEVOLUCIÓN</span>
-                                    <i class="bi bi-send-fill ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+                        </td>
+                    </tr>
 
-            <div class="mt-5 text-center fade-in">
-                <a href="{{ path('home') }}" class="text-decoration-none text-muted small fw-500 hover-black transition-all">
-                    <i class="bi bi-house-door me-2"></i>Volver a la tienda principal
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .fw-800 { font-weight: 800; }
-    .fw-600 { font-weight: 600; }
-    .fw-500 { font-weight: 500; }
-    .tracking-widest { letter-spacing: 0.1em; }
-    .line-height-relaxed { line-height: 1.7; }
-    
-    .font-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--c-muted);
-    }
-
-    .premium-input {
-        padding: 0.85rem 1.25rem;
-        background-color: #f8fafc;
-        border: 2px solid transparent;
-        border-radius: 12px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .premium-input:focus {
-        background-color: #fff;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
-        outline: none;
-    }
-
-    .btn-cancel-submit {
-        background-color: var(--primary-color, #000);
-        color: white;
-        border: none;
-        border-radius: 14px;
-        font-weight: 800;
-        letter-spacing: 0.05em;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .btn-cancel-submit:hover {
-        transform: translateY(-3px);
-        filter: brightness(1.1);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
-    }
-
-    .btn-cancel-submit:active {
-        transform: translateY(-1px);
-    }
-
-    .hover-black:hover { color: #000 !important; }
-    .transition-all { transition: all 0.3s ease; }
-    .fade-in { animation: fadeIn 0.8s ease-out; }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
-<script>
-    document.getElementById('cancellationForm').addEventListener('submit', function() {
-        const btn = this.querySelector('button');
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>PROCESANDO...';
-        btn.setAttribute('disabled', 'disabled');
-        btn.style.opacity = '0.8';
-    });
-</script>
-{% endblock %}
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="color: #1f2937; font-size: 14px; margin: 0 0 15px 0; font-weight: 600;">
+                                ¿Tienes alguna duda?
+                            </p>
+                            <p style="color: #6b7280; font-size: 13px; margin: 0 0 20px 0;">
+                                Contáctanos y te ayudaremos de inmediato
+                            </p>
+                            <a href="mailto:antonelamaciel2024@gmail.com" style="display: inline-block; background-color: #1a1a1a; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; font-size: 13px;">
+                                Enviar Consulta
+                            </a>
+                            <p style="color: #9ca3af; font-size: 11px; margin: 20px 0 0 0;">
+                                © {{ "now"|date("Y") }} - Todos los derechos reservados
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

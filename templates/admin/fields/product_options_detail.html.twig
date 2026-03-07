@@ -1,0 +1,32 @@
+{# templates/admin/fields/product_options_detail.html.twig #}
+{% if field.value is empty %}
+    <span class="text-muted small">Sin opciones definidas</span>
+{% else %}
+    <div class="product-options-detail">
+        {% for option in field.value %}
+            <div class="mb-3 p-3 border rounded shadow-sm bg-white">
+                <div class="d-flex align-items-center mb-2">
+                    <h6 class="mb-0 fw-bold text-primary">{{ option.name }}</h6>
+                    {% if option.isAvailable %}
+                        <span class="badge bg-success ms-2" style="font-size: 0.6rem;">Visible</span>
+                    {% else %}
+                        <span class="badge bg-secondary ms-2" style="font-size: 0.6rem;">Oculto</span>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex flex-wrap gap-2">
+                    {% for value in option.productOptionValues %}
+                        <div class="px-3 py-1 rounded-pill border {% if value.isAvailable %}border-info text-dark{% else %}border-light text-muted text-decoration-line-through{% endif %}" style="font-size: 0.85rem; background: #f8fafc;">
+                            {{ value.name }}
+                            {% if not value.isAvailable %}
+                                <i class="bi bi-eye-slash ms-1"></i>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span class="text-muted small italic">Sin valores</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

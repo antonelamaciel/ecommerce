@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Cart 
 {
-    private $session;
-    private $repository;
+    private SessionInterface $session;
+    private ProductRepository $repository;
 
     public function __construct(SessionInterface $session, ProductRepository $repository)
     {
@@ -27,7 +27,7 @@ class Cart
      * @param string|null $variants
      * @return void
      */
-    public function add(int $id, int $qty = 1, string $variants = null): void
+    public function add(int $id, int $qty = 1, ?string $variants = null): void
     {
         $cart = $this->session->get('cart_v2', []);
         
@@ -132,14 +132,22 @@ class Cart
             foreach ($cart as $compositeId => $item) {
                 $currentProduct = $this->repository->find($item['id']);
                 if ($currentProduct) {
+                    $discountPercentage = $currentProduct->getMaxDiscount();
+                    $unitPrice = $currentProduct->getPrice();
+                    if ($discountPercentage > 0) {
+                        $unitPrice = $unitPrice * (1 - $discountPercentage / 100);
+                    }
+                    
                     $cartProducts['products'][] = [
                         'product' => $currentProduct,
                         'quantity' => $item['qty'],
                         'variants' => $item['variants'],
-                        'compositeId' => $compositeId
+                        'compositeId' => $compositeId,
+                        'discountedPrice' => $unitPrice,
+                        'discountPercentage' => $discountPercentage
                     ];
                     $cartProducts['totals']['quantity'] += $item['qty'];
-                    $cartProducts['totals']['price'] += $item['qty'] * $currentProduct->getPrice();
+                    $cartProducts['totals']['price'] += $item['qty'] * $unitPrice;
                 }
             }
         }

@@ -32,8 +32,9 @@ class UserCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Usuario')
-            ->setEntityLabelInPlural('Usuarios')
+            ->setEntityLabelInSingular('Cliente/Usuario')
+            ->setEntityLabelInPlural('Clientes/Usuarios')
+            ->overrideTemplate('crud/index', 'admin/sales/clients.html.twig')
         ;
     }
 }

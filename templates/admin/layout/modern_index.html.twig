@@ -1,0 +1,64 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block main %}
+    <div class="ea-modern-wrapper">
+        
+        {# SECCIÓN DE ESTADÍSTICAS #}
+        {% block ea_stats %}
+            <div class="ea-stats-grid">
+                {% block ea_stats_content %}{% endblock %}
+            </div>
+        {% endblock %}
+
+        {# LISTADO MODERNO #}
+        <div class="ea-list-container">
+            {# Cabecera de la lista #}
+            <div class="ea-list-header">
+                {% block ea_list_header %}{% endblock %}
+            </div>
+
+            {# Filas de la lista #}
+            {% for entity in entities %}
+                <div class="ea-list-row">
+                    {% block ea_list_row %}{% endblock %}
+                </div>
+            {% else %}
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-inbox-fill d-block mb-3" style="font-size: 2rem; opacity: 0.3;"></i>
+                    No se encontraron registros.
+                </div>
+            {% endfor %}
+        </div>
+
+        {# Paginación #}
+        {% if entities|length > 0 %}
+            <div class="mt-4">
+                {{ include(ea.templatePath('crud/paginator')) }}
+            </div>
+        {% endif %}
+    </div>
+
+    {# Macro para el botón de acciones común #}
+    {% macro action_button(entity) %}
+        {% if entity.actions.count > 0 %}
+            <div class="dropdown dropdown-actions" style="justify-self: end;">
+                <a class="btn-modern-action" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="bi bi-three-dots" style="font-size: 1.1rem;"></i>
+                    <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem; opacity: 0.8;"></i>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right p-2 shadow-lg border-0">
+                    {% for action in entity.actions %}
+                        {{ include(action.templatePath, { action: action, entity: entity, isIncludedInDropdown: true }, with_context = false) }}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endmacro %}
+
+{% endblock %}

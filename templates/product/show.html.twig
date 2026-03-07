@@ -130,8 +130,9 @@
 
   .pdetail-price-box {
     display: flex;
-    align-items: baseline;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
     margin-bottom: 0.5rem;
   }
   .pdetail-price {
@@ -340,6 +341,10 @@
   .pcard__price {
     font-size: 1.1rem;
     font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
   }
 
   /* Quick-add button (Cart) */
@@ -487,7 +492,17 @@
             </header>
 
             <div class="pdetail-price-box">
-                <span class="pdetail-price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                {% set maxBundleDiscount = product.getMaxDiscount() %}
+                {% if maxBundleDiscount > 0 %}
+                    {% set discountedPrice = product.price * (1 - maxBundleDiscount / 100) %}
+                    <span class="pdetail-price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 1rem; margin-bottom: -5px;">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
+                    <span class="pdetail-price" style="color: #dc3545;">{{ (discountedPrice / 100)|number_format(2, ',', '.') }}$ {{ maxBundleDiscount }}%OFF</span>
+                {% elseif product.oldPrice %}
+                    <span class="pdetail-price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 1rem; margin-bottom: -5px;">{{ (product.oldPrice / 100)|number_format(2, ',', '.') }}$</span>
+                    <span class="pdetail-price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                {% else %}
+                    <span class="pdetail-price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                {% endif %}
             </div>
 
             <div class="mb-4 d-flex align-items-center">
@@ -650,7 +665,19 @@
                           </a>
                         </h3>
                         <span class="pcard__subtitle">{{ related.subtitle }}</span>
-                        <div class="pcard__price">$ {{ (related.price / 100)|number_format(2, ',', '.') }} ARS</div>
+                        <div class="pcard__price">
+                            {% set relDiscount = related.getMaxDiscount() %}
+                            {% if relDiscount > 0 %}
+                                {% set relFinal = related.price * (1 - relDiscount / 100) %}
+                                <span class="pcard__price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 0.7rem; margin-bottom: 2px;">{{ (related.price / 100)|number_format(2, ',', '.') }}$</span>
+                                <span style="color: #dc3545; line-height: 1;">{{ (relFinal / 100)|number_format(2, ',', '.') }}$ {{ relDiscount }}%OFF</span>
+                            {% elseif related.oldPrice %}
+                                <span class="pcard__price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 0.7rem; margin-bottom: 2px;">{{ (related.oldPrice / 100)|number_format(2, ',', '.') }}$</span>
+                                <span style="line-height: 1;">$ {{ (related.price / 100)|number_format(2, ',', '.') }} ARS</span>
+                            {% else %}
+                                $ {{ (related.price / 100)|number_format(2, ',', '.') }} ARS
+                            {% endif %}
+                        </div>
                     </div>
                     
                     {% set firstVariant = null %}

@@ -1,0 +1,36 @@
+{# templates/admin/sales/orders.html.twig #}
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block ea_stats_grid %}
+    <div class="ea-stats-grid">
+        <div class="ea-stat-card">
+            <div class="ea-stat-icon" style="color: #6366f1; background: #f5f3ff;">
+                <i class="bi bi-cart-check"></i>
+            </div>
+            <div class="ea-stat-info">
+                <span class="label">Total Pedidos</span>
+                <span class="value">{{ paginator.numResults }}</span>
+            </div>
+        </div>
+        
+        <div class="ea-stat-card">
+            <div class="ea-stat-icon" style="color: #10b981; background: #ecfdf5;">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="ea-stat-info">
+                <span class="label">Pedidos Pagados</span>
+                <span class="value">{{ total_paid|default(0) }}</span>
+            </div>
+        </div>
+
+        <div class="ea-stat-card">
+            <div class="ea-stat-icon" style="color: #f59e0b; background: #fffbeb;">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="ea-stat-info">
+                <span class="label">Pendientes de Pago</span>
+                <span class="value">{{ total_pending|default(0) }}</span>
+            </div>
+        </div>
+    </div>
+{% endblock ea_stats_grid %}

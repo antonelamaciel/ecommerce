@@ -85,7 +85,7 @@ class OrderController extends AbstractController
 
             $delivery_string = $address->getFirstname() . ' ' . $address->getLastname();
             $delivery_string .= '<br>' . $address->getPhone();
-            $delivery_string .= '<br>' . $address->getCompany() ?? '';
+            $delivery_string .= '<br>' . ($address->getCompany() ?? '');
             $delivery_string .= '<br>' . $address->getAddress();
             $delivery_string .= '<br>' . $address->getPostal();
             $delivery_string .= '<br>' . $address->getCity();

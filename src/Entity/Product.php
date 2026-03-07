@@ -36,6 +36,9 @@ class Product
     #[ORM\Column(type: 'float')]
     private $price;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private $oldPrice;
+
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
     private $category;
@@ -153,6 +156,18 @@ class Product
         return $this;
     }
 
+    public function getOldPrice(): ?float
+    {
+        return $this->oldPrice;
+    }
+
+    public function setOldPrice(?float $oldPrice): self
+    {
+        $this->oldPrice = $oldPrice;
+
+        return $this;
+    }
+
     public function getCategory(): ?Category
     {
         return $this->category;
@@ -256,5 +271,16 @@ class Product
         }
 
         return $this;
+    }
+
+    public function getMaxDiscount(): int
+    {
+        $maxDiscount = 0;
+        foreach ($this->bundles as $bundle) {
+            if ($bundle->getDiscountPercentage() > $maxDiscount) {
+                $maxDiscount = (int)$bundle->getDiscountPercentage();
+            }
+        }
+        return $maxDiscount;
     }
 }

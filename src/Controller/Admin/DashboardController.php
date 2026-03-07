@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 
 class DashboardController extends AbstractDashboardController
 {
@@ -27,23 +28,31 @@ class DashboardController extends AbstractDashboardController
      */
     public function index(): Response
     {
-        // redirect to some CRUD controller
-        $routeBuilder = $this->get(AdminUrlGenerator::class);
-
-        return $this->redirect($routeBuilder->setController(OrderCrudController::class)->generateUrl());
+        /** @var EntityManagerInterface $em */
+        $em = $this->container->get('doctrine')->getManager();
+        
+        return $this->render('admin/dashboard.html.twig', [
+            'total_orders' => $em->getRepository(Order::class)->count([]),
+            'total_products' => $em->getRepository(Product::class)->count([]),
+            'total_users' => $em->getRepository(User::class)->count([]),
+            'paid_orders' => $em->getRepository(Order::class)->count(['state' => 1]),
+            'pending_orders' => $em->getRepository(Order::class)->count(['state' => 0]),
+        ]);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<b>MONKAI</b> <small>Admin</small>')
+            ->setTitle(' <span class="ms-2 fw-bold">MONKAI</span> <small>Admin</small> <a href="/" class="btn-back-admin"><i class="fas fa-store text-white"></i> <span class="d-none d-sm-inline text-white">Volver a la tienda</span></a>')
             ->renderContentMaximized();
     }
 
     public function configureAssets(): \EasyCorp\Bundle\EasyAdminBundle\Config\Assets
     {
         return parent::configureAssets()
-            ->addCssFile('assets/css/admin-minimal.css');
+            ->addCssFile('assets/css/admin-minimal.css')
+            ->addCssFile('assets/css/admin-premium.css')
+            ->addJsFile('assets/js/admin-custom.js');
     }
 
     public function configureMenuItems(): iterable

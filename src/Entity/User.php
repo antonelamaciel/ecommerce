@@ -19,30 +19,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\NotBlank]
-    private $email;
+    private ?string $email = null;
 
     #[ORM\Column(type: 'json')]
-    private $roles = [];
+    private array $roles = [];
 
     #[ORM\Column(type: 'string')]
-    private $password;
+    private ?string $password = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\Length(null, 3)]
-    private $firstname;
+    private ?string $firstname = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $lastname;
+    private ?string $lastname = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Address::class)]
-    private $addresses;
+    private Collection $addresses;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class)]
-    private $orders;
+    private Collection $orders;
 
     public function __construct()
     {

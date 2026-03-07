@@ -15,7 +15,7 @@
         </div>
         <div id="qv-thumbnails" class="d-flex justify-content-center gap-2 mb-3 flex-wrap mt-2"></div>
         <h4 id="qv-name" class="fw-bold mb-1">Nombre</h4>
-        <p id="qv-price" class="fs-4 fw-bold mb-0" style="color: var(--secondary-color, var(--c-ink, #000));">$ 0,00 ARS</p>
+        <div id="qv-price" class="fw-bold mb-0 d-flex flex-column align-items-center" style="color: var(--secondary-color, var(--c-ink, #000)); font-size: 1.25rem;"></div>
         <div id="qv-options-container" class="mb-3 d-flex flex-wrap justify-content-center gap-1"></div>
         
         <form id="qv-form" method="GET" action="">
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
               qvImgWrap.appendChild(copiedBadge);
           }
           qvName.innerHTML = nameEl.innerHTML.trim();
-          qvPrice.textContent = priceEl.textContent.trim();
+          qvPrice.innerHTML = priceEl.innerHTML.trim();
           qvOptionsContainer.innerHTML = optionStore ? optionStore.innerHTML : '';
           qvDetailsBtn.href = nameEl.href;
           qvForm.action = btn.href;

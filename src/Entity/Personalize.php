@@ -58,6 +58,9 @@ class Personalize
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $address = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $postal = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $aliasCbu = null;
 
@@ -255,6 +258,18 @@ class Personalize
     public function setAliasCbu(?string $aliasCbu): static
     {
         $this->aliasCbu = $aliasCbu;
+
+        return $this;
+    }
+
+    public function getPostal(): ?string
+    {
+        return $this->postal;
+    }
+
+    public function setPostal(?string $postal): static
+    {
+        $this->postal = $postal;
 
         return $this;
     }

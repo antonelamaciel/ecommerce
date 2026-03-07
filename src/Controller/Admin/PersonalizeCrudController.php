@@ -56,7 +56,7 @@ class PersonalizeCrudController extends AbstractCrudController
         ];
 
         return [
-            Field\FormField::addPanel('Información General'),
+            Field\FormField::addPanel('Información General')->setCssClass('padded-internal-panel'),
             Field\TextField::new('companyName', 'Nombre de la empresa'),
             Field\ImageField::new('logo')
                 ->setBasePath('uploads/logo/')
@@ -64,35 +64,46 @@ class PersonalizeCrudController extends AbstractCrudController
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false),
 
-            Field\FormField::addPanel('Ubicación'),
+            Field\FormField::addPanel('Ubicación')->setCssClass('padded-internal-panel'),
             Field\ChoiceField::new('province', 'Provincia')
                 ->setChoices($provinces)
-                ->setFormTypeOption('placeholder', 'Selecciona una provincia'),
+                ->setFormTypeOption('placeholder', 'Selecciona una provincia') 
+                ->hideOnIndex(),
             
             Field\TextField::new('city', 'Localidad')
                 ->setFormTypeOption('attr', [
                     'data-current-city' => true,
                     'placeholder' => 'Selecciona una localidad'
-                ]),
+                ])
+                ->hideOnIndex(),
+
+            Field\TextField::new('postal', 'C.P. (Código Postal)')
+                ->hideOnIndex(),
 
             Field\TextField::new('address', 'Dirección Exacta'),
 
-            Field\FormField::addPanel('Branding (Colores)'),
+            Field\FormField::addPanel('Branding (Colores)')->setCssClass('padded-internal-panel'),
             Field\ColorField::new('primaryColor', 'Color primario'),
             Field\ColorField::new('secondaryColor', 'Color secundario'),
             Field\ColorField::new('tertiaryColor', 'Color terciario'),
 
-            Field\FormField::addPanel('Contacto Principal y Pagos'),
-            Field\EmailField::new('email', 'Email de contacto'),
+            Field\FormField::addPanel('Contacto Principal y Pagos')->setCssClass('padded-internal-panel'),
+            Field\EmailField::new('email', 'Email de contacto')
+                ->hideOnIndex(),
             Field\TextField::new('whatsapp', 'WhatsApp (ej: +549...)'),
-            Field\TextField::new('aliasCbu', 'Alias / CBU (para transferencias)')->setRequired(false),
+            Field\TextField::new('aliasCbu', 'Alias o CBU (para transferencias)')->setRequired(false),
 
-            Field\FormField::addPanel('Redes Sociales'),
-            Field\TextField::new('instagram', 'Instagram URL'),
-            Field\TextField::new('twitter', 'Twitter / X URL'),
-            Field\TextField::new('linkedin', 'LinkedIn URL'),
-            Field\TextField::new('tiktok', 'TikTok URL'),
-            Field\TextField::new('youtube', 'YouTube URL'),
+            Field\FormField::addPanel('Redes Sociales')->setCssClass('padded-internal-panel'),
+            Field\TextField::new('instagram', 'Instagram URL')
+                ->hideOnIndex(),
+            Field\TextField::new('twitter', 'Twitter / X URL')
+                ->hideOnIndex(),
+            Field\TextField::new('linkedin', 'LinkedIn URL')
+                ->hideOnIndex(),
+            Field\TextField::new('tiktok', 'TikTok URL')
+                ->hideOnIndex(),
+            Field\TextField::new('youtube', 'YouTube URL')
+                ->hideOnIndex(),
         ];
     }
 
@@ -132,12 +143,15 @@ class PersonalizeCrudController extends AbstractCrudController
                     return;
                 }
                 
-                const url = 'https://apis.datos.gob.ar/georef/api/localidades?provincia=' + encodeURIComponent(provinceName) + '&campos=nombre&max=2000&orden=nombre';
+                const url = 'https://apis.datos.gob.ar/georef/api/localidades?provincia=' + encodeURIComponent(provinceName) + '&campos=nombre,id&max=2000&orden=nombre';
                 
                 fetch(url)
                     .then(r => r.json())
                     .then(data => {
-                        const options = data.localidades.map(l => ({ nombre: l.nombre }));
+                        const options = data.localidades.map(l => ({ 
+                            nombre: l.nombre,
+                            id: l.id
+                        }));
                         tsCity.clearOptions();
                         tsCity.addOptions(options);
                         if (currentCity) {
@@ -145,6 +159,28 @@ class PersonalizeCrudController extends AbstractCrudController
                         }
                     })
                     .catch(err => console.error("Error cargando localidades:", err));
+            };
+
+            const postalInput = document.querySelector('input[name="Personalize[postal]"]');
+
+            tsCity.on('change', function(value) {
+                if (!value) return;
+                const option = tsCity.options[value];
+                if (option && option.id && option.id.length >= 4) {
+                    // In AR, often the first 4 or some part of the ID correlates to the old CP
+                    // But we'll just show it to the user.
+                    // If the postal field is empty, we suggest it or just set it if it's clearly a CP
+                    // For now, let's just show it in the dropdown rendering first.
+                }
+            });
+
+            // Re-render to show CP in dropdown
+            tsCity.settings.render.option = function(item, escape) {
+                const cp = item.id ? ' <small class="text-muted">(ID: ' + escape(item.id) + ')</small>' : '';
+                return '<div>' + escape(item.nombre) + cp + '</div>';
+            };
+            tsCity.settings.render.item = function(item, escape) {
+                return '<div>' + escape(item.nombre) + '</div>';
             };
 
             provinceSelect.addEventListener('change', function() {

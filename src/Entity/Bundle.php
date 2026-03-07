@@ -32,6 +32,24 @@ class Bundle
     #[ORM\Column(type: 'integer', nullable: true)]
     private $countdownHours;
 
+    #[ORM\Column(type: 'boolean')]
+    private $isPromoActive = false;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private $countdownEndsAt;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $discountPercentage;
+
+    #[ORM\Column(type: 'boolean')]
+    private $isBannerActive = false;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $bannerText;
+
+    #[ORM\Column(type: 'string', length: 30, nullable: true)]
+    private $bannerColor;
+
     #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'bundles')]
     private $products;
 
@@ -108,6 +126,58 @@ class Bundle
     public function setCountdownHours(?int $countdownHours): self
     {
         $this->countdownHours = $countdownHours;
+        
+        // If the promo is already active, we update the end time to start from now with the new hours
+        if ($this->isPromoActive && $countdownHours !== null) {
+            $this->countdownEndsAt = (new \DateTimeImmutable())->modify('+' . $countdownHours . ' hours');
+        } elseif (!$this->isPromoActive) {
+            // If inactive, ensure we don't have an old end time
+            $this->countdownEndsAt = null;
+        }
+
+        return $this;
+    }
+
+    public function isPromoActive(): ?bool
+    {
+        return $this->isPromoActive;
+    }
+
+    public function setIsPromoActive(bool $isPromoActive): self
+    {
+        // When transitioning to active, we set the end time starting from NOW
+        if ($isPromoActive && !$this->isPromoActive) {
+            if ($this->countdownHours !== null) {
+                $this->countdownEndsAt = (new \DateTimeImmutable())->modify('+' . $this->countdownHours . ' hours');
+            }
+        } elseif (!$isPromoActive) {
+            // When deactivating (or keeping inactive), we clear the end time (reset)
+            $this->countdownEndsAt = null;
+        }
+
+        $this->isPromoActive = $isPromoActive;
+        return $this;
+    }
+
+    public function getCountdownEndsAt(): ?\DateTimeImmutable
+    {
+        return $this->countdownEndsAt;
+    }
+
+    public function setCountdownEndsAt(?\DateTimeImmutable $countdownEndsAt): self
+    {
+        $this->countdownEndsAt = $countdownEndsAt;
+        return $this;
+    }
+
+    public function getDiscountPercentage(): ?int
+    {
+        return $this->discountPercentage;
+    }
+
+    public function setDiscountPercentage(?int $discountPercentage): self
+    {
+        $this->discountPercentage = $discountPercentage;
         return $this;
     }
 
@@ -132,6 +202,38 @@ class Bundle
     {
         $this->products->removeElement($product);
 
+        return $this;
+    }
+    public function isBannerActive(): ?bool
+    {
+        return $this->isBannerActive;
+    }
+
+    public function setIsBannerActive(bool $isBannerActive): self
+    {
+        $this->isBannerActive = $isBannerActive;
+        return $this;
+    }
+
+    public function getBannerText(): ?string
+    {
+        return $this->bannerText;
+    }
+
+    public function setBannerText(?string $bannerText): self
+    {
+        $this->bannerText = $bannerText;
+        return $this;
+    }
+
+    public function getBannerColor(): ?string
+    {
+        return $this->bannerColor;
+    }
+
+    public function setBannerColor(?string $bannerColor): self
+    {
+        $this->bannerColor = $bannerColor;
         return $this;
     }
 }

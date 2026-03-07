@@ -5,9 +5,9 @@
     <div class="d-inline-block">
         <a href="{{ asset('uploads/' ~ imageValue) }}" target="_blank">
             <img src="{{ asset('uploads/' ~ imageValue) }}" 
-                 style="max-width: 100px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+                 class="ea-img-preview" style="width: 100px; height: auto;">
         </a>
     </div>
 {% else %}
-    <span class="badge badge-secondary">Sin imagen</span>
+    <span class="ea-modern-badge" style="background: #f1f5f9; color: #64748b;">Sin imagen</span>
 {% endif %}

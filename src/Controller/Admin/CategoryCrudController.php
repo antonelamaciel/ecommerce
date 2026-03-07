@@ -6,6 +6,7 @@ use App\Entity\Category;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 class CategoryCrudController extends AbstractCrudController
 {
@@ -26,6 +27,7 @@ class CategoryCrudController extends AbstractCrudController
     {
         return [
             TextField::new('name', 'Nombre'),
+            NumberField::new('approximateWeight', 'Peso aproximado de los artículos'),
             \EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField::new('subcategories', 'Subcategorías')
                 ->setEntryType(\App\Form\SubcategoryType::class)
                 ->showEntryLabel(false)
