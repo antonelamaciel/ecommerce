@@ -18,13 +18,19 @@ class ProductOptionType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Título de Variantes (Ej: Colores, Talles, Versión)',
             ])
+            ->add('image', TextType::class, [
+                'label' => 'Imagen vinculada (opcional)',
+                'required' => false,
+                'help' => 'Selecciona la imagen que desea vincular a esta opcion.',
+                'attr' => ['class' => 'variant-image-select']
+            ])
             ->add('isAvailable', CheckboxType::class, [
                 'label' => 'Mostrar este grupo',
                 'required' => false,
             ])
             ->add('productOptionValues', CollectionType::class, [
                 'entry_type' => ProductOptionValueType::class,
-                'label' => 'Opciones hijas',
+                'label' => 'Opciones hijas (Sub opciones del producto)',
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,

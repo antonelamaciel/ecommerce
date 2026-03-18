@@ -14,29 +14,7 @@
                  style="background-image: url(/uploads/{{ header.image }});"></div>
             <div class="hc-slide__overlay"></div>
 
-            {# Main content #}
-            <div class="hc-slide__body">
-                <div class="hc-content">
-                    {% if header.title %}
-                    <h2 class="hc-content__title">{{ header.title }}</h2>
-                    {% endif %}
-
-                    {% if header.content %}
-                    <p class="hc-content__lead">{{ header.content }}</p>
-                    {% endif %}
-
-                    {% if header.btnTitle %}
-                    <div class="hc-content__actions">
-                        <a href="{{ header.btnUrl }}"
-                           class="hc-btn-primary"
-                           style="position:relative;z-index:30;">
-                            {{ header.btnTitle }}
-                            <span class="hc-btn__icon"><i class="bi bi-arrow-right"></i></span>
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+            {# Main content removed (only image and link per user request) #}
 
         </div>
         {% endfor %}
@@ -44,10 +22,10 @@
 
     {# Navigation arrows #}
     <a class="hc-ctrl hc-ctrl--prev" href="#heroCarousel" role="button" data-slide="prev" aria-label="Anterior">
-        <i class="bi bi-caret-left-fill"></i>
+        <i class="bi bi-arrow-left"></i>
     </a>
     <a class="hc-ctrl hc-ctrl--next" href="#heroCarousel" role="button" data-slide="next" aria-label="Siguiente">
-        <i class="bi bi-caret-right-fill"></i>
+        <i class="bi bi-arrow-right"></i>
     </a>
 
 </div>
@@ -212,14 +190,14 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 25;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 10%;
     background: var(--primary-color, #000) !important; /* Backend Primary Color */
-    color: #fff !important; /* White icon color */
+    /* color: var(--tertiary-color) managed in base.html.twig */
     font-size: 1.2rem;
     text-decoration: none;
     transition: transform 0.3s, filter 0.3s;
@@ -241,8 +219,8 @@
 @media (max-width: 768px) {
     .hc-carousel,
     .hc-slide {
-        height: 50vh;
-        min-height: 350px;
+        height: 35vh;
+        min-height: 250px;
     }
     .hc-content {
         padding: 0 3.5rem;

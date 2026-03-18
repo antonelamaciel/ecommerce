@@ -12,7 +12,7 @@
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #696561;
-    --c-brand: var(--primary-color, #1a1a1a);
+    --c-brand: var(--tertiary-color, #1a1a1a);
     --radius-md: 16px;
     --radius-sm: 10px;
     --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
@@ -23,12 +23,12 @@
   .account-wrap {
     font-family: var(--font-main);
     color: var(--c-ink);
-    padding: 3rem 0 5rem;
+    padding: 1rem 0 5rem;
     animation: fadeUp .6s var(--transition) both;
   }
 
   .account-header {
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
   }
   .account-title {
     font-size: clamp(2rem, 4vw, 2.5rem);
@@ -126,12 +126,24 @@
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  .drawer-item {
+    width: fit-content;
+    border-radius: 50px;
+    font-weight: bold;
+  }
 </style>
 
 <div class="account-wrap">
+  <button type="button" onclick="window.history.back()" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Volver
+  </button>
   <header class="account-header">
     <h1 class="account-title">Mi perfil</h1>
-    <p class="account-greeting">Bienvenido de nuevo, <strong>{{ app.user.firstname }}.</strong></p>
+    <p class="account-greeting">Bienvenido de nuevo, <b>{{ app.user.firstname }}.</b></p>
+    <a class="drawer-item fw-bold btn btn-primary" href="{{ path('home') }}">
+        <i class="bi bi-house-door mr-2"></i>Ir al Inicio
+    </a>
   </header>
 
   {% for message in app.flashes('notice') %}
@@ -147,7 +159,7 @@
             <div class="card-icon"><i class="bi bi-shield-lock"></i></div>
             <div>
               <div class="d-flex align-items-center gap-2 mb-1">
-                <h3 class="card-title">Panel de Control</h3>
+                <h3 class="card-title mr-1">Panel de Control</h3>
                 <span class="admin-badge">Admin</span>
               </div>
               <p class="card-desc">Acceder a la administración del sitio y gestión de productos.</p>

@@ -50,6 +50,7 @@ class DashboardController extends AbstractDashboardController
     public function configureAssets(): \EasyCorp\Bundle\EasyAdminBundle\Config\Assets
     {
         return parent::configureAssets()
+            ->addCssFile('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css')
             ->addCssFile('assets/css/admin-minimal.css')
             ->addCssFile('assets/css/admin-premium.css')
             ->addJsFile('assets/js/admin-custom.js');

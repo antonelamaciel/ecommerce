@@ -13,7 +13,7 @@
     --c-ink: #1a1a1a;
     --c-muted: #696561;
     --c-soft: #fcfaf7;
-    --c-brand: var(--primary-color, #1a1a1a);
+    --c-brand: var(--secondary-color, #1a1a1a);
     --radius-lg: 24px;
     --radius-md: 16px;
     --radius-sm: 10px;
@@ -25,7 +25,7 @@
   .order-detail-wrap {
     font-family: var(--font-main);
     color: var(--c-ink);
-    padding: 3rem 0 5rem;
+    padding: 1rem 0 5rem;
     animation: fadeUp .6s var(--transition) both;
   }
 
@@ -39,7 +39,7 @@
     flex-wrap: wrap;
   }
   .order-title {
-    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: 700;
     margin: 0;
   }
@@ -50,7 +50,7 @@
     color: var(--c-muted);
     font-size: 0.95rem;
   }
-  .order-meta strong { color: var(--c-ink); }
+  .order-meta b { color: var(--c-ink); }
 
   /* Grid Layout */
   .detail-grid {
@@ -129,24 +129,13 @@
     align-items: center;
     gap: 0.5rem;
   }
+  .state-0 { background: #fef2f2; color: #991b1b; }
   .state-1 { background: #eafcf1; color: #10b981; }
   .state-2 { background: #fffbe6; color: #d97706; }
   .state-3 { background: #eff6ff; color: #2563eb; }
+  .state-4 { background: #fffbeb; color: #b45309; }
+  .state-5 { background: #f1f5f9; color: #475569; text-decoration: line-through; }
 
-  .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.8rem 1.5rem;
-    border-radius: var(--radius-sm);
-    color: var(--c-muted);
-    font-weight: 600;
-    text-decoration: none !important;
-    transition: var(--transition);
-    border: 1px solid var(--c-border);
-    background: var(--c-surface);
-  }
-  .btn-back:hover { border-color: var(--c-brand); color: var(--c-brand); transform: translateX(-5px); }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -161,15 +150,15 @@
 <div class="order-detail-wrap">
   <div class="order-detail-header">
     <div>
-      <h1 class="order-title">Detalle del Pedido</h1>
+      <p class="order-title">Detalle del Pedido</p>
       <div class="order-meta">
-        <span>Pedido: <strong>#{{ order.reference }}</strong></span>
-        <span>Fecha: <strong>{{ order.createdAt|date('d/m/Y') }}</strong></span>
+        <span>Pedido: <b>#{{ order.reference }}</b></span>
+        <span>Fecha: <b>{{ order.createdAt|date('d/m/Y') }}</b></span>
       </div>
     </div>
-    <a href="{{ path('account_orders') }}" class="btn-back">
-      <i class="bi bi-arrow-left"></i> Volver a mis pedidos
-    </a>
+    <button type="button" onclick="window.history.back()" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Volver
+    </button>
   </div>
 
   <div class="detail-grid">
@@ -189,7 +178,14 @@
               <tr>
                 <td>
                   <div class="item-name">{{ detail.product }}</div>
-                  <div class="small text-muted">$ {{ (detail.price / 100)|number_format(2, ',', '.') }} ARS / ud.</div>
+                  {% if detail.variants %}
+                    <div class="item-variants mt-1">
+                      <span class="badge bg-light text-dark border fw-normal" style="font-size: 0.75rem; border-radius: 6px; padding: 0.35rem 0.6rem;">
+                        {{ detail.variants }}
+                      </span>
+                    </div>
+                  {% endif %}
+                  <div class="small text-muted mt-1">$ {{ (detail.price / 100)|number_format(2, ',', '.') }} ARS / ud.</div>
                 </td>
                 <td class="item-qty">x{{ detail.quantity }}</td>
                 <td class="item-price">$ {{ (detail.total / 100)|number_format(2, ',', '.') }} ARS</td>
@@ -212,14 +208,33 @@
         <h3 class="section-title"><i class="bi bi-info-circle"></i> Estado del pedido</h3>
         <div class="mb-4">
           <span class="state-pill state-{{ order.state }}">
-            {{ order.state == 1 ? 'Pago aceptado' :
-               order.state == 2 ? 'En preparación' : 'Enviado' }}
+            {{ order.state == 0 ? 'No pagado' :
+               order.state == 1 ? 'Pago aceptado' :
+               order.state == 2 ? 'En preparación' :
+               order.state == 3 ? 'Enviado/Retirado' :
+               order.state == 4 ? 'Pendiente de pago' :
+               order.state == 5 ? 'Cancelado' : 'Desconocido' }}
           </span>
         </div>
         
         <div class="mb-4">
           <div class="small text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Transportista</div>
           <div class="fw-bold">{{ order.carrierName }}</div>
+        </div>
+
+        <div class="mb-4">
+          <div class="small text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Método de Pago</div>
+          <div class="fw-bold">
+            {% if order.paymentMethod == 'cash' %}
+              Efectivo / Retiro
+            {% elseif order.paymentMethod == 'transfer' %}
+              Transferencia Bancaria
+            {% elseif order.paymentMethod == 'mercadopago' %}
+              Mercado Pago
+            {% else %}
+              No especificado
+            {% endif %}
+          </div>
         </div>
 
         <div class="order-summary mt-4 pt-4 border-top" style="border-top-style: dashed !important;">
@@ -239,7 +254,7 @@
       </div>
 
       <div class="text-center mt-4">
-        <p class="text-muted small">¿Tienes alguna duda sobre tu pedido?<br><a href="{{ path('contact') }}" class="text-decoration-none fw-bold" style="color: var(--c-brand)">Contáctanos</a></p>
+        <p class="text-muted small">¿Tienes alguna duda sobre tu pedido?<br><a href="{{ path('contact') }}" class="text-decoration-none fw-bold" style="color: var(--secondary-color)">Contáctanos</a></p>
       </div>
     </aside>
   </div>

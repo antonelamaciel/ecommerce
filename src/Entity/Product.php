@@ -6,6 +6,7 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -16,6 +17,8 @@ class Product
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Este campo es obligatorio")]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -28,12 +31,16 @@ class Product
     private $images = [];
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\JoinColumn(nullable: true)]
     private $subtitle;
 
     #[ORM\Column(type: 'text')]
+    #[ORM\JoinColumn(nullable: true)]
     private $description;
 
     #[ORM\Column(type: 'float')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Este campo es obligatorio")]
     private $price;
 
     #[ORM\Column(type: 'float', nullable: true)]
@@ -41,6 +48,7 @@ class Product
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Este campo es obligatorio")]
     private $category;
 
     #[ORM\Column(type: 'boolean')]
@@ -51,6 +59,9 @@ class Product
 
     #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'products')]
     private $bundles;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $stock;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductOption::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $options;
@@ -282,5 +293,16 @@ class Product
             }
         }
         return $maxDiscount;
+    }
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?int $stock): self
+    {
+        $this->stock = $stock;
+
+        return $this;
     }
 }

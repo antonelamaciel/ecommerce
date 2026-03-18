@@ -5,9 +5,7 @@
 {% block body %}
     <h2>Confirmación de su pedido</h2>
     <p>
-        Hola {{order.user.firstname}} {{order.user.lastname}}, <br>
-        Gracias por su pedido n° <b>{{order.reference}}</b>.<br>
-        Se le acaba de enviar una confirmación por correo electrónico. <br>
+        Hola <b>{{order.user.firstname}}</b>, Gracias por su pedido n° <b>{{order.reference}}</b>. Se le acaba de enviar una confirmación por correo electrónico.
     </p>
     <hr>
     <p>

@@ -1,0 +1,15 @@
+{% for detail in field.value %}
+    <div style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eee;">
+        <div style="font-weight: 800; font-size: 1rem;">{{ detail.product }} <span style="font-size: 0.8rem; color: #666; font-weight: normal;">x{{ detail.quantity }}</span></div>
+        {% if detail.variants %}
+            <div style="margin-top: 0.25rem;">
+                <span class="badge badge-light border" style="font-weight: 500; font-size: 0.85rem; padding: 0.3rem 0.6rem; background: #f8f9fa;">
+                    {{ detail.variants }}
+                </span>
+            </div>
+        {% endif %}
+        <div style="font-size: 0.85rem; margin-top: 0.25rem; font-weight: 700;">
+            $ {{ (detail.total / 100)|number_format(2, ',', '.') }} ARS
+        </div>
+    </div>
+{% endfor %}

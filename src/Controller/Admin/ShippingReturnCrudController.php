@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\ShippingReturn;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -14,6 +16,12 @@ class ShippingReturnCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return ShippingReturn::class;
+    }
+
+    public function configureActions(Actions $actions): Actions 
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -28,7 +36,7 @@ class ShippingReturnCrudController extends AbstractCrudController
     {
         return [
             TextField::new('title', 'Título'),
-            TextField::new('icon', 'Icono Bootstrap bi (ej: bi-truck, bi-box-seam)'),
+            TextField::new('icon', 'Icono Bootstrap bi')->setHelp('Icono Bootstrap bi (ej: bi-truck, bi-box-seam)')->setRequired(false),
             TextEditorField::new('content', 'Contenido'),
             BooleanField::new('isPublished', 'Publicada'),
         ];

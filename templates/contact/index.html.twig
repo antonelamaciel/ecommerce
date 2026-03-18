@@ -12,7 +12,7 @@
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #696561;
-    --c-brand: var(--primary-color, #1a1a1a);
+    --c-brand: var(--secondary-color, #1a1a1a);
     --radius-lg: 24px;
     --radius-md: 16px;
     --radius-sm: 10px;
@@ -122,86 +122,157 @@
     letter-spacing: 0.05em;
   }
 
-  /* Alerts */
-  .alert-styled {
-    border-radius: var(--radius-sm);
-    padding: 1rem;
-    font-weight: 600;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-  }
-  .alert-success { background: #eafcf1; color: #10b981; }
-
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Improved Alert Styles */
+  .alert-styled {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    animation: alertPop .5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .alert-danger { background: #fff1f2; color: #991b1b; }
+  .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+
+  @keyframes alertProgress {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+
+  /* Robust Success Mark Animation */
+  .success-checkmark-wow {
+    width: 60px; height: 60px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .checkmark {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    box-shadow: inset 0px 0px 0px #22c55e;
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  }
+  .checkmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #22c55e;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  }
+  .checkmark__check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+  }
+
+  @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+  @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+  @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 30px #22c55e; } }
+  .alert-content { flex: 1; }
+  .alert-title { display: block; font-weight: 800; font-size: 0.95rem; margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.02em; }
+  .alert-message { margin: 0; font-size: 0.9rem; font-weight: 500; opacity: 0.9; line-height: 1.4; }
+  .alert-progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px; background: currentColor;
+    opacity: 0.2;
+    animation: alertProgress 10s linear forwards;
+  }
+
+  @keyframes alertPop {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes alertProgress {
+    from { width: 100%; }
+    to { width: 0%; }
   }
 
   @media (max-width: 767px) {
     .card-premium { padding: 1.5rem; }
     .contact-wrap { padding: 1rem; }
   }
+
+.btn-submit {
+    width: 100%;
+    background: var(--c-brand) !important;
+    color: var(--primary-color) !important;
+    border: none !important;
+    padding: 1.1rem !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+}
+.btn-submit:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+.shadow-xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important; }
 </style>
 
 <div class="contact-wrap">
+  <button type="button" onclick="window.history.back()" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Volver
+  </button>
+
   <header class="contact-header">
     <h1 class="contact-title">Envíenos su mensaje</h1>
     <p class="contact-subtitle">¿Tienes alguna duda o quieres comentarnos algo? Estamos aquí para escucharte.</p>
   </header>
 
-  {# Success Message Card #}
+  <div id="alert-container"></div>
+
+  {# Success Message Alert #}
   {% for message in app.flashes('success_contact') %}
-      <div class="success-card shadow-xl">
-          <div class="success-icon">
-              <i class="bi bi-check-lg"></i>
+      <div class="alert alert-success alert-styled alert-dismissible fade show shadow-sm js-auto-close" role="alert">
+          <div class="success-checkmark-wow">
+              <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                  <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                  <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
           </div>
-          <h2 class="success-title">¡Mensaje Enviado!</h2>
-          <p class="success-text">{{ message }}</p>
-          <a href="{{ path('home') }}" class="btn-return">Volver al inicio</a>
+          <div class="alert-content">
+            <span class="alert-title">¡Mensaje Enviado!</span>
+            <p class="alert-message">{{ message }}</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          <div class="alert-progress"></div>
       </div>
-      <style>
-          .card-premium, .contact-header { display: none; }
-          .success-card {
-              background: #fff;
-              border-radius: var(--radius-lg);
-              padding: 3.5rem 2rem;
-              text-align: center;
-              border: 1px solid var(--c-border);
-              animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-          }
-          .success-icon {
-              width: 80px; height: 80px;
-              background: #ecfdf5; color: #10b981;
-              border-radius: 50%;
-              display: flex; align-items: center; justify-content: center;
-              font-size: 2.5rem; margin: 0 auto 1.5rem;
-              border: 4px solid #fff; box-shadow: 0 0 0 6px #ecfdf5;
-          }
-          .success-title { font-weight: 800; margin-bottom: 0.5rem; }
-          .success-text { color: var(--c-muted); margin-bottom: 2rem; }
-          .btn-return {
-              display: inline-block; padding: 0.75rem 2rem;
-              background: var(--c-brand); color: #fff !important;
-              text-decoration: none; border-radius: var(--radius-sm);
-              font-weight: 700; transition: var(--transition);
-          }
-          .btn-return:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-          @keyframes popIn {
-              from { opacity: 0; transform: scale(0.9) translateY(20px); }
-              to { opacity: 1; transform: scale(1) translateY(0); }
-          }
-      </style>
   {% endfor %}
 
   {# Error Message Alert #}
   {% for message in app.flashes('error') %}
-      <div class="alert alert-danger alert-styled alert-dismissible fade show shadow-sm" role="alert">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-          <div>{{ message }}</div>
+      <div class="alert alert-danger alert-styled alert-dismissible fade show shadow-sm js-auto-close" role="alert">
+          <div class="alert-icon-wrap">
+            <i class="bi bi-exclamation-circle-fill"></i>
+          </div>
+          <div class="alert-content">
+            <span class="alert-title">¡Ups! Algo salió mal</span>
+            <p class="alert-message">{{ message }}</p>
+          </div>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          <div class="alert-progress"></div>
       </div>
   {% endfor %}
 
@@ -222,40 +293,125 @@
   </div>
 </div>
 
+
+{% endblock %}
+
+{% block javascripts %}
 <script>
-document.getElementById('contact-form').addEventListener('submit', function() {
-    const btn = document.getElementById('submit-btn');
-    const text = btn.querySelector('.btn-text');
-    const spinner = btn.querySelector('.spinner-border');
+function initAutoClose() {
+    const alerts = document.querySelectorAll('.js-auto-close:not(.js-timer-set)');
+    alerts.forEach(alert => {
+        alert.classList.add('js-timer-set');
+        
+        // Use a 10 second timeout
+        setTimeout(() => {
+            if (alert) {
+                // Direct animation through styles for maximum reliability
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-20px)';
+                alert.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                
+                // After the fade out animation
+                setTimeout(() => {
+                    alert.style.display = 'none'; // Immediate hide
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert); // Remove from DOM
+                    }
+                }, 600);
+            }
+        }, 10000);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const btn = document.getElementById('submit-btn');
+            const text = btn.querySelector('.btn-text');
+            const spinner = btn.querySelector('.spinner-border');
+            const originalText = text.textContent;
+            const container = document.getElementById('alert-container');
+            
+            // Disable button
+            btn.setAttribute('disabled', 'disabled');
+            btn.style.opacity = '0.7';
+            text.textContent = 'Enviando...';
+            spinner.classList.remove('d-none');
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const alertType = data.success ? 'success' : 'danger';
+                const alertTitle = data.success ? '¡Mensaje Enviado!' : '¡Ups! Algo salió mal';
+                const icon = data.success ? 
+                    `<svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                     </svg>` : 
+                    `<i class="bi bi-exclamation-circle-fill" style="font-size: 2rem;"></i>`;
+                
+                const iconWrapClass = data.success ? 'success-checkmark-wow' : 'alert-icon-wrap';
+
+                container.innerHTML = `
+                    <div class="alert alert-${alertType} alert-styled alert-dismissible fade show shadow-sm js-auto-close" role="alert">
+                        <div class="${iconWrapClass}">
+                            ${icon}
+                        </div>
+                        <div class="alert-content">
+                          <span class="alert-title">${alertTitle}</span>
+                          <p class="alert-message">${data.message}</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="alert-progress"></div>
+                    </div>
+                `;
+                
+                if (data.success) form.reset();
+                initAutoClose();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger alert-styled alert-dismissible fade show shadow-sm js-auto-close" role="alert">
+                        <div class="alert-icon-wrap">
+                          <i class="bi bi-exclamation-circle-fill" style="font-size: 2rem;"></i>
+                        </div>
+                        <div class="alert-content">
+                          <span class="alert-title">¡Ups! Error de conexión</span>
+                          <p class="alert-message">No pudimos procesar tu solicitud. Por favor, revisa tu conexión.</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="alert-progress"></div>
+                    </div>
+                `;
+                initAutoClose();
+            })
+            .finally(() => {
+                btn.removeAttribute('disabled');
+                btn.style.opacity = '1';
+                text.textContent = originalText;
+                spinner.classList.add('d-none');
+            });
+        });
+    }
     
-    text.textContent = 'Enviando...';
-    spinner.classList.remove('d-none');
-    btn.setAttribute('disabled', 'disabled');
-    btn.style.opacity = '0.8';
+    // Initial run for flash messages
+    initAutoClose();
 });
 </script>
-
-<style>
-.btn-submit {
-    width: 100%;
-    background: var(--c-brand) !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 1.1rem !important;
-    border-radius: var(--radius-sm) !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    cursor: pointer;
-    transition: var(--transition);
-    margin-top: 1rem;
-    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-}
-.btn-submit:hover {
-    filter: brightness(1.1);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-}
-.shadow-xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important; }
-.alert-danger { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
-</style>
 {% endblock %}
+
+

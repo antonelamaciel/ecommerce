@@ -3,10 +3,9 @@
 {% block title %}Mi pedido - empresa{% endblock %}
 
 {% block body %}
-    <h2>Cancelación de su pedido</h2>
+    <h2 class="mt-5">Cancelación de su pedido</h2>
     <p>
-        Hola {{order.user.firstname}} {{order.user.lastname}}, <br>
-        Su pago para el pedido n° <b>{{order.reference}}</b> no se ha completado.<br>
+        Hola <b>{{order.user.firstname}}</b>, Su pago para el pedido n° <b>{{order.reference}}</b> no se ha completado.
     </p>
     <hr>
     <a class="btn btn-outline-success" href="{{ path('order') }}">Reintentar</a>

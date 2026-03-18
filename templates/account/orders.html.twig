@@ -16,7 +16,7 @@
     --c-soft: #fcfaf7;
     
     /* Dynamic Brand Colors */
-    --c-brand: var(--primary-color, #1a1a1a);
+    --c-brand: var(--tertiary-color, #1a1a1a);
     --c-brand-light: color-mix(in srgb, var(--c-brand) 8%, white);
     
     --radius-lg: 24px;
@@ -54,26 +54,6 @@
     margin-top: 0.5rem;
   }
 
-  /* Button Back */
-  .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.8rem 1.5rem;
-    border-radius: var(--radius-sm);
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    color: var(--c-muted);
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none !important;
-    transition: var(--transition);
-  }
-  .btn-back:hover {
-    border-color: var(--c-brand);
-    color: var(--c-brand);
-    transform: translateX(-5px);
-  }
 
   /* Table Card */
   .orders-card {
@@ -137,9 +117,12 @@
   }
 
   /* Status Colors */
+  .state-0 { background: #fef2f2; color: #991b1b; }
   .state-1 { background: #eafcf1; color: #10b981; } /* Approved */
   .state-2 { background: #fffbe6; color: #d97706; } /* Prep */
   .state-3 { background: #eff6ff; color: #2563eb; } /* Sent */
+  .state-4 { background: #fffbeb; color: #b45309; }
+  .state-5 { background: #f1f5f9; color: #475569; text-decoration: line-through; }
 
   .order-price {
     font-weight: 700;
@@ -204,8 +187,11 @@
 
   @media (max-width: 991px) {
     .orders-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .orders-card { overflow-x: auto; }
-    .orders-table { min-width: 800px; }
+  }
+  @media (max-width: 767px) {
+    .orders-card { overflow-x: visible; }
+    .orders-table { min-width: 0; }
+    .orders-table td, .orders-table th { padding: 1rem 0.75rem; }
   }
 </style>
 
@@ -217,9 +203,9 @@
       <h1 class="orders-title">Mis pedidos</h1>
       <p class="orders-subtitle">Gestiona y revisa el historial de tus compras</p>
     </div>
-    <a href="{{ path('account') }}" class="btn-back">
-      <i class="bi bi-arrow-left"></i> Volver a mi cuenta
-    </a>
+    <button type="button" onclick="window.history.back()" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Volver
+    </button>
   </div>
 
   {% if orders %}
@@ -228,27 +214,38 @@
       <table class="orders-table">
         <thead>
           <tr>
-            <th>Artículos</th>
-            <th>Estado</th>
-            <th>Total</th>
+            <th class="d-none d-md-table-cell">Artículos</th>
+            <th class="d-none d-md-table-cell">Estado</th>
+            <th class="d-none d-md-table-cell">Total</th>
             <th>Fecha</th>
-            <th>Referencia</th>
-            <th></th>
+            <th class="d-none d-md-table-cell">ID del pedido</th>
+            <th class="text-end">Acción</th>
           </tr>
         </thead>
         <tbody>
           {% for order in orders %}
             <tr>
-              <td>
+              <td class="d-none d-md-table-cell">
                 <span class="qty-pill">{{ order.totalQuantity }} unidades</span>
               </td>
-              <td>
-                <span class="state-badge state-{{ order.state }}">
-                  {{ order.state == 1 ? 'Pago aceptado' :
-                     order.state == 2 ? 'En preparación' : 'Enviado' }}
-                </span>
+              <td class="d-none d-md-table-cell">
+                <div class="d-flex flex-column gap-1">
+                  <span class="state-badge state-{{ order.state }}">
+                    {{ order.state == 0 ? 'No pagado' :
+                       order.state == 1 ? 'Pago aceptado' :
+                       order.state == 2 ? 'En preparación' :
+                       order.state == 3 ? 'Enviado/Retirado' :
+                       order.state == 4 ? 'Pendiente' :
+                       order.state == 5 ? 'Cancelado' : 'Estado ' ~ order.state }}
+                  </span>
+                  {% if order.paymentMethod %}
+                    <span class="small text-muted" style="font-size: 0.65rem; margin-left: 0.5rem;">
+                      {{ order.paymentMethod == 'cash' ? 'Efectivo' : (order.paymentMethod == 'transfer' ? 'Transferencia' : 'Mercado Pago') }}
+                    </span>
+                  {% endif %}
+                </div>
               </td>
-              <td>
+              <td class="d-none d-md-table-cell">
                 <span class="order-price">
                   $ {{ ((order.carrierPrice + order.total) / 100)|number_format(2, ',', '.') }} ARS
                 </span>
@@ -256,12 +253,12 @@
               <td>
                 <span class="order-date">{{ order.createdAt|date('d/m/Y') }}</span>
               </td>
-              <td>
+              <td class="d-none d-md-table-cell">
                 <span class="ref-badge">{{ order.reference }}</span>
               </td>
               <td class="text-end">
                 <a href="{{ path('account_order', {'reference': order.reference}) }}" class="order-action">
-                  Detalles <i class="bi bi-arrow-right"></i>
+                  Detalles <i class="bi bi-arrow-right d-md-inline"></i>
                 </a>
               </td>
             </tr>

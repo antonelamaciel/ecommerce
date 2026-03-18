@@ -35,6 +35,7 @@ class MercadoPagoController extends AbstractController
             }
 
             $order->setStripeSession($preference['id']); 
+            $order->setPaymentMethod('mercadopago');
             $em->flush();
 
             return $this->redirect($preference['init_point']);
@@ -94,7 +95,7 @@ class MercadoPagoController extends AbstractController
                     if ($order) {
                         switch ($status) {
                             case 'approved':
-                                if ($order->getState() == 0) {
+                                if ($order->getState() == 0 || $order->getState() == 4) {
                                     $order->setState(1);
                                     $em->flush();
 

@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Headers;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -14,6 +16,12 @@ class HeadersCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Headers::class;
+    }
+
+    public function configureActions(Actions $actions): Actions 
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -30,10 +38,10 @@ class HeadersCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('title', 'Título'),
-            TextareaField::new('content', 'Contenido'),
-            TextField::new('btnTitle', 'Texto del botón'),
-            TextField::new('btnUrl', 'Enlace del botón'),
+            // TextField::new('title', 'Título'),
+            // TextareaField::new('content', 'Contenido'),
+            // TextField::new('btnTitle', 'Texto del botón'),
+            TextField::new('btnUrl', 'Enlace del banner'),
             
             ImageField::new('image', 'Subir/Cambiar Banner')
                 ->setBasePath('uploads/')

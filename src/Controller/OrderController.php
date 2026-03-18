@@ -7,6 +7,7 @@ use App\Entity\OrderDetails;
 use App\Form\OrderType;
 use App\Model\Cart;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\OrderRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,7 +71,7 @@ class OrderController extends AbstractController
      * @return Response
      */
     #[Route('/order/summary', name: 'order_add', methods: 'POST')]
-    public function summary(Cart $cart, Request $request, EntityManagerInterface $em): Response
+    public function summary(Cart $cart, Request $request, EntityManagerInterface $em, \App\Service\Shipping\ShippingCalculatorService $shippingCalc): Response
     {
          //Récupération du panier en session
         $cartProducts = $cart->getDetails();   
@@ -93,14 +94,14 @@ class OrderController extends AbstractController
 
             $cartProducts = $cart->getDetails();
 
-            //Création de la commande avec les infos formulaire
+            //Création de la commande avec les infos formulario (sin transportista aún)
             $order = new Order;
             $date = new \DateTime;
             $order
                 ->setUser($this->getUser())
                 ->setCreatedAt($date)
-                ->setCarrierName($form->get('carriers')->getData()->getName())
-                ->setCarrierPrice($form->get('carriers')->getData()->getPrice())
+                ->setCarrierName('Pendiente de selección')
+                ->setCarrierPrice(0)
                 ->setDelivery($delivery_string)
                 ->setState(0)
                 ->setReference($date->format('YmdHis') . '-' . uniqid())
@@ -113,6 +114,7 @@ class OrderController extends AbstractController
                 $orderDetails
                     ->setBindedOrder($order)
                     ->setProduct($item['product']->getName())
+                    ->setProductObject($item['product'])
                     ->setVariants($item['variants'])
                     ->setQuantity($item['quantity'])
                     ->setPrice($item['product']->getPrice())
@@ -122,14 +124,131 @@ class OrderController extends AbstractController
             }
             $em->flush();
 
+            $cartProducts = $cart->getDetails();
+            $destCp = $address->getPostal();
+            $shippingOptions = $shippingCalc->calculateShipping($destCp, $cartProducts['totals']['price'] / 100);
+
             // Affichage récap
             return $this->renderForm('order/add.html.twig', [
                 'cart' => $cartProducts,
-                'totalPrice' =>$cartProducts['totals']['price'],
-                'order' => $order
+                'totalPrice' => $cartProducts['totals']['price'],
+                'order' => $order,
+                'carriers' => $shippingOptions
             ]);
         }
         //Si pas de formulaire, page non accessible, et donc redirection vers le panier
         return $this->redirectToRoute('cart');
+    }
+
+    #[Route('/order/update-carrier/{reference}/{id}', name: 'order_update_carrier', methods: ['POST'])]
+    public function updateCarrier(string $reference, string $id, OrderRepository $orderRepository, EntityManagerInterface $em, \App\Service\Shipping\ShippingCalculatorService $shippingCalc, Cart $cart): Response
+    {
+        $order = $orderRepository->findOneByReference($reference);
+        $carrier = $em->getRepository(\App\Entity\Carrier::class)->find($id);
+
+        if (!$order || $order->getUser() != $this->getUser()) {
+            return $this->json(['success' => false], 404);
+        }
+
+        // Get CP from order delivery string (line 5 usually, index 4)
+        $deliveryParts = explode('<br>', $order->getDelivery());
+        $destCp = trim($deliveryParts[4] ?? '1000');
+
+        $cartProducts = $cart->getDetails();
+        $options = $shippingCalc->calculateShipping($destCp, $order->getTotal() / 100);
+        
+        $selectedOption = null;
+        foreach ($options as $opt) {
+            if ($opt['id'] === $id) {
+                $selectedOption = $opt;
+                break;
+            }
+        }
+
+        if (!$selectedOption) {
+            return $this->json(['success' => false, 'message' => 'Opción de envío no válida'], 400);
+        }
+
+        $priceInCents = (int)($selectedOption['price'] * 100);
+
+        $order->setCarrierName($selectedOption['name']);
+        $order->setCarrierPrice($priceInCents);
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'carrierPrice' => $priceInCents,
+            'totalPrice' => $order->getTotal() + $priceInCents
+        ]);
+    }
+
+    #[Route('/order/confirm-efectivo/{reference}', name: 'order_confirm_cash')]
+    public function confirmCash(string $reference, OrderRepository $orderRepository, Cart $cart, EntityManagerInterface $em): Response
+    {
+        $order = $orderRepository->findOneByReference($reference);
+        if (!$order || $order->getUser() != $this->getUser()) {
+            return $this->redirectToRoute('cart');
+        }
+
+        // Si l'order est déjà validé (ou autre état que 0), on redirige
+        if ($order->getState() !== 0) {
+            return $this->redirectToRoute('account_order', ['reference' => $order->getReference()]);
+        }
+
+        // Marquer comme en attente de paiement
+        $order->setState(4);
+        $order->setPaymentMethod('cash');
+
+        // Reservar stock
+        foreach ($order->getOrderDetails() as $detail) {
+            $product = $detail->getProductObject();
+            if ($product && $product->getStock() !== null) {
+                $newStock = $product->getStock() - $detail->getQuantity();
+                $product->setStock(max(0, $newStock));
+            }
+        }
+        $em->flush();
+
+        // On vide le panier
+        $cart->remove();
+
+        return $this->render('order/success_cash.html.twig', [
+            'order' => $order
+        ]);
+    }
+
+    #[Route('/order/confirm-transferencia/{reference}', name: 'order_confirm_transfer')]
+    public function confirmTransfer(string $reference, OrderRepository $orderRepository, Cart $cart, EntityManagerInterface $em): Response
+    {
+        $order = $orderRepository->findOneByReference($reference);
+        if (!$order || $order->getUser() != $this->getUser()) {
+            return $this->redirectToRoute('cart');
+        }
+
+        // Si l'order est déjà validé (ou autre état que 0), on redirige
+        if ($order->getState() !== 0) {
+            return $this->redirectToRoute('account_order', ['reference' => $order->getReference()]);
+        }
+
+        // Marquer comme en attente de paiement
+        $order->setState(4);
+        $order->setPaymentMethod('transfer');
+
+        // Reservar stock
+        foreach ($order->getOrderDetails() as $detail) {
+            $product = $detail->getProductObject();
+            if ($product && $product->getStock() !== null) {
+                $newStock = $product->getStock() - $detail->getQuantity();
+                $product->setStock(max(0, $newStock));
+            }
+        }
+        $em->flush();
+
+        // On vide le panier
+        $cart->remove();
+
+        return $this->render('order/success_transfer.html.twig', [
+            'order' => $order
+        ]);
     }
 }

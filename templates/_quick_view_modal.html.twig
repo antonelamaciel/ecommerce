@@ -1,62 +1,90 @@
 <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-bold" id="quickViewModalLabel">Resumen del producto</h5>
-        <button type="button" id="qv-close-btn" class="btn btn-sm btn-outline-dark border-0 fw-bold fs-5" aria-label="Close" style="border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">X</button>
-      </div>
-      <div class="modal-body text-center p-4">
-        <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
-            <button type="button" id="qv-prev-img" class="btn text-white rounded-circle shadow-sm d-none d-sm-flex align-items-center justify-content-center flex-shrink-0" style="width:36px; height:36px; background: var(--primary-color, #333); border: none; transition: opacity 0.2s;"><i class="bi bi-chevron-left"></i></button>
-            <div id="qv-img-wrap" style="width: 100%; max-width: 320px; min-width: 200px; height: 240px; min-height: 200px; max-height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 10px; background: #f8f8f8; flex-grow: 1; position: relative;" class="mx-2">
-                <img id="qv-image" src="" alt="Producto" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; transition: opacity 0.3s ease;">
-            </div>
-            <button type="button" id="qv-next-img" class="btn text-white rounded-circle shadow-sm d-none d-sm-flex align-items-center justify-content-center flex-shrink-0" style="width:36px; height:36px; background: var(--primary-color, #333); border: none; transition: opacity 0.2s;"><i class="bi bi-chevron-right"></i></button>
-        </div>
-        <div id="qv-thumbnails" class="d-flex justify-content-center gap-2 mb-3 flex-wrap mt-2"></div>
-        <h4 id="qv-name" class="fw-bold mb-1">Nombre</h4>
-        <div id="qv-price" class="fw-bold mb-0 d-flex flex-column align-items-center" style="color: var(--secondary-color, var(--c-ink, #000)); font-size: 1.25rem;"></div>
-        <div id="qv-options-container" class="mb-3 d-flex flex-wrap justify-content-center gap-1"></div>
-        
-        <form id="qv-form" method="GET" action="">
-          <div class="d-flex flex-column gap-2 w-100 mt-2">
-            
-            <div class="d-flex align-items-center gap-2">
-              <button type="submit" id="qv-submit" class="btn btn-dark rounded-pill fw-bold py-2 py-sm-3 d-flex align-items-center justify-content-center flex-grow-1" style="background: var(--secondary-color, var(--c-ink, #000)); border: none; font-size: 0.95rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                <i class="bi bi-cart-plus mr-2"></i>
-                <span class="d-none d-sm-inline ml-2" style="font-weight: 800;">Comprar</span>
-                <span class="d-inline d-sm-none" style="font-weight: 800;">Comprar</span>
-              </button>
-              
-              <div class="d-flex justify-content-center align-items-center flex-shrink-0" id="qv-qty-controls" style="border: 1px solid #dee2e6; border-radius: 99px; padding: 0.2rem; height: 100%;">
-                <button type="button" class="btn rounded-circle fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="qv-minus" style="width: 32px; height: 32px; background: transparent; font-size: 0.9rem; padding: 0;">-</button>
-                <input type="number" id="qv-qty" name="qty" value="1" min="1" class="form-control text-center mx-1 border-0 fw-bold bg-transparent p-0" style="width: 35px; pointer-events: none; font-size: 0.9rem; box-shadow: none;" readonly>
-                <button type="button" class="btn rounded-circle fw-bold text-muted border-0 d-flex justify-content-center align-items-center" id="qv-plus" style="width: 32px; height: 32px; background: transparent; font-size: 0.9rem; padding: 0;">+</button>
-              </div>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+      <button type="button" id="qv-close-btn" class="btn btn-sm btn-outline-dark border-0 fw-bold fs-5" aria-label="Close" style="position: absolute; top: 15px; right: 15px; z-index: 10; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); transition: all 0.2s;"><i class="bi bi-x"></i></button>
+      
+      <div class="modal-body p-0">
+        <div class="row g-0">
+          <div class="col-md-5 p-0 d-flex flex-column align-items-center justify-content-center bg-light qv-img-col" style="position: relative; overflow: hidden; min-height: 400px;">
+            <div id="qv-img-wrap" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: absolute; inset: 0;">
+                <img id="qv-image" src="" alt="Producto" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease-in-out;">
             </div>
             
-            <a id="qv-details-btn" href="#" class="mt-2 btn btn-outline-dark rounded-pill fw-bold py-2 py-sm-3 d-flex align-items-center justify-content-center" style="font-size: 0.95rem; transition: all 0.2s;">
-              <i class="bi bi-eye mr-2"></i>
-              <span class="d-none d-sm-inline">Ver detalles del producto</span>
-              <span class="d-inline d-sm-none">Ver detalles</span>
-            </a>
+            <div class="d-flex align-items-center justify-content-between w-100 px-3" style="position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;">
+                <button type="button" id="qv-prev-img" class="btn text-dark bg-white shadow-sm d-none d-md-flex align-items-center justify-content-center flex-shrink-0 rounded-circle" style="width: 36px; height: 36px; opacity: 0.8; transition: all 0.2s;"><i class="bi bi-chevron-left"></i></button>
+                <button type="button" id="qv-next-img" class="btn text-dark bg-white shadow-sm d-none d-md-flex align-items-center justify-content-center flex-shrink-0 rounded-circle" style="width: 36px; height: 36px; opacity: 0.8; transition: all 0.2s;"><i class="bi bi-chevron-right"></i></button>
+            </div>
           </div>
-        </form>
+          
+          <div class="col-md-7 p-4 p-md-5 d-flex flex-column justify-content-center text-start qv-info-col">
+            <div class="qv-text-wrap">
+                <h4 id="qv-name" class="mt-2 fw-bold mb-2" style="line-height:1.2; font-size: 1.6rem; letter-spacing: -0.02em;">Nombre</h4>
+                <p id="qv-subtitle" class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.4;"></p>
+                <div id="qv-price" class="fw-bold mb-3 d-flex flex-wrap align-items-center gap-2" style="font-size: 1rem; color: var(--secondary-color);"></div>
+                <div id="qv-stock" class="small mb-4 d-flex align-items-center"></div>
+            </div>
+            
+            <div class="qv-rest-wrap w-100 mt-auto mt-md-0">
+                <div class="mb-2">
+                    <div id="qv-options-container" class="d-flex flex-wrap gap-2 w-100"></div>
+                </div>
+                <div id="qv-alert" class="alert d-none py-2 px-3 mb-4" style="font-size: 0.85rem; border-radius: 8px; background: #fff3f3; color: #dc3545; border: 1px solid #ffcccc; display: inline-block;">
+                    <i class="bi bi-exclamation-circle mr-1"></i> Selecciona una opcion del producto antes de comprar
+                </div>
+                
+                <form id="qv-form" method="GET" action="" class="mt-4 pt-4 border-top">
+              <div class="d-flex flex-column gap-3 w-100">
+                <div class="d-flex align-items-center gap-2 gap-sm-3">
+                  <div class="d-flex justify-content-center align-items-center flex-shrink-0 bg-light" id="qv-qty-controls" style="border-radius: 99px; padding: 0.25rem;">
+                    <button type="button" class="btn rounded-circle fw-bold text-dark border-0 d-flex justify-content-center align-items-center bg-white shadow-sm qv-qty-btn" id="qv-minus">-</button>
+                    <input type="number" id="qv-qty" name="qty" value="1" min="1" class="form-control text-center mx-1 border-0 fw-bold bg-transparent p-0" style="width: 35px; pointer-events: none; font-size: 1.1rem; box-shadow: none;" readonly>
+                    <button type="button" class="btn rounded-circle fw-bold text-dark border-0 d-flex justify-content-center align-items-center bg-white shadow-sm qv-qty-btn" id="qv-plus">+</button>
+                  </div>
+
+                  <button type="submit" id="qv-submit" class="btn rounded-pill fw-bold py-3 px-3 px-sm-4 d-flex align-items-center justify-content-center flex-grow-1" style="background: var(--c-ink, #000); color: #fff; border: none; font-size: 1.05rem; letter-spacing: 0.02em; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <i class="bi bi-cart-plus mr-2 fs-5"></i>
+                    <span>Comprar</span>
+                  </button>
+                </div>
+                
+                <a id="qv-details-btn" href="#" class="btn btn-outline-dark rounded-pill fw-bold py-2 mt-2 d-flex align-items-center justify-content-center" style="font-size: 0.95rem; border-width: 1.5px; border-color: #e5e7eb; color: #4b5563; transition: all 0.2s;" onmouseover="this.style.borderColor='#111827'; this.style.color='#111827';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#4b5563';">
+                  <span>Ver todos los detalles</span> <i class="bi bi-arrow-right ml-2"></i>
+                </a>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-@media (max-width: 575px) {
-  #qv-img-wrap {
-    max-width: none !important;
-    min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-    border-radius: 8px !important;
+@media (max-width: 767px) {
+  #quickViewModal {
+      display: none !important;
   }
+}
+
+
+.qv-qty-btn {
+    width: 40px; 
+    height: 40px; 
+    font-size: 1.2rem; 
+    padding: 0;
+}
+@media (max-width: 575px) {
+    .qv-qty-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+}
+
+#qv-prev-img:hover, #qv-next-img:hover {
+    opacity: 1 !important;
+    transform: scale(1.05);
 }
 #qv-options-container .badge:not(.option-unavailable) {
     background-color: transparent !important;
@@ -66,16 +94,47 @@
     background-color: transparent !important;
     color: #adb5bd !important;
 }
-.qv-parent-btn.active {
-    background-color: var(--primary-color, #000) !important;
-    color: #fff !important;
-    border-color: var(--primary-color, #000) !important;
+#qv-options-container .qv-value-btn {
+    border-radius: 9px !important;
+    padding: 0.6rem 1.25rem !important;
+    font-size: 0.9rem !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef !important;
+    color: #495057 !important;
+    font-weight: 500 !important;
 }
-.qv-value-btn.active {
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #000 !important;
+#qv-options-container .qv-parent-btn {
+    border-radius: 999px !important;
+    padding: 0.4rem 1rem !important;
+    font-size: 0.85rem !important;
+    background-color: transparent !important;
+    border: 1.5px solid #e9ecef !important;
+    color: #495057 !important;
+    font-weight: 600 !important;
 }
+#qv-options-container .qv-value-btn.option-unavailable {
+    opacity: 0.5;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+#qv-options-container .qv-parent-btn.active {
+    background-color: var(--tertiary-color, var(--primary-color, #000)) !important;
+    color: #fff !important;
+    border-color: var(--tertiary-color, var(--primary-color, #000)) !important;
+}
+#qv-options-container .qv-value-btn.active {
+    background-color: var(--tertiary-color, var(--primary-color, #000)) !important;
+    color: #fff !important;
+    border-color: var(--tertiary-color, var(--primary-color, #000)) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transform: translateY(-2px);
+}
+#qv-options-container .qv-value-btn:hover:not(.active):not(.option-unavailable) {
+    background-color: #e9ecef !important;
+    border-color: #dee2e6 !important;
+}
+
 </style>
 
 <script>
@@ -91,50 +150,81 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const qvCloseBtn = document.getElementById('qv-close-btn');
-  if (qvCloseBtn) {
-    qvCloseBtn.addEventListener('click', () => {
-        if (bsModal) {
-            bsModal.hide();
-        } else if (window.jQuery) {
-            $('#quickViewModal').modal('hide');
-        }
-    });
+  
+  function hideQvModal() {
+      stopQvAutoSlide();
+      if (bsModal) {
+          bsModal.hide();
+      } else if (window.jQuery) {
+          $('#quickViewModal').modal('hide');
+      }
   }
 
-  const cartBtns = document.querySelectorAll('.pcard__buy-btn');
+  if (qvCloseBtn) {
+    qvCloseBtn.addEventListener('click', hideQvModal);
+  }
+
+  // Handle modal hidden event natively to clean up
+  if (quickViewModal) {
+      quickViewModal.addEventListener('hidden.bs.modal', function () {
+          stopQvAutoSlide();
+      });
+  }
+
   const qvImage = document.getElementById('qv-image');
   const qvName = document.getElementById('qv-name');
   const qvPrice = document.getElementById('qv-price');
+  const qvStock = document.getElementById('qv-stock');
   const qvDetailsBtn = document.getElementById('qv-details-btn');
   const qvForm = document.getElementById('qv-form');
   const qvSubmit = document.getElementById('qv-submit');
-  const qvThumbnails = document.getElementById('qv-thumbnails');
   const qvPrevImg = document.getElementById('qv-prev-img');
   const qvNextImg = document.getElementById('qv-next-img');
   
   let currentQvImages = [];
   let currentQvIndex = 0;
   let qvSelections = {};
+  let qvAutoSlideInterval = null;
 
-  function setQvImage(idx) {
+  function stopQvAutoSlide() {
+      if (qvAutoSlideInterval) {
+          clearInterval(qvAutoSlideInterval);
+          qvAutoSlideInterval = null;
+      }
+  }
+
+  function startQvAutoSlide() {
+      stopQvAutoSlide();
+      if (currentQvImages.length > 1) {
+          qvAutoSlideInterval = setInterval(() => {
+              setQvImage(currentQvIndex + 1);
+          }, 3500); // Cambia imagen cada 3.5 segundos
+      }
+  }
+
+  function setQvImage(idx, userInitiated = false) {
     if(currentQvImages.length === 0) return;
     if(idx < 0) idx = currentQvImages.length - 1;
     if(idx >= currentQvImages.length) idx = 0;
     currentQvIndex = idx;
     const imgSrc = currentQvImages[currentQvIndex];
-    qvImage.style.opacity = '0.5';
-    setTimeout(() => {
-        qvImage.src = imgSrc;
-        qvImage.style.opacity = '1';
-    }, 150);
+    if (qvImage) {
+        qvImage.style.opacity = '0.3';
+        setTimeout(() => {
+            qvImage.src = imgSrc;
+            qvImage.style.opacity = '1';
+        }, 200);
+    }
     
-    Array.from(qvThumbnails.children).forEach((child, i) => {
-        child.style.border = i === currentQvIndex ? '2px solid var(--c-ink)' : '2px solid transparent';
-    });
+    if (userInitiated) {
+        // Stop and restart on user interaction
+        startQvAutoSlide();
+    }
   }
 
-  if (qvPrevImg) qvPrevImg.addEventListener('click', () => setQvImage(currentQvIndex - 1));
-  if (qvNextImg) qvNextImg.addEventListener('click', () => setQvImage(currentQvIndex + 1));
+  if (qvPrevImg) qvPrevImg.addEventListener('click', () => setQvImage(currentQvIndex - 1, true));
+  if (qvNextImg) qvNextImg.addEventListener('click', () => setQvImage(currentQvIndex + 1, true));
+
 
   let touchStartXQv = 0;
   let touchEndXQv = 0;
@@ -145,8 +235,8 @@ document.addEventListener('DOMContentLoaded', function() {
       qvImage.parentElement.addEventListener('touchend', e => {
           touchEndXQv = e.changedTouches[0].screenX;
           if(currentQvImages.length <= 1) return;
-          if (touchEndXQv < touchStartXQv - 40) setQvImage(currentQvIndex + 1);
-          if (touchEndXQv > touchStartXQv + 40) setQvImage(currentQvIndex - 1);
+          if (touchEndXQv < touchStartXQv - 40) setQvImage(currentQvIndex + 1, true);
+          if (touchEndXQv > touchStartXQv + 40) setQvImage(currentQvIndex - 1, true);
       }, {passive: true});
   }
   
@@ -154,121 +244,206 @@ document.addEventListener('DOMContentLoaded', function() {
   const qvMinus = document.getElementById('qv-minus');
   const qvPlus = document.getElementById('qv-plus');
 
-  qvMinus.addEventListener('click', () => {
-    let val = parseInt(qvQty.value);
-    if(val > 1) qvQty.value = val - 1;
-  });
+  if (qvMinus) {
+      qvMinus.addEventListener('click', () => {
+        let val = parseInt(qvQty.value);
+        if(val > 1) qvQty.value = val - 1;
+      });
+  }
 
-  qvPlus.addEventListener('click', () => {
-    let val = parseInt(qvQty.value);
-    qvQty.value = val + 1;
-  });
+  if (qvPlus) {
+      qvPlus.addEventListener('click', () => {
+        let val = parseInt(qvQty.value);
+        let maxStock = parseInt(qvForm.dataset.maxStock);
+        if (isNaN(maxStock) || val < maxStock) {
+            qvQty.value = val + 1;
+        }
+      });
+  }
 
-  cartBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      
-      const item = btn.closest('.pcard');
-      if(!item) {
-          window.location.href = btn.href;
-          return;
-      }
-      
-      const imgEl = item.querySelector('.pcard__img');
-      const nameEl = item.querySelector('.pcard__name a');
-      const priceEl = item.querySelector('.pcard__price');
-      const topBadgeEl = item.querySelector('.top-badge-right');
-      const optionStore = item.querySelector('.pcard__options-store');
-      const qvImgWrap = document.getElementById('qv-img-wrap');
-      const qvOptionsContainer = document.getElementById('qv-options-container');
-      
-      qvSelections = {}; // Clear previous selections
-      
-      const existingBadgeEl = qvImgWrap.querySelector('.top-badge-right');
-      if (existingBadgeEl) existingBadgeEl.remove();
-      
-      if(imgEl && nameEl && priceEl) {
-          qvImage.src = imgEl.src;
-          if (topBadgeEl) {
-              const copiedBadge = topBadgeEl.cloneNode(true);
-              qvImgWrap.appendChild(copiedBadge);
-          }
-          qvName.innerHTML = nameEl.innerHTML.trim();
-          qvPrice.innerHTML = priceEl.innerHTML.trim();
-          qvOptionsContainer.innerHTML = optionStore ? optionStore.innerHTML : '';
-          qvDetailsBtn.href = nameEl.href;
-          qvForm.action = btn.href;
-          qvQty.value = 1;
-          qvSubmit.innerHTML = '<i class="bi bi-cart-plus mr-2"></i> Comprar';
-          qvSubmit.disabled = false;
-          
-          qvThumbnails.innerHTML = '';
-          
-          let extraImages = [];
-          try {
-             if (imgEl.dataset.extraImages) {
-                 extraImages = JSON.parse(imgEl.dataset.extraImages);
-             }
-          } catch(e) {}
-          
-          const mainSrc = imgEl.src;
-          const allImages = [mainSrc];
-          if (Array.isArray(extraImages)) {
-              extraImages.forEach(img => {
-                  allImages.push('/uploads/' + img);
-              });
-          }
-          currentQvImages = allImages;
-          currentQvIndex = 0;
-
-          if (allImages.length > 1) {
-              // Only show arrow buttons on non-mobile (≥576px)
-              if (window.innerWidth >= 576) {
-                  qvPrevImg.classList.remove('d-none');
-                  qvNextImg.classList.remove('d-none');
-              }
-              allImages.forEach((imgSrc, idx) => {
-                  const thumb = document.createElement('img');
-                  thumb.src = imgSrc;
-                  thumb.style.width = '40px';
-                  thumb.style.height = '40px';
-                  thumb.style.objectFit = 'cover';
-                  thumb.style.borderRadius = '6px';
-                  thumb.style.cursor = 'pointer';
-                  thumb.style.border = idx === 0 ? '2px solid var(--c-ink)' : '2px solid transparent';
-                  thumb.style.transition = 'border 0.2s';
-                  
-                  thumb.addEventListener('click', () => setQvImage(idx));
-                  qvThumbnails.appendChild(thumb);
-              });
-          } else {
-              qvPrevImg.classList.add('d-none');
-              qvNextImg.classList.add('d-none');
-          }
-
-          // Auto-select first available option in ONLY the first group in Quick View
-          function qvAutoSelect() {
-              const firstContainer = qvOptionsContainer.querySelector('.qv-option-values');
-              if (firstContainer) {
-                  const groupName = firstContainer.dataset.groupName;
-                  const firstAvailable = firstContainer.querySelector('.qv-value-btn:not(:disabled)');
-                  if (firstAvailable) {
-                      firstAvailable.classList.add('active');
-                      qvSelections[groupName] = firstAvailable.dataset.valueName;
-                  }
-              }
-          }
-          qvAutoSelect();
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.pcard__buy-btn');
+    if(!btn || btn.getAttribute('id') === 'pd-submit') return;
     
-          if (bsModal) {
-              bsModal.show();
-          } else if (window.jQuery) {
-              $('#quickViewModal').modal('show');
-          }
-      } else {
-          window.location.href = btn.href;
-      }
-    });
+    // En mobile (<= 767px) no abrimos el popup, dejamos que vaya al detalle (href)
+    if (window.innerWidth <= 767) return;
+    
+    e.preventDefault();
+    
+    const item = btn.closest('.pcard');
+    if(!item) {
+        window.location.href = btn.href;
+        return;
+    }
+    
+    const imgEl = item.querySelector('.pcard__img');
+    const nameEl = item.querySelector('.pcard__name-text');
+    const pillsWrap = item.querySelector('.pcard__pills-wrap');
+    const subtitleEl = item.querySelector('.pcard__subtitle');
+    const priceEl = item.querySelector('.pcard__price');
+    const topBadgeEl = item.querySelector('.top-badge-right');
+    const popularBadgeEl = item.querySelector('.pcard__badge');
+    const optionStore = item.querySelector('.pcard__options-store');
+    const qvImgWrap = document.getElementById('qv-img-wrap');
+    const qvOptionsContainer = document.getElementById('qv-options-container');
+    const qvSubtitle = document.getElementById('qv-subtitle');
+    
+    qvSelections = {}; // Clear previous selections
+    
+    const qvAlert = document.getElementById('qv-alert');
+    if (qvAlert) qvAlert.classList.add('d-none');
+    
+    if (qvImgWrap) {
+        qvImgWrap.querySelectorAll('.top-badge-right, .pcard__badge').forEach(el => el.remove());
+    }
+    
+    if(imgEl && nameEl && priceEl) {
+        if (qvImage) qvImage.src = imgEl.src;
+        if (qvImgWrap) {
+            if (topBadgeEl) {
+                const copiedBadge = topBadgeEl.cloneNode(true);
+                copiedBadge.style.fontSize = '0.75rem';
+                copiedBadge.style.padding = '0.3rem 0.6rem';
+                if (window.innerWidth <= 767) {
+                    copiedBadge.style.top = '65px';
+                    copiedBadge.style.right = '15px';
+                }
+                qvImgWrap.appendChild(copiedBadge);
+            }
+            if (popularBadgeEl) {
+                const copiedPopular = popularBadgeEl.cloneNode(true);
+                copiedPopular.style.fontSize = '0.75rem';
+                copiedPopular.style.padding = '0.3rem 0.6rem';
+                copiedPopular.style.top = '1.25rem';
+                copiedPopular.style.left = '1.25rem';
+                qvImgWrap.appendChild(copiedPopular);
+            }
+        }
+        
+        // Name + Full Pills
+        if (qvName) {
+            qvName.innerHTML = nameEl.textContent.trim();
+            if (pillsWrap) {
+                const copiedPills = pillsWrap.cloneNode(true);
+                copiedPills.querySelectorAll('.bundle-pill').forEach(pill => {
+                    pill.style.fontSize = '0.7rem';
+                    pill.style.padding = '0.2rem 0.5rem';
+                    if (pill.dataset.fullText) {
+                        pill.textContent = pill.dataset.fullText;
+                    }
+                });
+                qvName.appendChild(document.createElement('br'));
+                qvName.appendChild(copiedPills);
+            }
+        }
+
+        if (qvSubtitle) {
+            qvSubtitle.textContent = subtitleEl ? subtitleEl.textContent.trim() : '';
+            qvSubtitle.style.display = subtitleEl ? 'block' : 'none';
+        }
+
+        if (qvPrice) {
+            qvPrice.innerHTML = priceEl.innerHTML.trim();
+            const mainPrice = qvPrice.querySelector('.pcard__price-main');
+            const oldPrice = qvPrice.querySelector('.pcard__price-old');
+            if (mainPrice) {
+                mainPrice.style.fontSize = '1.1rem';
+                mainPrice.style.fontWeight = '800';
+            }
+            if (oldPrice) {
+                oldPrice.style.fontSize = '0.8rem';
+                oldPrice.style.marginRight = '8px';
+                oldPrice.style.opacity = '0.7';
+            }
+        }
+
+        if (qvOptionsContainer) qvOptionsContainer.innerHTML = optionStore ? optionStore.innerHTML : '';
+        if (qvDetailsBtn) qvDetailsBtn.href = item.querySelector('.pcard__name a').href;
+        if (qvForm) qvForm.action = btn.dataset.addCartUrl || btn.href;
+        
+        const stock = item.dataset.stock;
+        if (qvStock) {
+            if (stock !== "" && stock !== null && stock !== undefined) {
+                const stockInt = parseInt(stock);
+                if (stockInt <= 0) {
+                    qvStock.innerHTML = '<span class="text-danger fw-bold d-flex align-items-center bg-danger bg-opacity-10 px-2 py-1 rounded" style="font-size: 0.85rem;"><i class="bi bi-x-circle mr-2"></i> Agotado por el momento</span>';
+                    if (qvSubmit) qvSubmit.disabled = true;
+                    if (qvPlus) qvPlus.disabled = true;
+                    if (qvMinus) qvMinus.disabled = true;
+                } else if (stockInt <= 5) {
+                    qvStock.innerHTML = `<span class="text-warning fw-bold d-flex align-items-center bg-warning bg-opacity-10 px-2 py-1 rounded" style="font-size: 0.85rem; color: #d97706 !important;"><i class="bi bi-exclamation-triangle mr-2"></i> ¡Corre, solo quedan ${stockInt}!</span>`;
+                    if (qvSubmit) qvSubmit.disabled = false;
+                } else {
+                    qvStock.innerHTML = `<span class="fw-bold d-flex align-items-center px-2 rounded qv-status-in-stock" style="font-size: 0.85rem; color: #198754; background-color: rgba(25,135,84,0.1);"><i class="bi bi-check-circle mr-2"></i> En stock y listo para enviar</span>`;
+                    if (qvSubmit) qvSubmit.disabled = false;
+                }
+                qvForm.dataset.maxStock = stockInt;
+            } else {
+                qvStock.innerHTML = '<span class="fw-bold d-flex align-items-center px-2 rounded qv-status-in-stock" style="font-size: 0.85rem; color: #198754; background-color: rgba(25,135,84,0.1);"><i class="bi bi-check-circle mr-2"></i> En stock y listo para enviar</span>';
+                qvForm.removeAttribute('data-max-stock');
+                if (qvSubmit) qvSubmit.disabled = false;
+            }
+        }
+
+        if (qvQty) qvQty.value = 1;
+        if (qvSubmit) {
+            qvSubmit.innerHTML = '<i class="bi bi-cart-plus mr-2 fs-5"></i><span>Añadir al carrito</span>';
+            qvSubmit.disabled = false;
+        }
+        
+        stopQvAutoSlide();
+        
+        let extraImages = [];
+        try {
+           if (imgEl.dataset.extraImages) {
+               extraImages = JSON.parse(imgEl.dataset.extraImages);
+           }
+        } catch(e) {}
+        
+        const mainSrc = imgEl.src;
+        const allImages = [mainSrc];
+        if (Array.isArray(extraImages)) {
+            extraImages.forEach(img => {
+                allImages.push('/uploads/' + img);
+            });
+        }
+        currentQvImages = allImages;
+        currentQvIndex = 0;
+
+        if (allImages.length > 1) {
+            if (qvPrevImg) qvPrevImg.classList.remove('d-none');
+            if (qvNextImg) qvNextImg.classList.remove('d-none');
+            startQvAutoSlide();
+        } else {
+            if (qvPrevImg) qvPrevImg.classList.add('d-none');
+            if (qvNextImg) qvNextImg.classList.add('d-none');
+        }
+
+        // Ensure options are cleanly unselected and styles are reset
+        if (qvOptionsContainer) {
+            qvOptionsContainer.querySelectorAll('.qv-value-btn').forEach(btn => {
+                btn.classList.remove('active');
+                // Remove inline styles that might interfere with CSS classes
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.border = '';
+            });
+            qvOptionsContainer.querySelectorAll('.qv-parent-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn === btn.parentElement.firstElementChild) {
+                    btn.classList.add('active'); // Keep the first category active
+                }
+            });
+        }
+  
+        if (bsModal) {
+            bsModal.show();
+        } else if (window.jQuery) {
+            $('#quickViewModal').modal('show');
+        }
+    } else {
+        window.location.href = btn.href;
+    }
   });
 
   // Delegated listener for interactive options in Quick View
@@ -287,6 +462,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const targetId = btn.getAttribute('data-target');
     const targetEl = container.querySelector('#' + targetId);
     if (targetEl) targetEl.classList.remove('d-none');
+
+    // Sync image if present
+    if (btn.dataset.image) {
+        updateQvImageFromPath(btn.dataset.image);
+    }
   });
 
   // Listener for interactive variant values in Quick View
@@ -307,10 +487,73 @@ document.addEventListener('DOMContentLoaded', function() {
     // Activate current
     btn.classList.add('active');
     qvSelections[groupName] = btn.dataset.valueName;
+
+    // Sync image if present
+    if (btn.dataset.image) {
+        updateQvImageFromPath(btn.dataset.image);
+    }
+
+    // Hide validation alert if active
+    const qvAlert = document.getElementById('qv-alert');
+    if (qvAlert) qvAlert.classList.add('d-none');
   });
+
+  function updateQvImageFromPath(imgName) {
+      if (!imgName) return;
+      const fullPath = imgName.startsWith('http') ? imgName : '/uploads/' + imgName;
+      
+      // Try to find in current carousel to keep index in sync
+      const foundIdx = currentQvImages.findIndex(src => src.includes(imgName));
+      if (foundIdx !== -1) {
+          setQvImage(foundIdx, true);
+      } else {
+          // If not in carousel, set directly
+          if (qvImage) {
+              qvImage.style.opacity = '0.3';
+              setTimeout(() => {
+                  qvImage.src = fullPath;
+                  qvImage.style.opacity = '1';
+              }, 200);
+          }
+      }
+  }
 
   qvForm.addEventListener('submit', function(e) {
     e.preventDefault();
+
+    const qvAlert = document.getElementById('qv-alert');
+    if (qvAlert) qvAlert.classList.add('d-none');
+
+    // Check validation if options exist
+    const optionsContainer = document.getElementById('qv-options-container');
+    const hasOptions = optionsContainer.querySelectorAll('.qv-option-values').length > 0;
+    
+    let needsSubOption = false;
+    if (hasOptions) {
+        // Find the currently active parent option category
+        const activeParentBtn = optionsContainer.querySelector('.qv-parent-btn.active');
+        if (activeParentBtn) {
+            const targetId = activeParentBtn.getAttribute('data-target');
+            const targetEl = optionsContainer.querySelector('#' + targetId);
+            // It needs a sub-option if the target element exists and has value buttons inside it
+            if (targetEl && targetEl.querySelectorAll('.qv-value-btn').length > 0) {
+                needsSubOption = true;
+            }
+        }
+    }
+
+    if (needsSubOption && Object.keys(qvSelections).length === 0) {
+        if (qvAlert) {
+            qvAlert.innerHTML = '<i class="bi bi-emoji-wink mr-2"></i> ¡Ups, aún te falta seleccionar la sub-opción que deseas!';
+            qvAlert.classList.remove('d-none');
+            qvAlert.style.animation = 'pillShake 0.4s';
+            setTimeout(() => { qvAlert.style.animation = ''; }, 400);
+        } else {
+            alert('¡Ups, aún te falta seleccionar la sub-opción que deseas!');
+        }
+        return;
+    }
+
     const actionUrl = new URL(qvForm.action, window.location.origin);
     
     // Add variants to URL params
@@ -322,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
     actionUrl.searchParams.set('qty', qvQty.value);
     actionUrl.searchParams.set('ajax', '1');
 
-    qvSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Añadiendo...';
+    qvSubmit.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Añadiendo...';
     qvSubmit.disabled = true;
 
     fetch(actionUrl.toString(), {
@@ -331,24 +574,23 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       if(data.success) {
-        // Update cart badge
-        let badges = document.querySelectorAll('.cart-badge');
-        if(badges.length > 0) {
-          badges.forEach(b => b.textContent = data.cartCount);
+        // Update cart badges with animation
+        if (window.updateGlobalCartCount) {
+            window.updateGlobalCartCount(data.cartCount);
         } else {
-          // Create badge if not exists
-          document.querySelectorAll('.cart-btn').forEach(btn => {
-             const badge = document.createElement('span');
-             badge.className = 'cart-badge';
-             badge.textContent = data.cartCount;
-             btn.appendChild(badge);
-          });
+            let badges = document.querySelectorAll('.cart-badge');
+            if(badges.length > 0) {
+              badges.forEach(b => b.textContent = data.cartCount);
+            }
         }
         
-        const originalHtml = qvSubmit.innerHTML;
+        const originalHtml = '<i class="bi bi-cart-plus mr-2 fs-5"></i><span>Comprar</span>'; // Fixed original state
+        const originalBackground = qvSubmit.style.background;
         qvSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
         qvSubmit.style.background = '#198754';
         
+        if (window.showCartNotification) window.showCartNotification();
+
         setTimeout(() => {
           if (bsModal) {
               bsModal.hide();
@@ -357,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           // reset color
           setTimeout(() => {
-              qvSubmit.style.background = '';
+              qvSubmit.style.background = originalBackground;
               qvSubmit.innerHTML = originalHtml;
               qvSubmit.disabled = false;
           }, 300);

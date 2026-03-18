@@ -44,6 +44,9 @@ class Order
     #[ORM\Column(type: 'integer')]
     private ?int $state = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $paymentMethod = null;
+
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
@@ -198,5 +201,30 @@ class Order
         $this->state = $state;
 
         return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(?string $paymentMethod): self
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    /**
+     * Virtual property for EasyAdmin index summary
+     */
+    public function getProductSummary(): string
+    {
+        $summary = [];
+        foreach ($this->getOrderDetails() as $detail) {
+            $variants = $detail->getVariants() ? " (".$detail->getVariants().")" : "";
+            $summary[] = $detail->getProduct() . $variants . " x" . $detail->getQuantity();
+        }
+        return implode(", ", $summary);
     }
 }

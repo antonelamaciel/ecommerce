@@ -32,6 +32,10 @@ class OrderDetails
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $variants = null;
 
+    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Product $productObject = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +109,18 @@ class OrderDetails
     public function setTotal(float $total): self
     {
         $this->total = $total;
+
+        return $this;
+    }
+
+    public function getProductObject(): ?Product
+    {
+        return $this->productObject;
+    }
+
+    public function setProductObject(?Product $productObject): self
+    {
+        $this->productObject = $productObject;
 
         return $this;
     }

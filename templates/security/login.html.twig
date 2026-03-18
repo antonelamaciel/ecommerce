@@ -5,6 +5,9 @@
 {% block body %}
 <div class="login-page-modern py-5">
     <div class="container">
+        <button type="button" onclick="window.history.back()" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-5">
                 {# Header Section #}
@@ -17,7 +20,7 @@
                         </div>
                     {% endif %}
                     <h1 class="display-5 fw-bold text-dark mb-3">Bienvenido</h1>
-                    <p class="text-muted lead px-lg-2">Accede a tu cuenta</p>
+                    <p class="text-muted lead px-lg-2">Accede a tu cuenta o <a href="{{ path('register') }}" class="fw-bold text-decoration-none" style="color: var(--secondary-color); border-bottom: 2px solid rgba(0,0,0,0.05);">Crea una cuenta</a></p>
                 </div>
 
                 {# Form Section #}
@@ -25,14 +28,14 @@
                     <form method="post" id="loginForm">
                         {% if error %}
                             <div class="alert alert-danger border-0 shadow-sm py-3 px-4 mb-4 rounded-4 d-flex align-items-center">
-                                <i class="bi bi-exclamation-circle-fill fs-4 me-3"></i>
+                                <i class="bi bi-exclamation-circle-fill fs-4 mr-3"></i>
                                 <div class="small fw-500">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                             </div>
                         {% endif %}
 
                         {% if app.user %}
                             <div class="alert alert-light border shadow-sm py-3 px-4 mb-4 rounded-4 text-center">
-                                <p class="mb-2">Has iniciado sesión como <strong>{{ app.user.username }}</strong></p>
+                                <p class="mb-2">Has iniciado sesión como <b>{{ app.user.username }}</b></p>
                                 <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm rounded-pill px-4">Cerrar sesión</a>
                             </div>
                         {% endif %}
@@ -70,9 +73,7 @@
                         </button>
                     </form>
 
-                    <div class="text-center mt-5">
-                        <p class="text-muted">¿Eres nuevo aquí? <a href="{{ path('register') }}" class="fw-bold text-decoration-none" style="color: var(--primary-color); border-bottom: 2px solid rgba(0,0,0,0.05);">Crea una cuenta</a></p>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -157,7 +158,7 @@
     }
 
     .btn-primary-lux {
-        background-color: var(--primary-color);
+        background-color: var(--secondary-color);
         color: white;
         border: none;
         border-radius: 1rem;

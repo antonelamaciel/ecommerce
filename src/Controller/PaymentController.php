@@ -40,8 +40,11 @@ class PaymentController extends AbstractController
         if (!$order || $order->getUser() != $this->getUser()) {
             throw $this->createNotFoundException('Commande innaccessible');
         }
-        if ($order->getState() == 0) {
+        if ($order->getState() == 0 || $order->getState() == 4) {
             $order->setState(1);
+            if (!$order->getPaymentMethod()) {
+                $order->setPaymentMethod('mercadopago');
+            }
             $em->flush();
         }
 

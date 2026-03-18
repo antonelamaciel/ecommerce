@@ -5,22 +5,20 @@
 {% block body %}
 
 <style>
-  /* ── Tokens (Consistent with whole ecosystem) ── */
+  /* ── Tokens ── */
   :root {
-    --c-bg: #fcfbf9;
+    --c-bg: #fdfcfb;
     --c-surface: #ffffff;
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #696561;
     --radius-lg: 24px;
     --radius-md: 16px;
-    --radius-sm: 10px;
-    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --radius-sm: 8px;
+    --shadow-soft: 0 4px 25px rgba(0,0,0,0.04);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
     --font-main: 'Outfit', sans-serif;
   }
-
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
   body { 
     background: var(--c-bg); 
@@ -28,374 +26,621 @@
     color: var(--c-ink);
   }
 
-  .cart-container { padding-top: 3rem; padding-bottom: 5rem; }
+  .cart-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 1200px; }
+
+  /* ── Checkout Progress ── */
+  .checkout-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--c-muted);
+    opacity: 0.5;
+  }
+  .step-item.active { opacity: 1; color: var(--tertiary-color, var(--c-ink)); }
+  .step-item.active .step-num { background: var(--tertiary-color, var(--c-ink)); color: #fff; }
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+  }
+  .step-line {
+    width: 40px; height: 1px; background: var(--c-border);
+  }
 
   /* ── Header ── */
   .cart-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
   }
   .cart-title {
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
     margin: 0;
   }
-  .clear-cart-link {
-    color: #ef4444;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1rem;
-    border-radius: 99px;
-    transition: var(--transition);
-  }
-  .clear-cart-link:hover { background: #fef2f2; }
 
-  /* ── Cart Items ── */
-  .cart-grid { display: grid; grid-template-columns: 1fr 350px; gap: 3rem; }
+  /* ── Cart Grid ── */
+  .cart-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; align-items: start; }
   
-  .cart-item {
+  .cart-items-list {
     background: var(--c-surface);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid var(--c-border);
-    display: grid;
-    grid-template-columns: 100px 1fr auto;
-    align-items: center;
-    gap: 1.5rem;
-    transition: var(--transition);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.75rem;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: fadeInUp 0.5s ease backwards;
   }
-  .cart-item:hover { transform: translateX(8px); border-color: var(--primary-color, var(--c-ink)); }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: .5rem 0;
+    border-bottom: 1px solid var(--c-border);
+    transition: var(--transition);
+    position: relative;
+  }
+  .cart-item:last-child { border-bottom: none; }
 
   .cart-item__img-wrap {
-    width: 100px; height: 100px;
-    background: #fdfcfb;
-    border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
+    width: 80px; height: 100px;
+    border-radius: 5px;
     overflow: hidden;
+    transition: var(--transition);
   }
-  .cart-item__img { max-width: 80%; max-height: 80%; object-fit: contain; }
+  .cart-item:hover .cart-item__img-wrap { transform: scale(1.02); }
+  .cart-item__img { width: 100%; height: 100%; object-fit: cover; }
 
-  .cart-item__info { display: flex; flex-direction: column; gap: 0.25rem; }
-  .cart-item__name { font-weight: 600; font-size: 1.1rem; margin: 0; }
-  .cart-item__name a { color: var(--c-ink); text-decoration: none; }
-  .cart-item__details { font-size: 0.85rem; color: var(--c-muted); }
+  .cart-item__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0; /* Required for ellipsis in some browsers */
+  }
 
-  .cart-item__actions { display: flex; align-items: center; gap: 2rem; justify-self: end; }
+  .cart-item__info { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+  .cart-item__name { 
+    font-weight: 800; font-size: 1.1rem; margin: 0; line-height: 1.2; letter-spacing: -0.02em; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cart-item__name a { color: var(--c-ink); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; }
+  .cart-item__variants { font-size: 0.7rem; color: var(--c-ink); background: #f0ede8; padding: 0.15rem 0.5rem; border-radius: 99px; width: fit-content; font-weight: 700; text-transform: uppercase; margin-top: 0.2rem; }
 
-  /* Quantity Controls */
+  /* New Actions Layer */
+  .cart-item__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 0.25rem;
+  }
+
   .qty-ctrl {
     display: flex;
     align-items: center;
-    background: #f3f1ed;
-    border-radius: 99px;
-    padding: 0.35rem;
-    gap: 0.75rem;
+    background: #f8f7f5;
+    border-radius: 12px;
+    padding: 0.25rem;
+    gap: 0.25rem;
   }
   .qty-btn {
-    width: 30px; height: 30px;
-    border-radius: 50%;
+    width: 28px; height: 28px;
+    border-radius: 10px;
     background: #fff;
-    border: none;
+    border: 1px solid var(--c-border);
     color: var(--c-ink);
     display: flex; align-items: center; justify-content: center;
     font-size: 0.8rem;
     transition: var(--transition);
     text-decoration: none !important;
   }
-  .qty-btn:hover { background: var(--c-ink); color: #fff; }
-  .qty-val { font-weight: 700; font-size: 0.95rem; min-width: 20px; text-align: center; }
+  .qty-btn:hover { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+  .qty-val { font-weight: 800; font-size: 0.95rem; min-width: 32px; text-align: center; }
 
-  .cart-item__price-total { text-align: right; min-width: 100px; }
-  .price-total { font-weight: 700; font-size: 1.15rem; display: block; }
-  .price-unit { font-size: 0.8rem; color: var(--c-muted); }
+  .cart-item__side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+
+  .cart-item__price-wrap { text-align: right; }
+  .price-total { font-weight: 900; font-size: 1.2rem; color: var(--c-ink); letter-spacing: -0.03em; }
+  .price-unit { font-size: 0.75rem; color: var(--c-muted); font-weight: 600; display: block; margin-top: 0.05rem; }
 
   .btn-remove-item {
-    color: var(--c-muted);
-    font-size: 1.2rem;
-    transition: var(--transition);
+    color: #cbd5e1;
+    background: transparent;
+    border: none;
     padding: 0.5rem;
+    font-size: 1.15rem;
+    transition: var(--transition);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
   }
-  .btn-remove-item:hover { color: #ef4444; transform: scale(1.1); }
+  .btn-remove-item:hover { color: #ef4444; background: #fff1f2; transform: scale(1.1); }
 
   /* ── Summary Sidebar ── */
   .cart-summary {
     background: var(--c-surface);
     border-radius: var(--radius-lg);
     padding: 2.5rem;
-    border: 1px solid var(--c-border);
+    border: none;
     box-shadow: var(--shadow-soft);
-    position: sticky; top: 100px;
-    height: fit-content;
+    position: sticky; top: 120px;
+    animation: fadeInUp 0.5s ease backwards 0.2s;
   }
-  .summary-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; }
+  .summary-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 2rem; color: var(--c-ink); letter-spacing: -0.02em; }
   
   .summary-row {
-    display: flex; justify-content: space-between;
-    margin-bottom: 1rem; font-size: 0.95rem;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--c-muted); font-weight: 500;
   }
   .summary-row.total {
-    margin-top: 1.5rem; padding-top: 1.5rem;
+    margin-top: 2rem; padding-top: 1.5rem;
     border-top: 1px solid var(--c-border);
-    font-size: 1.4rem; font-weight: 700;
+    align-items: flex-end;
   }
-  .summary-row.total .total-label { letter-spacing: -0.02em; }
+  .summary-row.total .total-label { font-size: 0.9rem; font-weight: 600; color: var(--c-muted); }
+  .summary-row.total .total-amount { font-size: 0.9rem; font-weight: 900; color: var(--c-ink); letter-spacing: -0.03em; }
 
   .btn-checkout {
     width: 100%;
-    background: var(--primary-color, var(--c-ink));
+    background: var(--tertiary-color, var(--c-ink));
     color: #fff;
     border: none;
     border-radius: var(--radius-md);
-    padding: 1.25rem;
-    font-weight: 700;
+    padding: 1.15rem;
+    font-weight: 800;
     font-size: 1rem;
     display: flex; align-items: center; justify-content: center;
     gap: 0.75rem;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     transition: var(--transition);
     text-decoration: none !important;
   }
   .btn-checkout:hover {
-    filter: brightness(1.1); transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1); color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    filter: brightness(1.1); color: #fff;
   }
 
-  /* ── Empty State ── */
-  .cart-empty {
-    text-align: center; padding: 6rem 1rem;
-    background: var(--c-surface); border-radius: var(--radius-lg);
-    border: 1px solid var(--c-border);
+  .btn-shipping-info {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #fff;
+    background: #6ed197;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1.25rem;
+    width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.6rem;
+    transition: var(--transition);
+    margin: 1.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
-  .empty-icon { font-size: 4rem; color: var(--c-border); margin-bottom: 1.5rem; display: block; }
-  .empty-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; }
-  .empty-text { color: var(--c-muted); margin-bottom: 2.5rem; }
-  .btn-modern-primary {
-    display: inline-flex; background: var(--c-ink); color: #fff;
-    padding: 1rem 2.5rem; border-radius: 99px; text-decoration: none;
-    font-weight: 600; transition: var(--transition);
-  }
-  .btn-modern-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .btn-shipping-info:hover { filter: brightness(1.05); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(110, 209, 151, 0.3); }
 
+  /* ── Selection Cards ── */
+  .selection-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .selection-card {
+    position: relative; display: block;
+    background: #fff; border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-md); padding: 1rem 1.25rem;
+  }
+  .selection-card__body { display: flex; align-items: center; gap: 1rem; }
+  .selection-card__icon { 
+    width: 42px; height: 42px; border-radius: 12px; background: #f8f7f5;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    color: var(--c-muted);
+  }
+  .selection-card__info { flex: 1; min-width: 0; }
+  .selection-card__name { font-weight: 800; font-size: 0.95rem; color: var(--c-ink); margin-bottom: 0.1rem; }
+  .selection-card__desc { font-size: 0.8rem; color: var(--c-muted); font-weight: 500; line-height: 1.2; }
+
+  /* ── Responsive ── */
   @media (max-width: 991px) {
-    .cart-grid { grid-template-columns: 1fr; }
-    .cart-summary { position: static; }
+    .cart-container { padding-top: .5rem; padding-bottom: .5rem; }
+    .cart-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .cart-summary { position: static; max-width: 100%; padding: 1.25rem; }
+    .cart-items-list { padding: 1.25rem; gap: 1rem; }
+    .checkout-steps { margin-bottom: 1.5rem; gap: 0.5rem; }
+    .step-item { font-size: 0.7rem; gap: 0.4rem; }
+    .step-line { width: 20px; }
+    .cart-header { margin-bottom: 1.5rem; }
   }
 
   @media (max-width: 767px) {
     .cart-item {
-      grid-template-columns: 80px 1fr;
+      grid-template-columns: 70px 1fr;
       gap: 1rem;
-      padding: 1rem;
+      padding: 1.25rem 0;
     }
-    .cart-item__actions {
+    .cart-item__img-wrap { width: 70px; height: 90px; }
+    .cart-item__side {
       grid-column: 1 / -1;
+      flex-direction: row;
       justify-content: space-between;
-      width: 100%;
-      padding-top: 1rem;
-      border-top: 1px dashed var(--c-border);
-      gap: 1rem;
+      align-items: center;
+      margin-top: 0.25rem;
+      background: #fdfcfb;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-md);
     }
-    .cart-item__img-wrap { width: 80px; height: 80px; }
-    .cart-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .cart-item__name { font-size: 1rem; }
+    .price-total { font-size: 1.1rem; }
+    .qty-btn { width: 26px; height: 26px; }
+    .qty-val { font-size: 0.85rem; min-width: 28px; }
+    .cart-item__price-wrap { text-align: left; }
+    .btn-remove-item { order: 2; }
+    .summary-row { margin-bottom: 0.75rem; font-size: 0.9rem; }
+    .summary-title { margin-bottom: 1rem; font-size: 1.1rem; }
+    .btn-checkout { padding: 0.9rem; margin-top: 1rem; font-size: 0.9rem; }
+    .btn-shipping-info { padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.75rem; }
   }
 </style>
 
 <div class="container cart-container">
     {% if totalQuantity > 0 %}
-        <header class="cart-header">
-            <div>
-                <a href="{{ path('home') }}" class="text-muted text-decoration-none d-inline-flex align-items-center mb-3 fw-semibold hover-text-dark" style="font-size: 0.9rem; transition: all 0.2s;">
-                    <i class="bi bi-arrow-left mr-2"></i> Volver al inicio
-                </a>
-                <h1 class="cart-title">Mi Carrito</h1>
-                <p class="text-muted mt-2">Tienes {{ totalQuantity }} artículo(s) listo(s) para comprar</p>
-            </div>
-            <a href="{{ path('remove_cart') }}" class="clear-cart-link">
-                <i class="bi bi-trash3"></i> Vaciar carrito
+        <div class="mb-2 d-flex justify-content-between align-items-center">
+            <button type="button" onclick="window.history.back()" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+            <a href="{{ path('remove_cart') }}" class="pb-3 text-danger opacity-75 hover-opacity-100 text-decoration-none fw-bold small d-flex align-items-center gap-1" style="transition:0.2s; font-size: 0.9rem;">
+                <i class="bi bi-trash3 mr-1"></i>  <b>Vaciar carrito</b>
             </a>
+        </div>
+
+        <!-- Step Tracker -->
+        <div class="checkout-steps">
+            <div class="step-item">
+                <span class="step-num">1</span> Envio
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <span class="step-num">2</span> Pago
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <span class="step-num">3</span> Confirmación
+            </div>
+        </div>
+
+        <header class="cart-header">
+            <p class="cart-title">MI CARRITO</p>
+            <small class="text-muted mt-1 mb-0">Tienes <span class="js-cart-count fw-bold">{{ totalQuantity }}</span> producto(s) en tu carrito!</small>
         </header>
 
         <div class="cart-grid">
-            <!-- Part 1: Items List -->
-            <div class="cart-items-list">
-                {% for item in cart %}
-                    <article class="cart-item">
-                        <div class="cart-item__img-wrap">
-                            <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-item__img">
-                        </div>
-                        
-                        <div class="cart-item__info">
-                            <h3 class="cart-item__name">
-                                <a href="{{ path('product_show', {slug: item.product.slug}) }}">
-                                    {{ item.quantity }} x {{ item.product.name }}
-                                </a>
-                            </h3>
-                            {% if item.variants %}
-                                <div class="cart-item__variants" style="font-size: 0.9rem; color: var(--c-muted); margin-top: 2px;">
-                                    <i class="bi bi-gear-fill me-1" style="font-size: 0.8rem;"></i> {{ item.variants }}
+            <main>
+                <div class="cart-items-list">
+
+                    {% for item in cart %}
+                        <article class="cart-item js-cart-item" data-id="{{ item.compositeId }}" data-price="{{ item.product.price }}">
+                            <div class="cart-item__img-wrap">
+                                <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-item__img">
+                            </div>
+                            
+                            <div class="cart-item__main">
+                                <div class="cart-item__info">
+                                    <h3 class="cart-item__name">
+                                        <a href="{{ path('product_show', {slug: item.product.slug}) }}">
+                                            {{ item.product.name }}
+                                        </a>
+                                    </h3>
+                                    {% if item.variants %}
+                                        <div class="cart-item__variants">
+                                            {{ item.variants }}
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
-                            <span class="cart-item__details mt-1 d-block">{{ item.product.subtitle }}</span>
-                        </div>
 
-                        <div class="cart-item__actions">
-                            <div class="qty-ctrl">
-                                <a href="{{ path('decrease_item', {id: item.compositeId}) }}" class="qty-btn" title="Quitar uno">
-                                    <i class="bi bi-dash-lg"></i>
-                                </a>
-                                <span class="qty-val">{{ item.quantity }}</span>
-                                <a href="{{ path('add_to_cart', {id: item.product.id, qty: 1, variants: item.variants}) }}" class="qty-btn" title="Añadir uno">
-                                    <i class="bi bi-plus-lg"></i>
-                                </a>
+                                 <div class="cart-item__actions">
+                                    <div class="qty-ctrl">
+                                        <a href="{{ path('decrease_item', {id: item.compositeId}) }}" class="qty-btn js-qty-btn" data-action="decrease" title="Menos">
+                                            <i class="bi bi-dash"></i>
+                                        </a>
+                                        <span class="qty-val js-qty-val">{{ item.quantity }}</span>
+                                        <a href="{{ path('add_to_cart', {id: item.product.id, qty: 1, variants: item.variants}) }}" class="qty-btn js-qty-btn" data-action="increase" title="Más">
+                                            <i class="bi bi-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="cart-item__price-total">
-                                <span class="price-total">$ {{ (item.quantity * (item.product.price / 100))|number_format(2,',','.') }} ARS</span>
-                                <span class="price-unit">$ {{ (item.product.price / 100)|number_format(2,',','.') }} ARS / ud.</span>
+                            <div class="cart-item__side">
+                                <a href="{{ path('remove_cart_item', {id: item.compositeId}) }}" class="btn-remove-item js-remove-item" title="Eliminar">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                                <div class="cart-item__price-wrap">
+                                    <span class="price-total js-price-total">$ {{ (item.quantity * (item.product.price / 100))|number_format(2,',','.') }}</span>
+                                    <span class="price-unit js-price-unit" style="{{ item.quantity > 1 ? '' : 'display:none;' }}">$ {{ (item.product.price / 100)|number_format(2,',','.') }} ud.</span>
+                                </div>
                             </div>
-
-                            <a href="{{ path('remove_cart_item', {id: item.compositeId}) }}" class="btn-remove-item" title="Eliminar artículo">
-                                <i class="bi bi-x-circle-fill"></i>
-                            </a>
-                        </div>
-                    </article>
-                {% endfor %}
-                
-                <div class="mt-4">
-                    <a href="{{ path('product') }}" class="text-decoration-none fw-semibold" style="color: var(--c-muted)">
-                        <i class="bi bi-arrow-left me-1"></i> Seguir explorando productos
-                    </a>
+                        </article>
+                    {% endfor %}
                 </div>
-            </div>
+            </main>
 
-            <!-- Part 2: Order Summary -->
             <aside>
-                <div class="cart-summary">
-                    <h2 class="summary-title">Resumen del pedido</h2>
+                <div class="cart-summary js-cart-summary">
+                    <h2 class="summary-title">Resumen de Pedido</h2>
                     
                     <div class="summary-row">
-                        <span>Subtotal ({{ totalQuantity }} art.)</span>
-                        <span class="fw-bold">$ {{ (totalPrice / 100)|number_format(2,',','.') }} ARS</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Impuestos incluidos</span>
-                        <span class="text-muted">Incluidos en total</span>
+                        <span>Productos (<span class="js-cart-count">{{ totalQuantity }}</span>)</span>
+                        <span class="fw-800 text-dark js-cart-total-price">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
 
-                    <div class="mt-4 mb-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-2 py-2" data-toggle="modal" data-target="#shippingMethodsModal">
-                            <i class="bi bi-truck"></i>
-                            Ver métodos de envío
-                        </button>
+                    <button type="button" class="btn-shipping-info" data-toggle="modal" data-target="#shippingMethodsModal">
+                        <i class="bi bi-truck"></i>
+                        Ver info de envíos
+                    </button>
+
+                    <p class="small text-muted mb-0 mt-3" style="line-height: 1.4;">El envío y los impuestos finales se calcularán en el siguiente paso.</p>
+
+                    <div class="summary-row total mb-3">
+                        <span class="total-label">Subtotal estimado</span>
+                        <span class="total-amount js-cart-total-price" data-raw-price="{{ totalPrice / 100 }}">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
+                    </div>
+                    <hr>
+                    <!-- Shipping Calculator Input -->
+                    <div class="shipping-calculator mt-3 pb-3 border-bottom">
+                        <label for="shipping-cp" class="small fw-bold text-muted mb-2">Calcular costo de envío</label>
+                        <div class="input-group mb-2">
+                            <input type="text" id="shipping-cp" class="form-control" placeholder="Tu código postal" style="border-radius: var(--radius-sm) 0 0 var(--radius-sm); border: 1px solid var(--c-border); font-size: 0.9rem;">
+                            <button class="btn btn-dark" type="button" id="btn-calc-shipping" style="border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 0.85rem; font-weight: 700;">
+                                Calcular
+                            </button>
+                        </div>
+                        <div id="shipping-results" class="d-none mt-2">
+                            <!-- JS fills options here -->
+                        </div>
+                        <div id="shipping-error" class="text-danger small fw-bold d-none mt-1"></div>
+                        <a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" class="small text-decoration-none text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle"></i> No sé mi código postal</a>
                     </div>
 
-                    <div class="summary-row total">
-                        <span class="total-label">Total</span>
-                        <span>$ {{ (totalPrice / 100)|number_format(2,',','.') }} ARS</span>
-                    </div>
 
                     <a href="{{ path('order') }}" class="btn-checkout">
-                        <span>Proceder al pago</span>
+                        <span>Seleccionar Dirección</span>
                         <i class="bi bi-arrow-right"></i>
                     </a>
 
-                    <div class="mt-4 pt-4 border-top">
-                        <div class="d-flex align-items-center gap-3 text-muted small mb-2">
-                            <i class="bi bi-shield-lock-fill fs-5"></i>
-                            <span>Pago 100% encriptado y seguro</span>
-                        </div>
+                    <div class="mt-4 pt-4 border-top text-center opacity-75">
+                        <small class="text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.75rem; font-weight: 700;">
+                            <i class="bi bi-shield-check-fill " style="font-size: 1.1rem; color: #6ed197;"></i>
+                            PAGO SEGURO Y PROTEGIDO
+                        </small>
                     </div>
                 </div>
             </aside>
         </div>
 
     {% else %}
-        <!-- Empty State -->
-        <div class="cart-empty">
-            <i class="bi bi-bag-x empty-icon"></i>
-            <h2 class="empty-title">Tu carrito está vacío</h2>
-            <p class="empty-text">Parece que aún no has añadido nada a tu selección.</p>
-            <a href="{{ path('home') }}" class="btn-modern-primary">
-                Explorar productos
+        <div class="cart-empty py-5 text-center">
+            <div class="bg-light d-inline-flex p-4 rounded-circle mb-4">
+                <i class="bi bi-bag-x" style="font-size: 3rem; color: #cbd5e1;"></i>
+            </div>
+            <h2 class="order-title mb-3">Tu carrito está vacío</h2>
+            <p class="text-muted mb-4">¡No te preocupes! Tenemos productos increíbles esperándote.</p>
+            <a href="{{ path('home') }}" class="btn-checkout d-inline-flex w-auto px-5 rounded-pill">
+                Ir de compras
             </a>
         </div>
     {% endif %}
 </div>
 
-<!-- Modal Métodos de Envío -->
-<div class="modal fade" id="shippingMethodsModal" tabindex="-1" aria-labelledby="shippingMethodsModalLabel" aria-hidden="true">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formatPrice = (price) => {
+        return '$ ' + (price / 100).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
+    const updateTotals = (data) => {
+        const cartCounts = document.querySelectorAll('.js-cart-count');
+        const totalPrices = document.querySelectorAll('.js-cart-total-price');
+        const badgeCounts = document.querySelectorAll('.cart-badge');
+
+        cartCounts.forEach(el => el.textContent = data.cartCount);
+        totalPrices.forEach(el => el.textContent = formatPrice(data.totalPrice));
+        badgeCounts.forEach(el => el.textContent = data.cartCount);
+        
+        if (data.cartCount === 0) {
+            location.reload(); 
+        }
+    };
+
+    document.querySelectorAll('.js-qty-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const item = this.closest('.js-cart-item');
+            const qtyVal = item.querySelector('.js-qty-val');
+            const priceTotal = item.querySelector('.js-price-total');
+            const priceUnit = item.querySelector('.js-price-unit');
+            const unitPrice = parseInt(item.dataset.price);
+            const action = this.dataset.action;
+            
+            let currentQty = parseInt(qtyVal.textContent);
+            if (action === 'decrease' && currentQty === 1) return; 
+
+            const url = new URL(this.href, window.location.origin);
+            url.searchParams.set('ajax', '1');
+
+            item.style.opacity = '0.5';
+            item.style.pointerEvents = 'none';
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const newQty = (action === 'increase') ? currentQty + 1 : currentQty - 1;
+                    qtyVal.textContent = newQty;
+                    priceTotal.textContent = formatPrice(newQty * unitPrice);
+                    priceUnit.style.display = newQty > 1 ? 'block' : 'none';
+                    updateTotals(data);
+                }
+            })
+            .finally(() => {
+                item.style.opacity = '1';
+                item.style.pointerEvents = 'auto';
+            });
+        });
+    });
+
+    document.querySelectorAll('.js-remove-item').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!confirm('¿Eliminar este producto?')) return;
+
+            const item = this.closest('.js-cart-item');
+            const url = new URL(this.href, window.location.origin);
+            url.searchParams.set('ajax', '1');
+
+            item.style.transform = 'scale(0.95)';
+            item.style.opacity = '0.5';
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    item.remove();
+                    updateTotals(data);
+                }
+            });
+        });
+    });
+
+    const btnCalcShipping = document.getElementById('btn-calc-shipping');
+    const inputCp = document.getElementById('shipping-cp');
+    const resultsContainer = document.getElementById('shipping-results');
+    const errorContainer = document.getElementById('shipping-error');
+
+    if (btnCalcShipping && inputCp) {
+        btnCalcShipping.addEventListener('click', function() {
+            const cp = inputCp.value.trim();
+            if (!cp) {
+                errorContainer.textContent = 'Ingresa un código postal';
+                errorContainer.classList.remove('d-none');
+                return;
+            }
+
+            errorContainer.classList.add('d-none');
+            btnCalcShipping.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            btnCalcShipping.disabled = true;
+
+            fetch('{{ path('cart_shipping_estimate') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ postalCode: cp })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.options) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.classList.remove('d-none');
+                    
+                    data.options.forEach(opt => {
+                        resultsContainer.innerHTML += `
+                            <div class="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom" style="font-size: 0.85rem; padding-bottom: 5px;">
+                                <div class="d-flex flex-column">
+                                    <span class="text-dark fw-bold">${opt.name}</span>
+                                    <span class="text-muted small">${opt.eta}</span>
+                                </div>
+                                <span class="fw-bold text-dark">${opt.formatted}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    errorContainer.textContent = data.error || 'Error al calcular';
+                    errorContainer.classList.remove('d-none');
+                    resultsContainer.classList.add('d-none');
+                }
+            })
+            .catch(err => {
+                errorContainer.textContent = 'Hubo un error de conexión';
+                errorContainer.classList.remove('d-none');
+            })
+            .finally(() => {
+                btnCalcShipping.innerHTML = 'Calcular';
+                btnCalcShipping.disabled = false;
+            });
+        });
+    }
+});
+</script>
+
+<div class="modal fade" id="shippingMethodsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="shippingMethodsModalLabel">Nuestros Métodos de Envío</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h5 class="modal-title fw-bold">Métodos de Envío</h5>
+                <button type="button" class="close" data-dismiss="modal" style="background:none; border:none; font-size: 1.5rem;">&times;</button>
             </div>
             <div class="modal-body p-4">
-                <div class="d-flex flex-column gap-4">
-                    <!-- Retiro en sucursal -->
-                    <div class="d-flex gap-3 align-items-start">
-                        <div class="bg-primary p-2 rounded-circle" style="color:white;">
-                            <i class="bi bi-geo-alt-fill fs-5"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Retiro en sucursal</h6>
-                            <p class="small text-muted mb-1">Dirección: {{ personalize.address }}, {{ personalize.city }}, {{ personalize.province }}</p>
-                            <span class="badge badge-success">GRATIS</span>
+                <div class="selection-list">
+                    <div class="selection-card">
+                        <div class="selection-card__body">
+                            <div class="selection-card__icon"><i class="bi bi-geo-alt"></i></div>
+                            <div class="selection-card__info">
+                                <div class="selection-card__name">Retiro en sucursal <span class="text-success small fw-bold ms-1">GRATIS</span></div>
+                                <div class="selection-card__desc">{{ personalize.address }}</div>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Moto Uber / WhatsApp -->
-                    <div class="d-flex gap-3 align-items-start">
-                        <div class="bg-success p-2 rounded-circle" style="color:white;">
-                            <i class="bi bi-whatsapp fs-5"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Moto / Uber / Mensajería</h6>
-                            <p class="small text-muted mb-1">A acordar con el vendedor directamente por chat.</p>
-                            <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" class="btn btn-sm btn-success rounded-pill px-3">
-                                Chatear ahora
+                    <div class="selection-card">
+                        <div class="selection-card__body">
+                            <div class="selection-card__icon text-success"><i class="bi bi-whatsapp"></i></div>
+                            <div class="selection-card__info">
+                                <div class="selection-card__name">Coordinar envío rápido</div>
+                                <div class="selection-card__desc">Moto / Uber / Mensajería</div>
+                            </div>
+                            <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" class="btn btn-success btn-sm rounded-pill fw-bold">
+                                Consultar
                             </a>
                         </div>
                     </div>
 
-                    <!-- Otros métodos -->
-                    {% if carriers|length > 0 %}
-                        <hr class="my-1 opacity-10">
-                        <h6 class="fw-bold small text-muted text-uppercase" style="letter-spacing: 1px;">Otros transportistas</h6>
-                        {% for carrier in carriers %}
-                            {% if carrier.type != 'pickup' and carrier.type != 'special' %}
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-truck text-muted"></i>
-                                        <span class="small font-weight-bold">{{ carrier.name }}</span>
-                                    </div>
-                                    <span class="small font-weight-bold">
-                                        {% if carrier.type == 'long_distance' %}
-                                            Calculado por CP
-                                        {% else %}
-                                            $ {{ (carrier.price / 100)|number_format(2,',','.') }} ARS
-                                        {% endif %}
-                                    </span>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
+                    <div class="selection-card">
+                        <div class="selection-card__body">
+                           <small class="text-muted">Al final del pedido te mostraremos otros metodos de envío dependiendo de tu ubicación y método de pago.</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-dismiss="modal">Entendido</button>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-dark w-100 rounded-pill py-2" data-dismiss="modal">Entendido</button>
             </div>
         </div>
     </div>
 </div>
+</style>
 {% endblock %}

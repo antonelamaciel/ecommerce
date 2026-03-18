@@ -24,6 +24,14 @@ class ProductOptionValueType extends AbstractType
                 'attr' => ['class' => 'form-check-input'],
                 'row_attr' => ['class' => 'form-check form-switch'],
             ])
+            ->add('image', TextType::class, [
+                'label' => 'Imagen vinculada (ej: color-rojo.jpg)',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Nombre del archivo...',
+                    'class' => 'variant-image-select'
+                ]
+            ])
         ;
     }
 

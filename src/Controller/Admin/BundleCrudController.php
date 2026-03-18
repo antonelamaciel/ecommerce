@@ -7,13 +7,106 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 
 class BundleCrudController extends AbstractCrudController
 {
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets->addHtmlContentToHead('
+            <style>
+                /* --- SOLUCIÓN DEFINITIVA DE VISIBILIDAD DE DESPLEGABLES --- */
+
+                /* 1. Prevenir que CUALQUIER contenedor padre oculte los hijos */
+                .padded-internal-panel, 
+                .ea-complex-field-panel, 
+                .content-panel, 
+                .form-widget,
+                .form-group,
+                fieldset,
+                .row,
+                .content-wrapper,
+                .main-content,
+                section.content { 
+                    overflow: visible !important; 
+                }
+
+                /* 2. Z-INDEX SUPERIOR PARA TODOS LOS POSIBLES LIBRERÍAS DE SELECT */
+                .select2-container, 
+                .select2-dropdown,
+                .ts-dropdown,
+                .ts-wrapper,
+                .ea-autocomplete {
+                    z-index: 1044 !important;
+                }
+
+                .ts-control {
+                    z-index: 1 !important;
+                }
+
+                .ts-dropdown.single.plugin-dropdown_input.plugin-clear_button {
+                    z-index: 1044 !important;
+                }
+
+                /* 3. ¡AGRANDAR FÍSICAMENTE EL CONTENEDOR DEL ELEMENTO! */
+                /* Al hacer que el campo de asociación sea gigante, el menú siempre tiene espacio y NADA lo puede cortar */
+                .field-association {
+                    min-height: 230px !important;
+                    padding-bottom: 230px !important;
+                    position: relative !important;
+                    z-index: 999 !important;
+                    padding-top: 10px !important;
+                }
+
+                @media (max-width: 768px) {
+                    .content-wrapper{
+                        width: 330px !important;
+                        margin-left: 0 !important;
+                        margin-right: 0 !important;
+                        padding-left: 0 !important;
+                        padding-right: 0 !important;
+                    }
+
+                    .padded-internal-panel{
+                        padding-left: 0 !important;
+                        padding-right: 0 !important;
+                        margin-left: 0 !important;
+                        margin-right: 0 !important;
+                    }
+                } 
+                    
+            </style>
+            
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Forzar que Select2 se adjunte al body de la página en lugar del panel interno
+                    if (typeof $ !== "undefined" && $.fn.select2) {
+                        setTimeout(function() {
+                            $("select[data-widget=\"select2\"], .select2").each(function() {
+                                $(this).select2({ dropdownParent: $(document.body) });
+                            });
+                        }, 500);
+                    }
+                });
+            </script>
+        ');
+    }
+
+
+
     public static function getEntityFqcn(): string
     {
         return Bundle::class;
+    }
+
+    public function configureActions(Actions $actions): Actions 
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -41,6 +134,10 @@ class BundleCrudController extends AbstractCrudController
                 ])
                 ->setHelp('Aparecera del alado del nombre de cada producto seleccionado.')
                 ->setRequired(false),
+
+            \EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField::new('discountPercentage', 'descuento (%)')
+                ->setHelp('Aplica un descuento automático a todos los productos seleccionados. Dejar vacío si no quieres hacer un descuento.')
+                ->setRequired(false),
             ChoiceField::new('topRightBadge', 'Etiqueta Superior Derecha')
                 ->setChoices([
                     'Ninguna' => '',
@@ -50,14 +147,15 @@ class BundleCrudController extends AbstractCrudController
                 ])
                 ->setHelp('Aparecera en la esquina superior derecha de cada producto seleccionado.')
                 ->setRequired(false),
-            \EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField::new('discountPercentage', 'descuento (%)')
-                ->setHelp('Aplica un descuento automático a todos los productos seleccionados. Dejar vacío si no quieres hacer un descuento.')
-                ->setRequired(false),
+            
             AssociationField::new('products', 'Productos seleccionados (afectados)')
                 ->setFormTypeOptions([
                     'by_reference' => false,
+                    'choice_attr' => function($choice, $key, $value) {
+                        // Pasamos la imagen en un atributo data-image para que el JS lo use
+                        return ['data-image' => '/uploads/' . ($choice->getImage() ?: 'default.png')];
+                    },
                 ])
-                ->autocomplete()
                 ->setHelp('Busca los productos a los que deseas aplicar esta etiqueta especial.'),
 
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Cuenta Regresiva')->setCssClass('padded-internal-panel'),
@@ -89,3 +187,4 @@ class BundleCrudController extends AbstractCrudController
         ];
     }
 }
+

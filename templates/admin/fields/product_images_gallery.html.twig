@@ -1,0 +1,23 @@
+{# templates/admin/fields/product_images_gallery.html.twig #}
+{% set currentImages = entity.instance.images|default([]) %}
+
+{% if currentImages is not empty %}
+    <div class="d-flex flex-wrap gap-3 mt-2">
+        {% for image in currentImages %}
+            <div class="position-relative d-inline-block p-2 border rounded bg-light text-center shadow-sm">
+                <a href="{{ asset('uploads/' ~ image) }}" target="_blank" class="d-block {% if ea.crud.currentAction != 'detail' %}mb-2{% endif %}">
+                    <img src="{{ asset('uploads/' ~ image) }}" 
+                         style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;">
+                </a>
+                {% if ea.crud.currentAction != 'detail' %}
+                <div class="form-check m-0 d-flex justify-content-center align-items-center">
+                    <input class="form-check-input mt-0 mr-1" type="checkbox" name="delete_images[]" value="{{ image }}" id="delete_image_{{ loop.index }}" style="cursor: pointer;">
+                    <label class="form-check-label text-danger small" for="delete_image_{{ loop.index }}" style="cursor: pointer;">Eliminar</label>
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-light border p-2 d-inline-block mt-2 mb-0">Sin imagenes cargadas</div>
+{% endif %}

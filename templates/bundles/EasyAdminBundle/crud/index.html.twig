@@ -38,7 +38,7 @@
 
             {# ROWS #}
             {% for entity in entities %}
-                <div class="ea-list-row" style="display: grid; grid-template-columns: repeat({{ entity.fields|length }}, 1fr) 100px; gap: 1.5rem; align-items: center;">
+                <div class="ea-list-row" data-id="{{ entity.primaryKeyValueAsString }}" style="display: grid; grid-template-columns: repeat({{ entity.fields|length }}, 1fr) 100px; gap: 1.5rem; align-items: center;">
                     
                     {% for field in entity.fields %}
                         <div class="ea-list-cell" data-label="{{ field.label|e('html_attr') }}">
@@ -94,5 +94,18 @@
             </div>
         {% endif %}
     </div>
+
+    {# EA REQUIRED MODALS #}
+    {% block delete_form %}
+        {{ include('@EasyAdmin/crud/includes/_delete_form.html.twig', with_context = false) }}
+    {% endblock delete_form %}
+
+    {% if filters|length > 0 %}
+        {{ include('@EasyAdmin/crud/includes/_filters_modal.html.twig') }}
+    {% endif %}
+
+    {% if batch_actions|length > 0 %}
+        {{ include('@EasyAdmin/crud/includes/_batch_action_modal.html.twig', {}, with_context = false) }}
+    {% endif %}
 
 {% endblock %}

@@ -5,22 +5,20 @@
 {% block body %}
 
 <style>
-  /* ── Tokens (Consistent with ecosystem) ── */
+  /* ── Tokens ── */
   :root {
-    --c-bg: #fcfbf9;
+    --c-bg: #fdfcfb;
     --c-surface: #ffffff;
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #696561;
     --radius-lg: 24px;
     --radius-md: 16px;
-    --radius-sm: 10px;
-    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --radius-sm: 8px;
+    --shadow-soft: 0 10px 40px rgba(0,0,0,.03);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
     --font-main: 'Outfit', sans-serif;
   }
-
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
   body { 
     background: var(--c-bg); 
@@ -28,105 +26,209 @@
     color: var(--c-ink);
   }
 
-  .order-container { padding-top: 3rem; padding-bottom: 5rem; }
+  .order-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 1200px; }
+
+  /* ── Checkout Progress ── */
+  .checkout-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--c-muted);
+    opacity: 0.5;
+  }
+  .step-item.active { opacity: 1; color: var(--tertiary-color, var(--c-ink)); }
+  .step-item.active .step-num { background: var(--tertiary-color, var(--c-ink)); color: #fff; }
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+  }
+  .step-line {
+    width: 40px; height: 1px; background: var(--c-border);
+  }
 
   /* ── Header ── */
-  .order-header { margin-bottom: 3rem; }
+  .order-header { margin-bottom: 2rem; text-align: center; }
   .order-title {
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: clamp(1rem, 4vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
     margin: 0;
   }
 
   /* ── Grid Layout ── */
-  .order-grid { display: grid; grid-template-columns: 1fr 400px; gap: 3rem; }
+  .order-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
 
-  /* ── Form Section ── */
+  /* ── Address Cards (Ultra Minimalist) ── */
   .order-card {
     background: var(--c-surface);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
-    border: 1px solid var(--c-border);
-    box-shadow: var(--shadow-soft);
+    padding: 2rem;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
   }
   .order-card__title {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: .9rem;
+    font-weight: 800;
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-  }
-  .order-card__title i { color: var(--primary-color, var(--c-ink)); }
-
-  /* Address Selection Styling */
-  .address-form-box { margin-top: 1rem; }
-  .address-form-box label { 
-    display: block; 
-    font-weight: 600; 
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    color: var(--c-muted);
-  }
-  
-  /* Styling the container of radio buttons/labels */
-  .address-form-box .form-check {
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius-md);
-    padding: 1.25rem 1.25rem 1.25rem 3rem;
-    margin-bottom: 1rem;
-    transition: var(--transition);
-    cursor: pointer;
-    position: relative;
-  }
-  .address-form-box .form-check:hover { background: #fdfcfb; border-color: var(--c-ink); }
-  .address-form-box input[type="radio"]:checked + label { color: var(--c-ink); font-weight: 600; }
-  
-  .btn-add-new {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    font-weight: 600;
+    gap: 0.6rem;
     color: var(--c-ink);
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    background: #f3f1ed;
-    border-radius: 99px;
-    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .address-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .address-option {
+    position: relative;
+    cursor: pointer;
+    animation: fadeInUp 0.4s ease backwards;
+  }
+  .address-option:nth-child(2) { animation-delay: 0.05s; }
+  .address-option:nth-child(3) { animation-delay: 0.1s; }
+  .address-option:nth-child(4) { animation-delay: 0.15s; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .address-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .address-card-inner {
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    height: 100%;
+    transition: all 0.3s ease;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .address-option:hover .address-card-inner {
+    border-color: var(--c-ink);
+    background: #fff;
+  }
+
+  .address-option input[type="radio"]:checked + .address-card-inner {
+    border-color: var(--tertiary-color, var(--c-ink));
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  }
+
+  .address-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.15rem;
+  }
+  .address-card__name {
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: var(--c-ink);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .address-card__check {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-border);
+    display: flex; align-items: center; justify-content: center;
     transition: var(--transition);
   }
-  .btn-add-new:hover { background: var(--c-ink); color: #fff; }
+  .address-option input[type="radio"]:checked + .address-card-inner .address-card__check {
+    background: var(--tertiary-color, var(--c-ink));
+    border-color: var(--tertiary-color, var(--c-ink));
+  }
+  .address-card__check i { color: #fff; font-size: 0.55rem; display: none; }
+  .address-option input[type="radio"]:checked + .address-card-inner .address-card__check i { display: block; }
+
+  .address-card__details {
+    font-size: 0.8rem;
+    color: var(--c-muted);
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .btn-add-new-card {
+    border: 1px dashed var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--c-muted);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.8rem;
+    transition: var(--transition);
+    height: 100%;
+    min-height: 80px;
+    background: transparent;
+  }
+  .btn-add-new-card:hover { border-color: var(--tertiary-color, var(--c-ink)); color: var(--tertiary-color, var(--c-ink)); background: #fff; }
+  .btn-add-new-card i { font-size: 1rem; }
 
   /* ── Right Summary Sidebar ── */
   .summary-sidebar {
     background: var(--c-surface);
     border-radius: var(--radius-lg);
     padding: 2.5rem;
-    border: 1px solid var(--c-border);
-    box-shadow: var(--shadow-soft);
-    position: sticky; top: 100px;
-    height: fit-content;
+    border: none;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+    position: sticky; top: 120px;
   }
-  .summary-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 2rem; }
+  .summary-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 2rem; letter-spacing: -0.02em; }
 
   .summary-item {
-    display: grid;
-    grid-template-columns: 50px 1fr auto;
-    align-items: center;
+    display: flex;
+    align-items: flex-start;
     gap: 1rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
   .summary-item__img {
-    width: 50px; height: 50px;
-    object-fit: contain;
+    width: 54px; height: 70px;
+    object-fit: cover;
     background: #fdfcfb;
     border-radius: var(--radius-sm);
-    padding: 0.25rem;
+    border: 1px solid var(--c-border);
   }
-  .summary-item__name { font-size: 0.9rem; font-weight: 500; color: var(--c-ink); line-height: 1.3; }
-  .summary-item__qty { font-size: 0.85rem; color: var(--c-muted); font-weight: 600; }
+  .summary-item__info { flex: 1; min-width: 0; }
+  .summary-item__name { 
+    font-size: 0.9rem; 
+    font-weight: 700; 
+    color: var(--c-ink); 
+    line-height: 1.25; 
+    margin-bottom: 0.2rem;
+  }
+  .summary-item__qty { font-size: 0.8rem; color: var(--c-muted); font-weight: 500; }
+  .summary-item__price { font-size: 0.9rem; font-weight: 800; text-align: right; }
 
   .summary-totals {
     margin-top: 2rem;
@@ -134,203 +236,207 @@
     border-top: 1px solid var(--c-border);
   }
   .total-row {
-    display: flex; justify-content: space-between;
-    font-size: 1.25rem; font-weight: 700; color: var(--c-ink);
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 1rem;
   }
+  .total-label { font-size: 0.9rem; font-weight: 600; color: var(--c-muted); }
+  .total-amount { font-size: 0.9rem; font-weight: 900; color: var(--c-ink); letter-spacing: -0.03em; }
 
   .btn-order-next {
     width: 100%;
-    background: var(--primary-color, var(--c-ink));
+    background: var(--tertiary-color, var(--c-ink));
     color: #fff;
     border: none;
     border-radius: var(--radius-md);
-    padding: 1.25rem;
-    font-weight: 700;
+    padding: 1.15rem;
+    font-weight: 800;
     font-size: 1rem;
     display: flex; align-items: center; justify-content: center;
     gap: 0.75rem;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     transition: var(--transition);
     cursor: pointer;
   }
-  .btn-order-next:hover {
-    filter: brightness(1.1); transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  .btn-order-next:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    filter: brightness(1.1);
   }
+  .btn-order-next:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ── Mobile ── */
   @media (max-width: 991px) {
-    .order-grid { grid-template-columns: 1fr; }
-    .summary-sidebar { position: static; }
+    .order-container { padding-top: 1rem; padding-bottom: 1rem; }
+    .order-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .order-card { padding: 1.25rem; }
+    .summary-sidebar { position: static; max-width: 100%; padding: 1.5rem; }
+    .address-grid { grid-template-columns: 1fr; }
+    .order-title { font-size: 1rem; }
+    .checkout-steps { margin-bottom: 2rem; gap: 0.5rem; }
+    .step-item { font-size: 0.75rem; }
+    .step-line { width: 25px; }
+  }
+  
+  @media (max-width: 480px) {
+    .order-card { padding: 1rem; }
+    .address-card-inner { padding: 1rem; }
   }
 </style>
 
 <div class="container order-container">
+    
+    <div class="mb-1">
+        <button type="button" onclick="window.history.back()" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
+    </div>
+
+    <!-- Step Tracker -->
+    <div class="checkout-steps">
+        <div class="step-item active">
+            <span class="step-num">1</span> Envio
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+            <span class="step-num">2</span> Pago
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+            <span class="step-num">3</span> Confirmación
+        </div>
+    </div>
+
     <header class="order-header">
-        <h1 class="order-title">Valido mi pedido</h1>
-        <p class="text-muted mt-2">Paso 1: Selecciona tu lugar de entrega</p>
+        <p class="order-title">Seleccionar Dirección</p>
+        <small class="text-muted mt-2">¿En qué dirección entregamos tu pedido?</small>
     </header>
 
-    <div class="order-grid">
-        <!-- Left: Form -->
-        <main>
-            <div class="order-card">
-                <div class="order-card__title">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    Dirección de entrega
-                </div>
-                
-                <a href="{{ path('account_address_new') }}" class="btn-add-new">
-                    <i class="bi bi-plus-circle"></i> Añadir nueva dirección
-                </a>
-
-                <div class="address-form-box">
-                    {% set formHtml %}
-                        {{ form_start(form, {action: path('order_add')}) }}
-                            <div class="custom-form-rows">
-                                {{ form_widget(form.addresses) }}
-                            </div>
-
-                            <div class="order-card__title mt-5">
-                                <i class="bi bi-truck"></i>
-                                Elija su transportista
-                            </div>
-                            <div class="custom-form-rows" id="carrier-selection-container">
-                                {{ form_widget(form.carriers) }}
-                            </div>
-
-                            <!-- --- CALCULADOR DE ENVÍOS EN CHECKOUT --- -->
-                            <div id="checkout-shipping-calc" class="mt-4 p-3 rounded-3 border bg-light d-none">
-                                <h6 class="fw-bold small mb-2"><i class="bi bi-calculator me-2"></i>Calcular envío por Código Postal</h6>
-                                <p class="extra-small text-muted mb-3" id="zip-preview">Seleccionando dirección...</p>
-                                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-calculate-checkout">
-                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
-                                    Actualizar cotización
-                                </button>
-                                <div id="checkout-calc-result" class="mt-2 fw-bold text-success small"></div>
-                            </div>
-
-                            <div class="mt-4">
-                                {{ form_widget(form.submit, {'attr': {'class': 'btn-order-next'}, 'label': 'Continuar con el pago'}) }}
-                            </div>
-                        {{ form_end(form) }}
-                    {% endset %}
-
-                    <script>
-                        const userAddresses = {{ addressesJson|raw }};
-                        const storeLocation = {
-                            province: "{{ personalize.province }}",
-                            city: "{{ personalize.city }}",
-                            postal: "{{ personalize.postal }}",
-                            address: "{{ personalize.address }}"
-                        };
-
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const carrierRadios = document.querySelectorAll('input[name="order[carriers]"]');
-                            const addressRadios = document.querySelectorAll('input[name="order[addresses]"]');
-                            const calcBox = document.getElementById('checkout-shipping-calc');
-                            const zipPreview = document.getElementById('zip-preview');
-                            const btnCalc = document.getElementById('btn-calculate-checkout');
-                            const resultDiv = document.getElementById('checkout-calc-result');
-                            const btnSubmit = document.querySelector('.btn-order-next');
-
-                            const getSelectedAddress = () => {
-                                for(let r of addressRadios) { if(r.checked) return userAddresses[r.value]; }
-                                return null;
-                            };
-
-                            const updateUI = () => {
-                                let selectedCarrierId = null;
-                                let isLongDistance = false;
-                                
-                                for(let r of carrierRadios) {
-                                    if(r.checked) {
-                                        selectedCarrierId = r.value;
-                                        // Buscamos si la etiqueta contiene "Larga Distancia" (podríamos haber pasado los carriers también)
-                                        const label = r.closest('.form-check').textContent;
-                                        if(label.toLowerCase().includes('larga distancia')) isLongDistance = true;
-                                        break;
-                                    }
-                                }
-
-                                const addr = getSelectedAddress();
-                                if(isLongDistance && addr) {
-                                    calcBox.classList.remove('d-none');
-                                    zipPreview.innerHTML = `Calculando para CP: <b class="text-dark">\${addr.postal}</b> (\${addr.city})`;
-                                    btnSubmit.disabled = !resultDiv.textContent; // Desactivar si no se ha calculado
-                                } else {
-                                    calcBox.classList.add('d-none');
-                                    btnSubmit.disabled = false;
-                                }
-                            };
-
-                            carrierRadios.forEach(r => r.addEventListener('change', updateUI));
-                            addressRadios.forEach(r => r.addEventListener('change', updateUI));
-
-                            btnCalc.addEventListener('click', function() {
-                                const addr = getSelectedAddress();
-                                const spinner = btnCalc.querySelector('.spinner-border');
-                                
-                                spinner.classList.remove('d-none');
-                                btnCalc.disabled = true;
-
-                                // Simulación de cálculo basado en distancia
-                                setTimeout(() => {
-                                    spinner.classList.add('d-none');
-                                    btnCalc.disabled = false;
-                                    
-                                    // Cálculo simplificado: Si es la misma provincia que el local 800, sino 1500
-                                    const basePrice = (addr.city.toLowerCase() === storeLocation.city.toLowerCase()) ? 600 : 1200;
-                                    resultDiv.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Costo estimado: $\${basePrice.toLocaleString('es-AR')},00 ARS`;
-                                    btnSubmit.disabled = false;
-                                }, 1000);
-                            });
-
-                            updateUI();
-                        });
-                    </script>
-                    
-                    {# 
-                       We use raw and manual styling for the Symfony radio outputs 
-                       The replace [br] is for better formatting of the address labels 
-                    #}
-                    {{ formHtml|replace({
-                        '[br]' : '<br>',
-                        'form-check' : 'form-check custom-p-check'
-                    })|raw }}
-                </div>
-            </div>
-        </main>
-
-        <!-- Right: Summary -->
-        <aside>
-            <div class="summary-sidebar">
-                <h2 class="summary-title">Resumen de tu selección</h2>
-                
-                <div class="summary-items-list">
-                    {% for item in cart.products %}
-                        <div class="summary-item">
-                            <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="summary-item__img">
-                            <div class="summary-item__name">
-                                {{ item.product.name }}{% if item.variants %}<span class="text-muted" style="font-weight: 400; font-size: 0.85em;"> con {{ item.variants }}</span>{% endif %}
-                            </div>
-                            <div class="summary-item__qty">x{{ item.quantity }}</div>
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <div class="summary-totals">
-                    <div class="total-row">
-                        <span>Total estimado</span>
-                        <span>$ {{ (totalPrice / 100)|number_format(2,',','.') }} ARS</span>
+    {% set formHtml %}
+        <div class="order-grid">
+            <!-- Left: Form -->
+            <main>
+                <div class="order-card">
+                    <div class="order-card__title">
+                        <i class="bi bi-geo-alt" style="color: var(--tertiary-color);"></i>
+                        Mis Direcciones Guardadas
                     </div>
-                    <p class="small text-muted mt-2 mb-0 text-center">
-                        <i class="bi bi-shield-check me-1"></i> Transacción segura y protegida
-                    </p>
-                </div>
-            </div>
-        </aside>
-    </div>
-</div>
+                    
+                    <div class="address-grid">
+                        {% for choice in form.addresses %}
+                            {% set fullLabel = choice.vars.label|replace({'[br]': '<br>', '{br}': '<br>'}) %}
+                            {# Split by the colon separator #}
+                            {% set labelParts = fullLabel|split(': <br>') %}
+                            
+                            <label class="address-option">
+                                <input type="radio" name="{{ choice.vars.full_name }}" value="{{ choice.vars.value }}" {% if choice.vars.checked %}checked="checked"{% endif %}>
+                                <div class="address-card-inner">
+                                    <div class="address-card__header">
+                                        <div class="address-card__name">
+                                            {% if labelParts|length > 1 %}
+                                                {{ labelParts[0]|raw }}
+                                            {% else %}
+                                                Dirección
+                                            {% endif %}
+                                        </div>
+                                        <div class="address-card__check">
+                                            <i class="bi bi-check-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="address-card__details">
+                                        {% if labelParts|length > 1 %}
+                                            {{ labelParts[1]|raw }}
+                                        {% else %}
+                                            {{ fullLabel|raw }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </label>
+                        {% endfor %}
 
+                        <a href="{{ path('account_address_new') }}" class="btn-add-new-card">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Nueva Dirección</span>
+                        </a>
+                    </div>
+                    {% do form.addresses.setRendered() %}
+                </div>
+            </main>
+
+            <!-- Right: Summary -->
+            <aside>
+                <div class="summary-sidebar">
+                    <h2 class="summary-title">Resumen de Pedido</h2>
+                    
+                    <div class="summary-items-list">
+                        {% for item in cart.products %}
+                            <div class="summary-item">
+                                <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="summary-item__img">
+                                <div class="summary-item__info">
+                                    <div class="summary-item__name">{{ item.product.name }}</div>
+                                    <div class="summary-item__qty">
+                                        {{ item.quantity }} ud.
+                                        {% if item.variants %}
+                                            <div class="mt-1">
+                                                <span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                                    {{ item.variants }}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="summary-item__price">
+                                    $ {{ ((item.quantity * item.product.price) / 100)|number_format(2,',','.') }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="total-row">
+                            <span class="total-label">Subtotal estimado</span>
+                            <span class="total-amount">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
+                        </div>
+
+                        <p class="small text-muted mb-4" style="line-height: 1.4;">El envío y los impuestos finales se calcularán en el siguiente paso.</p>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn-order-next" id="btn-proceed">
+                                <span class="fw-800">Continuar al Pago</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top text-center opacity-75">
+                            <small class="text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.7rem;">
+                                <i class="bi bi-shield-lock-fill"></i>
+                                COMPRA 100% SEGURA
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    {% endset %}
+
+    {{ form_start(form, {action: path('order_add'), 'attr': {'id': 'checkout-form'}}) }}
+        {{ formHtml|raw }}
+        {{ form_widget(form._token) }}
+    {{ form_end(form, {'render_rest': false}) }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addressRadios = document.querySelectorAll('input[name="order[addresses]"]');
+            const btnSubmit = document.getElementById('btn-proceed');
+
+            const updateUI = () => {
+                let anyChecked = false;
+                addressRadios.forEach(r => { if(r.checked) anyChecked = true; });
+                btnSubmit.disabled = !anyChecked;
+            };
+
+            addressRadios.forEach(r => r.addEventListener('change', updateUI));
+            updateUI();
+        });
+    </script>
+</div>
 {% endblock %}

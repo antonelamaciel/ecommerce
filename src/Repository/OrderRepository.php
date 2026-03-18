@@ -26,7 +26,7 @@ class OrderRepository extends ServiceEntityRepository
     public function findPaidOrdersByUser(User $user): array
     {
         return $this->createQueryBuilder('o')
-            ->andWhere('o.state > :val')
+            ->andWhere('o.state > :val OR o.state = 4')
             ->andWhere('o.user = :user')
             ->setParameter('val', 0)
             ->setParameter('user', $user)

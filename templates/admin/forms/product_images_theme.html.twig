@@ -17,32 +17,6 @@
     </div>
 {% endblock %}
 
-{% block _Product_images_gallery_widget %}
-    {# Render the gallery images in the form #}
-    {% set entity = form.parent.vars.value %}
-    {% set images = entity.images|default([]) %}
-    
-    <div class="mb-3">
-        {% if images and images|length > 0 %}
-            <div class="d-flex flex-wrap gap-2 p-2 border rounded bg-light">
-                {% for img in images %}
-                    <div class="gallery-preview-item">
-                        <a href="{{ asset('uploads/' ~ img) }}" target="_blank">
-                            <img src="{{ asset('uploads/' ~ img) }}" 
-                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="alert alert-light border p-2 d-inline-block">Sin imágenes en la galería</div>
-        {% endif %}
-    </div>
-    <style>
-        .gallery-preview-item img { transition: transform 0.2s; }
-        .gallery-preview-item:hover img { transform: scale(1.1); z-index: 5; position: relative; }
-    </style>
-{% endblock %}
 {% block _Headers_image_preview_widget %}
     {# Render the current banner image in the form #}
     {% set entity = form.parent.vars.value %}
@@ -60,4 +34,29 @@
             <div class="alert alert-light border p-2 d-inline-block">Sin imagen de banner cargada</div>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block _Product_gallery_preview_widget %}
+    {# Render the product images gallery with delete checkboxes in the form #}
+    {% set entity = form.parent.vars.value %}
+    {% set currentImages = entity.images|default([]) %}
+
+    {% if currentImages is not empty %}
+        <div class="d-flex flex-wrap gap-3 mt-2">
+            {% for image in currentImages %}
+                <div class="position-relative d-inline-block p-2 border rounded bg-light text-center shadow-sm">
+                    <a href="{{ asset('uploads/' ~ image) }}" target="_blank" class="d-block mb-2">
+                        <img src="{{ asset('uploads/' ~ image) }}" 
+                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;">
+                    </a>
+                    <div class="form-check m-0 d-flex justify-content-center align-items-center">
+                        <input class="form-check-input mt-0 mr-1" type="checkbox" name="delete_images[]" value="{{ image }}" id="delete_image_{{ loop.index }}" style="cursor: pointer;">
+                        <label class="form-check-label text-danger small" for="delete_image_{{ loop.index }}" style="cursor: pointer;">Eliminar</label>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-light border p-2 d-inline-block mt-2 mb-0">Sin imágenes en galería</div>
+    {% endif %}
 {% endblock %}

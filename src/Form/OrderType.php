@@ -17,13 +17,6 @@ class OrderType extends AbstractType
     {
         $user = $options['user'];
         $builder
-         ->add('carriers', EntityType::class, [
-                'label' => 'Elija su transportista',
-                'required' => true,
-                'class' => Carrier::class,
-                'choice_label' => 'carrierLabel',
-                'expanded' => true
-            ])
             ->add('addresses', EntityType::class, [
                 'label' => false,
                 'required' => true,

@@ -13,10 +13,10 @@
     --c-ink: #1a1a1a;
     --c-muted: #7c7772;
     --c-accent: #2563eb;
-    --radius: 20px;
-    --radius-sm: 12px;
-    --shadow: 0 4px 20px rgba(0,0,0,.03);
-    --shadow-hover: 0 12px 40px rgba(0,0,0,.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 12px rgba(0,0,0,.03);
+    --shadow-hover: 0 10px 30px rgba(0,0,0,.06);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
     --font-main: 'Outfit', sans-serif;
   }
@@ -124,27 +124,7 @@
     gap: 0.75rem;
   }
 
-  .btn-filter-submit {
-    width: 100%;
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 0.95rem;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
-    letter-spacing: 0.03em;
-  }
-
-  .btn-filter-submit:hover {
-    background: #2a2a2a;
-  }
-
-  .btn-filter-submit:active {
-    transform: scale(0.98);
-  }
+  /* Removed .btn-filter-submit styles */
 
   .btn-clear-filters {
     width: 100%;
@@ -347,120 +327,59 @@
     color: var(--c-muted);
   }
 
-  /* ── Product Card (Match Home) ── */
-  .pcard {
-    background: var(--c-surface);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    border: 1px solid var(--c-border);
-    position: relative;
-  }
-  .pcard:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-6px);
-    border-color: rgba(0,0,0,0.05);
-  }
-  .pcard__img-wrap {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 1/1;
-    background: #fdfcfb;
-    margin: 0.5rem;
-    border-radius: calc(var(--radius) - 6px);
-  }
-  .pcard__img {
-    width: 100%; height: 100%;
-    object-fit: contain;
-    padding: 1.5rem;
-    transition: transform .6s ease;
-  }
-  .pcard:hover .pcard__img { transform: scale(1.08); }
 
-  .pcard__actions {
-    display: flex;
+  /* Grid Helpers */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 0;
   }
-  .pcard__buy-btn {
-    background: var(--secondary-color, var(--c-ink));
-    color: #fff !important;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    padding: 1rem;
-    text-align: center;
-    text-decoration: none !important;
-    transition: var(--transition);
-    flex: 1;
-  }
-  .pcard__buy-btn:hover {
-    filter: brightness(1.1);
-  }
-  .pcard__detail-btn {
-    background: var(--c-ink);
-    color: #fff !important;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    padding: 1rem;
-    text-align: center;
-    text-decoration: none !important;
-    transition: var(--transition);
-    flex: 1;
-    border-left: 1px solid rgba(255,255,255,0.15);
-  }
-  .pcard__detail-btn:hover {
-    filter: brightness(1.25);
+  
+  @media (min-width: 768px) {
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
   }
 
-  .pcard__body {
-    padding: 0.5rem 1.25rem 1.5rem;
-    display: flex; flex-direction: column;
-    gap: .4rem; flex: 1; text-align: center;
-  }
-  .pcard__name {
-    font-size: 1.05rem; font-weight: 600; line-height: 1.3; margin: 0;
-  }
-  .pcard__name a { color: var(--c-ink); text-decoration: none; }
-  .pcard__subtitle {
-    font-size: .85rem; color: var(--c-muted); line-height: 1.4;
-  }
-  .pcard__footer {
-    display: flex; 
-    flex-direction: column;
-    align-items: center; 
-    justify-content: center;
-    margin-top: auto; 
-    padding-top: 0.5rem;
-  }
-  .pcard__price {
-    font-size: 1.2rem; font-weight: 700; color: var(--c-ink);
+  @media (min-width: 1200px) {
+    .products-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
   }
 
   /* Mobile Filter Toggle Button */
   .mobile-filter-toggle {
-    background: var(--c-ink);
+    background: {% if personalize is defined and personalize and personalize.tertiaryColor %}{{ personalize.tertiaryColor }}{% else %}var(--c-ink){% endif %};
     color: white;
     border: none;
-    padding: 0.85rem 1.25rem;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 0.9rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
     width: 100%;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .mobile-filter-toggle:active {
+    transform: scale(0.98);
   }
   .mobile-filter-toggle:hover {
     opacity: 0.9;
   }
-  .mobile-filter-toggle i {
-    margin-right: 0.5rem;
-    font-size: 0.85rem;
+  .mobile-filter-toggle .arrow-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+  }
+  .mobile-filter-toggle[aria-expanded="true"] .arrow-icon {
+    transform: rotate(180deg);
   }
 
   /* Fade-in */
@@ -482,23 +401,6 @@
   }
 
   @media (max-width: 767px) {
-    .pcard__body {
-      padding: 0.5rem 0.75rem 1rem;
-      gap: 0.25rem;
-    }
-    .pcard__name { font-size: 0.9rem; }
-    .pcard__subtitle { font-size: 0.75rem; }
-    .pcard__price { font-size: 1rem; }
-    .pcard__img-wrap { margin: 0.25rem; }
-    .pcard__buy-btn, .pcard__detail-btn {
-        padding: 0.7rem 0.25rem;
-        font-size: 0.7rem;
-        letter-spacing: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3rem;
-    }
     .shop-sidebar {
       padding: 1.5rem;
     }
@@ -521,14 +423,16 @@
     <button class="mobile-filter-toggle d-lg-none mb-4" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
         <i class="bi bi-funnel-fill"></i>
         <span>Filtrar productos</span>
+        <i class="bi bi-chevron-down arrow-icon"></i>
     </button>
 
     <div class="row g-5">
         <!-- Sidebar -->
         <aside class="col-lg-3">
             <div class="collapse d-lg-block shop-sidebar" id="filterCollapse">
-                <div class="filter-header">
-                    <h3 class="filter-title">Filtros</h3>
+                <div class="filter-header d-flex align-items-center justify-content-between">
+                    <h3 class="filter-title mb-0">Filtros</h3>
+                    <span id="activeFiltersCount" class="active-filters-badge" style="display: none;">0</span>
                 </div>
                 
                 {{ form_start(form) }}
@@ -590,7 +494,6 @@
 
                     <!-- Filter Buttons -->
                     <div class="filter-buttons">
-                        <button type="submit" class="btn-filter-submit">Aplicar filtros</button>
                         <button type="button" class="btn-clear-filters" id="clearFiltersBtn">Limpiar todo</button>
                     </div>
                 {{ form_end(form) }}
@@ -606,119 +509,13 @@
                 </div>
             </header>
             
-            <div class="row row-cols-2 row-cols-md-2 row-cols-xl-3 g-4">
+            <div class="products-grid">
                 {% for product in products %}
-                    <div class="col mb-3">
-                        <article class="pcard">
-                            {% for bundle in product.bundles %}
-                              {% if bundle.topRightBadge %}
-                                {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : 
-                                                   (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
-                                <span class="top-badge-right top-badge-right--{{ bundle.topRightBadge }}">{{ badgeText }}</span>
-                              {% endif %}
-                            {% endfor %}
-
-                            <div class="pcard__img-wrap">
-                                <a href="{{ path('product_show', {slug: product.slug}) }}">
-                                    <img class="pcard__img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" data-extra-images="{{ product.images|default([])|json_encode }}">
-                                </a>
-                            </div>
-
-                            <div class="pcard__body">
-                                <h3 class="pcard__name">
-                                    <a href="{{ path('product_show', {slug: product.slug}) }}">
-                                        {{ product.name }}
-                                        {% if product.bundles|length > 0 %}
-                                            {% for bundle in product.bundles %}
-                                                {% set pillText = 'Descuento Especial' %}
-                                                {% if bundle.type == 'oferta_sorpresa' %}{% set pillText = 'Oferta sorpresa!' %}{% endif %}
-                                                {% if bundle.type == 'ultimos_stock' %}{% set pillText = 'Últimos en stock!' %}{% endif %}
-                                                {% if bundle.type == 'pocas_unidades' %}{% set pillText = '¡Apúrate, quedan pocas unidades!' %}{% endif %}
-                                                <span class="bundle-pill bundle-pill--{{ bundle.type }}" title="{{ bundle.title }}">{{ pillText }}</span>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </a>
-                                </h3>
-                                <span class="pcard__subtitle">{{ product.subtitle }}</span>
-                                <div class="pcard__footer">
-                                    {% set maxBundleDiscount = product.getMaxDiscount() %}
-                                    {% if maxBundleDiscount > 0 %}
-                                        {% set discountedPrice = product.price * (1 - maxBundleDiscount / 100) %}
-                                        <span class="pcard__price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 0.8rem; margin-bottom: 2px;">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
-                                        <span class="pcard__price" style="color: #dc3545; line-height: 1;">{{ (discountedPrice / 100)|number_format(2, ',', '.') }}$ {{ maxBundleDiscount }}%OFF</span>
-                                    {% elseif product.oldPrice %}
-                                        <span class="pcard__price-old" style="text-decoration: line-through; color: var(--c-muted); font-size: 0.8rem; margin-bottom: 2px;">{{ (product.oldPrice / 100)|number_format(2, ',', '.') }}$</span>
-                                        <span class="pcard__price" style="line-height: 1;">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
-                                    {% else %}
-                                        <span class="pcard__price">$ {{ (product.price / 100)|number_format(2, ',', '.') }} ARS</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% set firstVariant = null %}
-                            {% for option in product.options %}
-                                {% if option.isAvailable and not firstVariant %}
-                                    {% for value in option.productOptionValues %}
-                                        {% if value.isAvailable and not firstVariant %}
-                                             {% set firstVariant = option.name ~ ': ' ~ value.name %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            {% endfor %}
-                            {% set variantString = firstVariant %}
-                            <div class="pcard__actions">
-                                <a href="{{ path('add_to_cart', {id: product.id, variants: variantString}) }}" class="pcard__buy-btn">
-                                    <i class="bi bi-cart-plus d-md-none"></i>
-                                    <span class="d-none d-md-inline">Comprar ahora</span>
-                                    <span class="d-inline d-md-none">Añadir</span>
-                                </a>
-                                <a href="{{ path('product_show', {slug: product.slug}) }}" class="pcard__detail-btn">
-                                    <i class="bi bi-eye d-md-none"></i>
-                                    <span class="d-none d-md-inline">Ver detalles del producto</span>
-                                    <span class="d-inline d-md-none">Ver</span>
-                                </a>
-                            </div>
-                            <div class="pcard__options-store d-none">
-                                {% if product.options|length > 0 %}
-                                    <div class="product-options-interactive-store mb-2 mt-2 w-100">
-                                        {# Parents Row #}
-                                        <div class="d-flex flex-wrap gap-1 justify-content-center mb-2 qv-parents-row">
-                                            {% for option in product.options %}
-                                                {% if option.isAvailable %}
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-outline-dark rounded-pill px-3 qv-parent-btn {% if loop.first %}active{% endif %}" 
-                                                            data-target="qv-option-list-{{ product.id }}-{{ option.id }}"
-                                                            style="font-size: 0.7rem; border: 1.5px solid #ddd; font-weight: 700;">
-                                                        {{ option.name }}
-                                                    </button>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-
-                                        {# Children Containers #}
-                                        {% for option in product.options %}
-                                            {% if option.isAvailable %}
-                                                <div class="qv-option-values {% if not loop.first %}d-none{% endif %}" 
-                                                     id="qv-option-list-{{ product.id }}-{{ option.id }}"
-                                                     data-group-name="{{ option.name }}">
-                                                    <div class="d-flex flex-wrap gap-1 justify-content-center">
-                                                        {% for value in option.productOptionValues %}
-                                                            <button type="button" 
-                                                                  class="btn btn-sm qv-value-btn {{ value.isAvailable ? '' : 'option-unavailable' }}" 
-                                                                  data-value-name="{{ value.name }}"
-                                                                  {% if not value.isAvailable %}disabled{% endif %}
-                                                                  style="border: 1px solid {{ value.isAvailable ? 'var(--primary-color, #333)' : '#ccc' }}; color: {{ value.isAvailable ? '#000' : '#adb5bd' }}; background: transparent; font-size: 0.75rem; padding: 0.2rem 0.5rem; transition: all 0.2s;">
-                                                                {{ value.name }}
-                                                            </button>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </article>
-                    </div>
+                    {% include "_pcard.html.twig" with {
+                        'product': product,
+                        'buy_btn_text': 'Comprar',
+                        'suffix': 'idx'
+                    } %}
                 {% endfor %}
             </div> 
         </main>
@@ -847,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ══════════════════════════════════════════════════════════════
     function updateActiveFiltersCount() {
         const allCheckedBoxes = document.querySelectorAll('.parent-cat-check:checked, .sub-cat-check:checked');
-        const searchInput = document.querySelector('input[type="text"], input[type="search"]');
+        const searchInput = document.querySelector('.shop-sidebar input[type="text"], .shop-sidebar input[type="search"]');
         const hasSearchText = searchInput && searchInput.value.trim().length > 0;
         
         const totalFilters = allCheckedBoxes.length + (hasSearchText ? 1 : 0);
@@ -864,6 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ══════════════════════════════════════════════════════════════
     // CLEAR FILTERS BUTTON
     // ══════════════════════════════════════════════════════════════
+    const filterForm = document.querySelector('.shop-sidebar form');
     const clearBtn = document.getElementById('clearFiltersBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
@@ -874,27 +672,74 @@ document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('input[type="text"], input[type="search"]');
             if (searchInput) searchInput.value = '';
             
-            // Cerrar todos los desplegables
-            document.querySelectorAll('.sub-list.show').forEach(list => {
-                list.classList.remove('show');
-            });
-            document.querySelectorAll('.sub-toggle-btn.active').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            updateActiveFiltersCount();
+            if (filterForm) filterForm.submit();
         });
     }
 
     // ══════════════════════════════════════════════════════════════
-    // INITIAL STATE
+    // INITIAL STATE & LIVE SEARCH LOGIC (AJAX)
     // ══════════════════════════════════════════════════════════════
     updateActiveFiltersCount();
 
-    // Update count when search input changes
-    const searchInput = document.querySelector('input[type="text"], input[type="search"]');
-    if (searchInput) {
-        searchInput.addEventListener('input', updateActiveFiltersCount);
+    if (filterForm) {
+        
+        // Función asíncrona para buscar y reemplazar productos sin recargar
+        const performLiveSearch = () => {
+            const urlParams = new URLSearchParams(new FormData(filterForm)).toString();
+            // Aseguramos que la URL original no duplique los símbolos de interrogación '?'
+            const fetchUrl = window.location.pathname + '?' + urlParams;
+
+            const grid = document.querySelector('.products-grid');
+            if (grid) grid.style.opacity = '0.4';
+
+            fetch(fetchUrl)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newGrid = doc.querySelector('.products-grid');
+                    if (newGrid && grid) {
+                        grid.innerHTML = newGrid.innerHTML;
+                        grid.style.opacity = '1';
+                    }
+                    
+                    const newCount = doc.querySelector('.shop-count');
+                    const count = document.querySelector('.shop-count');
+                    if (newCount && count) {
+                        count.innerHTML = newCount.innerHTML;
+                    }
+
+                    // Actualizar silenciosamente la URL para poder compartir o refrescar
+                    window.history.replaceState({}, '', fetchUrl);
+                })
+                .catch(err => {
+                    console.error("Error realizando live search: ", err);
+                    if (grid) grid.style.opacity = '1';
+                });
+        };
+
+        // Trigger on Checkbox change
+        const allCheckboxes = filterForm.querySelectorAll('.form-check-input');
+        allCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                performLiveSearch();
+            });
+        });
+
+        // Trigger on Search Input (Debounced)
+        const searchInput = filterForm.querySelector('input[type="text"], input[type="search"]');
+        let searchTimeout = null;
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                updateActiveFiltersCount();
+                clearTimeout(searchTimeout);
+                // 300ms de retraso da una sensación inmediata y fluida a medida que el usuario tipe
+                searchTimeout = setTimeout(() => {
+                    performLiveSearch();
+                }, 300); 
+            });
+        }
     }
 });
 </script>

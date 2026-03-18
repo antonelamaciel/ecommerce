@@ -5,22 +5,20 @@
 {% block body %}
 
 <style>
-  /* ── Tokens (Consistent with ecosystem) ── */
+  /* ── Tokens ── */
   :root {
-    --c-bg: #fcfbf9;
+    --c-bg: #fdfcfb;
     --c-surface: #ffffff;
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #696561;
     --radius-lg: 24px;
     --radius-md: 16px;
-    --radius-sm: 10px;
-    --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
+    --radius-sm: 8px;
+    --shadow-soft: 0 4px 25px rgba(0,0,0,0.04);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
     --font-main: 'Outfit', sans-serif;
   }
-
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
   body { 
     background: var(--c-bg); 
@@ -28,126 +26,242 @@
     color: var(--c-ink);
   }
 
-  .order-container { padding-top: 3rem; padding-bottom: 5rem; }
+  .order-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 1200px; }
+
+  /* ── Checkout Progress ── */
+  .checkout-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--c-muted);
+    opacity: 0.5;
+  }
+  .step-item.active { opacity: 1; color: var(--tertiary-color, var(--c-ink)); }
+  .step-item.active .step-num { background: var(--tertiary-color, var(--c-ink)); color: #fff; }
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+  }
+  .step-line {
+    width: 40px; height: 1px; background: var(--c-border);
+  }
 
   /* ── Header ── */
-  .order-header { margin-bottom: 3rem; }
+  .order-header {
+    margin-bottom: 3.5rem;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
   .order-title {
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
     margin: 0;
   }
 
   /* ── Grid Layout ── */
-  .order-grid { display: grid; grid-template-columns: 1fr 400px; gap: 3rem; }
+  .order-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
 
-  /* ── Info Cards (Left) ── */
+  /* ── Info Cards ── */
   .info-card {
     background: var(--c-surface);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     padding: 2rem;
-    border: 1px solid var(--c-border);
-    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.5s ease backwards;
   }
+  
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .info-card__title {
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--c-muted);
-    margin-bottom: 1.25rem;
+    font-size: .9rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    color: var(--c-ink);
+    letter-spacing: -0.02em;
   }
-  .info-card__title i { color: var(--primary-color, var(--c-ink)); }
-  .info-card__content { font-size: 1rem; line-height: 1.6; }
+  .info-card__title i { color: var(--tertiary-color, var(--c-ink)); font-size: 1.25rem; }
+  .info-card__content { font-size: 1rem; line-height: 1.6; color: var(--c-muted); }
+  .info-card__content b { color: var(--c-ink); font-weight: 700; }
 
-  /* ── Summary Sidebar (Right) ── */
+  /* ── Selection Cards (Modern & Minimalist) ── */
+  .selection-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .selection-card {
+    position: relative; cursor: pointer; display: block; margin: 0;
+    background: #fff; border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-md); padding: 1rem 1.25rem;
+    transition: var(--transition);
+  }
+  .selection-card:hover { border-color: var(--c-ink); transform: translateY(-2px); }
+  .selection-card.active, .selection-card:has(input:checked) {
+    border-color: var(--tertiary-color, var(--c-ink));
+    background: #fdfcfb; box-shadow: var(--shadow-soft);
+  }
+  .selection-card input { position: absolute; opacity: 0; }
+  
+  .selection-card__body { display: flex; align-items: center; gap: 1rem; }
+  .selection-card__icon { 
+    width: 42px; height: 42px; border-radius: 12px; background: #f8f7f5;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    color: var(--c-muted); transition: var(--transition);
+  }
+  .selection-card.active .selection-card__icon, 
+  .selection-card:has(input:checked) .selection-card__icon { 
+    background: var(--tertiary-color, var(--c-ink)); color: #fff; 
+  }
+  
+  .selection-card__info { flex: 1; min-width: 0; }
+  .selection-card__name { font-weight: 800; font-size: 0.95rem; color: var(--c-ink); margin-bottom: 0.1rem; }
+  .selection-card__desc { font-size: 0.8rem; color: var(--c-muted); font-weight: 500; line-height: 1.2; }
+  .selection-card__price { font-weight: 900; font-size: 1rem; color: var(--c-ink); white-space: nowrap; }
+
+  /* ── Grid Layout ── */
+  .order-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
   .summary-sidebar {
     background: var(--c-surface);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
-    border: 1px solid var(--c-border);
+    padding: 2rem;
     box-shadow: var(--shadow-soft);
-    position: sticky; top: 100px;
-    height: fit-content;
+    position: sticky; top: 120px;
+    animation: fadeInUp 0.5s ease backwards 0.2s;
   }
-  .summary-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; }
+  .summary-title { font-size: 1rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
 
   .summary-item {
-    display: grid;
-    grid-template-columns: 50px 1fr auto;
+    display: flex;
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--c-border);
   }
+  .summary-item:last-child { border-bottom: none; margin-bottom: 1.5rem; }
   .summary-item__img {
-    width: 50px; height: 50px;
+    width: 50px; height: 65px;
     object-fit: contain;
     background: #fdfcfb;
     border-radius: var(--radius-sm);
-    padding: 0.25rem;
+    border: 1px solid var(--c-border);
   }
-  .summary-item__name { font-size: 0.9rem; font-weight: 500; color: var(--c-ink); line-height: 1.3; }
-  .summary-item__qty { font-size: 0.85rem; color: var(--c-muted); font-weight: 600; }
+  .summary-item__info { flex: 1; min-width: 0; }
+  .summary-item__name { font-size: 0.9rem; font-weight: 700; color: var(--c-ink); line-height: 1.2; }
+  .summary-item__qty { font-size: 0.8rem; color: var(--c-muted); margin-top: 0.25rem; font-weight: 500; }
 
   .summary-breakdown {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--c-border);
   }
   .breakdown-row {
-    display: flex; justify-content: space-between;
-    margin-bottom: 0.75rem; font-size: 0.95rem;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1rem; font-size: 0.95rem; color: var(--c-muted); font-weight: 500;
   }
   .breakdown-row.final-total {
-    margin-top: 1.5rem; padding-top: 1.5rem;
+    margin-top: 1rem; padding-top: 1.5rem;
     border-top: 1px solid var(--c-border);
-    font-size: 1.4rem; font-weight: 700; color: var(--c-ink);
+    font-size: 1rem; font-weight: 900; color: var(--c-ink); letter-spacing: -0.03em;
   }
 
-  .btn-pay {
+  .btn-pay, #btn-confirm-order {
     width: 100%;
-    background: var(--primary-color, var(--c-ink));
+    background: var(--tertiary-color, var(--c-ink));
     color: #fff;
     border: none;
     border-radius: var(--radius-md);
-    padding: 1.25rem;
-    font-weight: 700;
-    font-size: 1.1rem;
+    padding: 1rem;
+    font-weight: 800;
+    font-size: 1rem;
     display: flex; align-items: center; justify-content: center;
     gap: 0.75rem;
-    margin-top: 2rem;
     transition: var(--transition);
-    text-decoration: none !important;
   }
-  .btn-pay:hover {
-    filter: brightness(1.1); transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1); color: #fff;
+  .btn-pay:hover, #btn-confirm-order:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    filter: brightness(1.1);
   }
 
-  /* ── Mobile ── */
+  /* ── Responsive ── */
   @media (max-width: 991px) {
-    .order-grid { grid-template-columns: 1fr; }
-    .summary-sidebar { position: static; }
+    .order-container { padding-top: 1rem; padding-bottom: 1rem; margin: 0 auto; }
+    .order-grid { grid-template-columns: 1fr; gap: 1.5rem; width: 100%; }
+    .order-grid main, .order-grid aside { width: 100%; max-width: 500px; margin: 0 auto; }
+    
+    .info-card, .summary-sidebar { 
+      padding: 1.25rem; 
+      margin-left: auto; 
+      margin-right: auto; 
+    }
+    
+    .info-card__title { justify-content: center; text-align: center; }
+    .info-card__content { text-align: center; }
+    .selection-card__body { justify-content: center; }
+    
+    .checkout-steps { margin-bottom: 2rem; gap: 0.5rem; }
+    .step-item { font-size: 0.75rem; }
+    .step-line { width: 25px; }
+
+    .back-link-wrapper { text-align: start; margin-bottom: 1rem; width: 100%; }
+    #cash-shipping-notice { margin-left: 0 !important; text-align: center; }
   }
 </style>
 
 <div class="container order-container">
+    <div class="mb-1 back-link-wrapper">
+        <button type="button" onclick="window.history.back()" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
+    </div>
+
+    <!-- Step Tracker -->
+    <div class="checkout-steps">
+        <div class="step-item active">
+            <span class="step-num">1</span> Envio
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item active">
+            <span class="step-num">2</span> Pago
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+            <span class="step-num">3</span> Confirmación
+        </div>
+    </div>
+
     <header class="order-header">
-        <h1 class="order-title">Resumen de mi pedido</h1>
-        <p class="text-muted mt-2">Último paso: Revisa tus datos y procede al pago seguro</p>
+        <h1 class="order-title">Validar mi Pedido</h1>
+        <small class="text-muted mt-1 mb-0">Revisa los detalles finales antes de confirmar tu compra</small>
     </header>
 
     <div class="order-grid">
-        <!-- Left: Details -->
         <main>
             <div class="info-card">
                 <div class="info-card__title">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    Dirección de entrega
+                    <i class="bi bi-geo-alt"></i>
+                    Dirección de Envío
                 </div>
                 <div class="info-card__content">
                     {{ order.delivery|raw }}
@@ -156,64 +270,156 @@
 
             <div class="info-card">
                 <div class="info-card__title">
-                    <i class="bi bi-truck"></i>
-                    Método de envío
+                    <i class="bi bi-credit-card"></i>
+                    1. Selecciona tu Método de Pago
                 </div>
                 <div class="info-card__content">
-                    <strong>{{ order.carrierName }}</strong>
+                    <div class="selection-list">
+                        <label class="selection-card payment-option">
+                            <input type="radio" name="payment_method" value="mercadopago" class="payment-input">
+                            <div class="selection-card__body">
+                                <div class="selection-card__icon"><i class="bi bi-wallet2"></i></div>
+                                <div class="selection-card__info">
+                                    <div class="selection-card__name">Mercado Pago</div>
+                                    <div class="selection-card__desc">Tarjetas de crédito/débito o dinero en cuenta</div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="selection-card payment-option">
+                            <input type="radio" name="payment_method" value="transfer" class="payment-input">
+                            <div class="selection-card__body">
+                                <div class="selection-card__icon"><i class="bi bi-bank"></i></div>
+                                <div class="selection-card__info">
+                                    <div class="selection-card__name">Transferencia Bancaria / Alias</div>
+                                    <div class="selection-card__desc">Abonas y envías el comprobante por WhatsApp</div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="selection-card payment-option">
+                            <input type="radio" name="payment_method" value="cash" class="payment-input">
+                            <div class="selection-card__body">
+                                <div class="selection-card__icon"><i class="bi bi-cash-stack"></i></div>
+                                <div class="selection-card__info">
+                                    <div class="selection-card__name">Efectivo al retirar</div>
+                                    <div class="selection-card__desc">Pagas en el local al momento del retiro</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-4">
-                <a href="{{ path('order') }}" class="text-decoration-none fw-semibold" style="color: var(--c-muted)">
-                    <i class="bi bi-arrow-left me-1"></i> Cambiar datos de entrega
+
+            <div class="info-card" id="carrier-card" style="opacity: 0.5; pointer-events: none;">
+                <div class="info-card__title mb-2">
+                    <i class="bi bi-truck"></i>
+                    <span>2. Selecciona tu Forma de Entrega</span>
+                </div>
+                <div id="cash-shipping-notice" class="d-none mb-3" style="margin-left: 2rem;">
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle p-2" style="font-size: 0.8rem; text-transform: none; font-weight: 500; border-radius: 10px;">
+                        <b>Pagos en efectivo solo disponibles <br> para Retiro en sucursal</b>
+                    </span>
+                </div>
+                <div class="info-card__content">
+                    <div id="carrier-selection-grid" class="selection-list">
+                        {% for carrier in carriers %}
+                            <label class="selection-card carrier-option carrier-item" data-carrier-type="{{ carrier.type }}">
+                                <input type="radio" name="carrier" value="{{ carrier.id }}" data-price="{{ carrier.price }}" class="carrier-input">
+                                <div class="selection-card__body">
+                                    <div class="selection-card__icon">
+                                        <i class="bi {{ carrier.type == 'pickup' ? 'bi-geo-alt' : 'bi-truck' }}"></i>
+                                    </div>
+                                    <div class="selection-card__info">
+                                        
+                                        <div class="selection-card__desc">
+                                            {{ carrier.description }}
+                                        </div>
+                                    </div>
+                                    <div class="selection-card__price">
+                                        {% if carrier.price == 0 %}
+                                            Gratis
+                                        {% else %}
+                                            $ {{ carrier.price|number_format(2, ',', '.') }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="mt-3">
+                <a href="{{ path('order') }}" class="text-decoration-none small fw-600 text-muted hover-text-dark" style="transition:0.2s;">
+                    <i class="bi bi-pencil-square mr-1"></i> Modificar dirección
                 </a>
             </div>
         </main>
 
-        <!-- Right: Summary & Pay -->
         <aside>
             <div class="summary-sidebar">
-                <h2 class="summary-title">Tus artículos</h2>
+                <p class="summary-title">Resumen de Artículos</p>
                 
-                <div class="summary-items-list text-muted">
+                <div class="summary-items-list">
                     {% for item in cart.products %}
                         <div class="summary-item">
                             <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="summary-item__img">
-                            <div class="summary-item__name">
-                                {{ item.product.name }}{% if item.variants %}<span class="text-muted" style="font-weight: 400; font-size: 0.85em;"> con {{ item.variants }}</span>{% endif %}
+                            <div class="summary-item__info">
+                                <div class="summary-item__name">
+                                    {{ item.product.name }}
+                                </div>
+                                <div class="summary-item__qty">
+                                    {{ item.quantity }} ud.
+                                    {% if item.variants %}
+                                        <div class="mt-1">
+                                            <span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                                {{ item.variants }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="summary-item__qty">x{{ item.quantity }}</div>
+                            <div class="small fw-700">
+                                $ {{ ((item.quantity * item.product.price) / 100)|number_format(2,',','.') }}
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
 
                 <div class="summary-breakdown">
                     <div class="breakdown-row">
-                        <span>Subtotal art.</span>
-                        <span>$ {{ (totalPrice / 100)|number_format(2,',','.') }} ARS</span>
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-600">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
                     <div class="breakdown-row">
-                        <span>Costo de envío</span>
-                        <span>$ {{ (order.carrierPrice/100)|number_format(2,',','.') }} ARS</span>
+                        <span class="text-muted">Envío</span>
+                        <span class="fw-600">$ {{ (order.carrierPrice/100)|number_format(2,',','.') }}</span>
                     </div>
 
                     <div class="breakdown-row final-total">
-                        <span>Total pedido</span>
-                        <span>$ {{ ((totalPrice / 100) + order.carrierPrice / 100)|number_format(2,',','.') }} ARS</span>
+                        <span>Total Final</span>
+                        <span>$ {{ ((totalPrice / 100) + order.carrierPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
 
-                    <a href="{{ path('mercadopago_checkout', {reference: order.reference}) }}" class="btn-pay">
-                        <i class="bi bi-wallet2"></i>
-                        Pagar con Mercado Pago
-                    </a>
+                    <div class="payment-opts" id="payment-buttons-container" style="opacity: 0.5; pointer-events: none;">
+                        <button type="button" id="btn-confirm-order" class="btn-pay">
+                            <i class="bi bi-check-circle"></i>
+                            Confirmar Pedido
+                        </button>
+                    </div>
 
-                    <div class="mt-4 pt-4 border-top text-center text-muted small">
-                        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-                            <i class="bi bi-shield-lock-fill"></i>
-                            <span>Conexión 100% segura</span>
-                        </div>
-                        <p class="mb-0">Aceptamos la mayoría de tarjetas de crédito y débito</p>
+                    <div id="order-validation-warning" class="mt-3 text-center text-danger small fw-bold">
+                        <i class="bi bi-info-circle mr-1"></i> Completa los pasos anteriores
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-center opacity-75">
+                        <small class="text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.7rem;">
+                            <i class="bi bi-shield-check"></i>
+                            PAGO SEGURO Y PROTEGIDO
+                        </small>
                     </div>
                 </div>
             </div>
@@ -221,4 +427,268 @@
     </div>
 </div>
 
+<!-- Modals (Simplified stylings to match) -->
+<div class="modal fade" id="cashModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pb-0 px-4 pt-4">
+        <h5 class="modal-title fw-bold">Importante: Reserva de Pedido</h5>
+        <button type="button" class="close" data-dismiss="modal" style="background:none; border:none; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="d-flex align-items-start gap-3 mb-1" style="color: #981919ff;">
+            <i class="bi bi-exclamation-triangle-fill fs-3 mr-2"></i>
+            <div>
+                <b class="mb-2 fw-bold">¿Deseas reservar este pedido?</b>
+                <p class="small text-muted mb-0" style="line-height: 1.5;">Al seleccionar este método, se te reservarán los productos por <b>72 horas hábiles</b> para que puedas retirar y pagar presencialmente. Si no completas el retiro en ese plazo, el pedido se cancelará automáticamente.</p>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 p-3 pt-0">
+        <a id="pd-cash-confirm" href="{{ path('order_confirm_cash', {reference: order.reference}) }}" class="btn btn-dark w-100 rounded-pill py-3 fw-bold">Entiendo y deseo reservar</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="transferModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pb-0 px-4 pt-4">
+        <h5 class="modal-title fw-bold">Transferencia Bancaria</h5>
+        <button type="button" class="close" data-dismiss="modal" style="background:none; border:none; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div class="modal-body p-4">
+        {% if personalize.aliasCbu %}
+        <div class="p-3 bg-light rounded-4 text-center mb-3">
+            <small class="text-muted d-block mb-1">CBU / Alias para transferir</small>
+            <b class="fs-5 text-dark">{{ personalize.aliasCbu }}</b>
+        </div>
+        {% endif %}
+
+        <div class="p-3 rounded-4 mb-3" style="background: #fef2f2; border: 1px solid #fee2e2;">
+            <p class="small text-danger fw-bold mb-1"><i class="bi bi-exclamation-circle mr-1"></i> ¡IMPORTANTE!</p>
+            <p class="small text-danger mb-0">Es obligatorio enviar el comprobante por WhatsApp. La orden solo se procesará una vez recibido.</p>
+        </div>
+
+        <p class="small text-muted text-center mb-0">La verificación es manual (1-6 días hábiles).</p>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0">
+        <a id="btn-whatsapp-transfer" href="#" target="_blank" class="btn btn-success w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+            <i class="bi bi-whatsapp mr-2"></i> Enviar comprobante
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentInputs = document.querySelectorAll('.payment-input');
+    const carrierInputs = document.querySelectorAll('.carrier-input');
+    const carrierCard = document.getElementById('carrier-card');
+    const paymentContainer = document.getElementById('payment-buttons-container');
+    const validationWarning = document.getElementById('order-validation-warning');
+    const btnConfirm = document.getElementById('btn-confirm-order');
+    
+    // Selectors for price rows
+    const rows = document.querySelectorAll('.breakdown-row');
+    let shippingRow, finalRow;
+    rows.forEach(r => {
+        if (r.textContent.includes('Envío')) shippingRow = r.querySelector('span:last-child');
+        if (r.classList.contains('final-total')) finalRow = r.querySelector('span:last-child');
+    });
+
+    let selectedPayment = document.querySelector('.payment-input:checked')?.value || null;
+    let selectedCarrier = document.querySelector('.carrier-input:checked')?.value || null;
+
+    if (selectedPayment) {
+        document.querySelector(`.payment-input[value="${selectedPayment}"]`)?.closest('.payment-option')?.classList.add('active');
+        carrierCard.style.opacity = '1';
+        carrierCard.style.pointerEvents = 'auto';
+        
+        // Update carrier list visibility without resetting selection if it exists
+        const cashNotice = document.getElementById('cash-shipping-notice');
+        const carrierItems = document.querySelectorAll('.carrier-item');
+        if (selectedPayment === 'cash') {
+            cashNotice.classList.remove('d-none');
+            carrierItems.forEach(item => {
+                item.style.display = item.dataset.carrierType === 'pickup' ? '' : 'none';
+            });
+        } else {
+            cashNotice.classList.add('d-none');
+            carrierItems.forEach(item => item.style.display = '');
+        }
+    }
+    if (selectedCarrier) {
+        document.querySelector(`.carrier-input[value="${selectedCarrier}"]`)?.closest('.carrier-option')?.classList.add('active');
+    }
+
+    const updateCarrierList = (method) => {
+        const cashNotice = document.getElementById('cash-shipping-notice');
+        const carrierItems = document.querySelectorAll('.carrier-item');
+
+        // Unlock section
+        carrierCard.style.opacity = '1';
+        carrierCard.style.pointerEvents = 'auto';
+
+        // Reset state completely
+        selectedCarrier = null;
+        document.querySelectorAll('.carrier-option').forEach(opt => opt.classList.remove('active'));
+        document.querySelectorAll('.carrier-input').forEach(inp => inp.checked = false);
+
+        if (method === 'cash') {
+            // Show ONLY pickup, hide all others
+            cashNotice.classList.remove('d-none');
+            let pickupInput = null;
+            carrierItems.forEach(item => {
+                if (item.dataset.carrierType === 'pickup') {
+                    item.style.display = '';
+                    // Auto-select pickup
+                    const input = item.querySelector('.carrier-input');
+                    if (input) {
+                        input.checked = true;
+                        item.classList.add('active');
+                        pickupInput = input;
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            // Auto-trigger server update for pickup carrier
+            if (pickupInput) {
+                selectedCarrier = pickupInput.value;
+                checkConfirmation(); // Enable button immediately for better UX
+                updateCarrierOnServer(pickupInput.value);
+                return;
+            }
+        } else {
+            // Show all carriers
+            cashNotice.classList.add('d-none');
+            carrierItems.forEach(item => { item.style.display = ''; });
+        }
+
+        // Reset price UI
+        if (shippingRow) shippingRow.textContent = '$ 0,00';
+        const subtotal = {{ totalPrice / 100 }};
+        if (finalRow) finalRow.textContent = `$ ${subtotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+        checkConfirmation();
+    };
+
+    const checkConfirmation = () => {
+        // "Efectivo al retirar" implies pickup, so we consider it complete immediately
+        const isComplete = (selectedPayment === 'cash') || (selectedPayment && selectedCarrier);
+        
+        if (isComplete) {
+            paymentContainer.style.opacity = '1';
+            paymentContainer.style.pointerEvents = 'auto';
+            btnConfirm.classList.remove('disabled');
+            btnConfirm.disabled = false;
+            validationWarning.classList.add('d-none');
+        } else {
+            paymentContainer.style.opacity = '0.5';
+            paymentContainer.style.pointerEvents = 'none';
+            btnConfirm.classList.add('disabled');
+            btnConfirm.disabled = true;
+            validationWarning.classList.remove('d-none');
+            
+            if (!selectedPayment) {
+                validationWarning.innerHTML = '<i class="bi bi-info-circle mr-1"></i> Selecciona un método de pago';
+            } else if (!selectedCarrier) {
+                validationWarning.innerHTML = '<i class="bi bi-info-circle mr-1"></i> Selecciona una forma de entrega';
+            }
+        }
+    };
+
+    // Initial check
+    checkConfirmation();
+
+    const updateCarrierOnServer = (carrierId) => {
+        const url = `/order/update-carrier/{{ order.reference }}/${carrierId}`;
+        fetch(url, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    if (shippingRow) shippingRow.textContent = `$ ${(data.carrierPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    if (finalRow) finalRow.textContent = `$ ${(data.totalPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    checkConfirmation();
+                    
+                    // Smooth scroll to confirmation button for better UX
+                    if (window.innerWidth < 991) {
+                        btnConfirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            })
+            .catch(err => console.error("Error updating carrier:", err));
+    };
+
+    paymentInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
+            this.closest('.payment-option').classList.add('active');
+            selectedPayment = this.value;
+            updateCarrierList(this.value);
+            checkConfirmation();
+        });
+    });
+
+    carrierInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            document.querySelectorAll('.carrier-option').forEach(opt => opt.classList.remove('active'));
+            this.closest('.carrier-option').classList.add('active');
+            selectedCarrier = this.value;
+            updateCarrierOnServer(this.value);
+        });
+    });
+
+
+    // Make entire cards clickable (optional with label wrapper, but kept for robustness if needed)
+    // Actually, with label wrapper, the input is clicked automatically. 
+    // We just need to make sure our "active" class logic still works if we use it for JS filtering/selection.
+
+    // Confirmation Button Logic
+    btnConfirm.addEventListener('click', function() {
+        const isComplete = (selectedPayment === 'cash') || (selectedPayment && selectedCarrier);
+        if (!isComplete) return;
+
+        if (selectedPayment === 'mercadopago') {
+            window.location.href = "{{ path('mercadopago_checkout', {reference: order.reference}) }}";
+        } else if (selectedPayment === 'cash') {
+            $('#cashModal').modal('show');
+        } else if (selectedPayment === 'transfer') {
+            $('#transferModal').modal('show');
+        }
+    });
+
+    const btnWhatsapp = document.getElementById('btn-whatsapp-transfer');
+    if (btnWhatsapp) {
+        btnWhatsapp.addEventListener('click', function(e) {
+            e.preventDefault();
+            const whatsappNumber = "{{ personalize.whatsapp|default('')|replace({' ': '', '+': '', '-': ''}) }}";
+            let message = "Hola! Quiero enviar el comprobante de mi pedido.\n\n";
+            message += "*Orden:* #{{ order.reference }}\n";
+            message += "*Total:* " + (finalRow ? finalRow.textContent : "") + "\n\n";
+            message += "*Detalle:*\n";
+            {% for item in cart.products %}
+                message += "- {{ item.product.name }} x{{ item.quantity }}{% if item.variants %} ({{ item.variants }}){% endif %}\n";
+            {% endfor %}
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            setTimeout(() => {
+                window.location.href = "{{ path('order_confirm_transfer', {reference: order.reference}) }}";
+            }, 800);
+        });
+    }
+
+    const btnCash = document.getElementById('pd-cash-confirm');
+    if (btnCash) {
+        btnCash.addEventListener('click', function() {
+            btnCash.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span> Procesando...';
+            btnCash.classList.add('disabled');
+        });
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

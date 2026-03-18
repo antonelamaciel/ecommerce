@@ -25,7 +25,9 @@
                 /* Variables base */
                 {% if personalize.primarycolor %}--primary-color: {{ personalize.primarycolor }};{% endif %}
                 {% if personalize.secondarycolor %}--secondary-color: {{ personalize.secondarycolor }};{% endif %}
-                {% if personalize.tertiaryColor %}--tertiary-color: {{ personalize.tertiaryColor }};{% endif %}
+                {% if personalize.tertiaryColor %}
+                    --tertiary-color: {{ personalize.tertiaryColor }};
+                {% endif %}
             {% endif %}
         }
         
@@ -41,14 +43,55 @@
                 -webkit-backdrop-filter: blur(10px);
             }
             
-            .footer-custom {
-                background-color: var(--primary-color) !important;
-                color: {{ headerIsLight ? '#333' : 'white' }} !important;
+            /* Dynamic text colors */
+            .navbar-custom, 
+            .navbar-custom *,
+            .footer-custom, 
+            .footer-custom *,
+            .mobile-drawer,
+            .mobile-drawer *,
+            .drawer-header,
+            .drawer-header *,
+            .drawer-close-btn,
+            .hamburger-line,
+            .cart-btn,
+            .text-white,
+            .text-white-50,
+            .hover-white:hover,
+            .hc-ctrl,
+            .hc-ctrl i,
+            .btn-arrepentimiento {
+                color: var(--tertiary-color) !important;
             }
             
-            /* Dynamic text colors */
-            .navbar-brand, .nav-link, .navbar .dropdown-toggle, .navbar .btn-cart-icon, .navbar .text-reset {
-                color: {{ headerIsLight ? '#2d3436' : 'white' }} !important;
+            .hamburger-line,
+            .navbar-custom .cart-badge {
+                background-color: var(--tertiary-color) !important;
+            }
+
+            .navbar-custom .cart-badge {
+                color: var(--primary-color) !important;
+                border-color: var(--primary-color) !important;
+            }
+
+            .navbar-custom .search-box input, 
+            .navbar-custom .nav-pill-btn, 
+            .navbar-custom .btn-login,
+            .search-overlay-form input,
+            .btn-outline-light {
+                border-color: var(--tertiary-color) !important;
+                color: var(--tertiary-color) !important;
+            }
+            
+            .search-close-btn {
+                background: rgba(0, 0, 0, 0.1) !important;
+                color: var(--tertiary-color) !important;
+            }
+
+            .navbar-custom .search-box input::placeholder,
+            .search-overlay-form input::placeholder {
+                color: var(--tertiary-color) !important;
+                opacity: 0.6;
             }
             
             .nav-link:hover, .navbar .dropdown-toggle:hover {
@@ -105,7 +148,7 @@
             font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
-            border-radius: 99px;
+            border-radius: 4px;
             margin-left: 0.4rem;
             margin-top: 0.25rem;
             margin-bottom: 0.25rem;
@@ -129,9 +172,17 @@
             font-weight: 800;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            border-radius: 6px;
+            border-radius: 4px;
             color: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 767px) {
+            .top-badge-right {
+                top: 2.2rem;
+                right: 0.75rem;
+                font-size: 0.6rem;
+                padding: 0.3rem 0.5rem;
+            }
         }
         .top-badge-right--envio_gratis { background-color: #198754; }
         .top-badge-right--recomendado { background-color: #ffb100; color: #111; }
@@ -214,6 +265,133 @@
             margin: 0;
         }
 
+        /* ── Product Card Global Component ── */
+        .pcard {
+            background: var(--c-surface, #ffffff);
+            border-radius: var(--radius, 12px);
+            overflow: hidden;
+            transition: all .4s cubic-bezier(.16, 1, .3, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            border: none;
+            text-decoration: none;
+            color: var(--c-ink, #1a1a1a);
+        }
+        .pcard:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+        .pcard__img-wrap {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1/1.2;
+            background: #f8f8f8;
+            border-radius: var(--radius, 12px);
+            margin-bottom: 0.75rem;
+        }
+        .pcard__img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform .8s cubic-bezier(.16, 1, .3, 1);
+        }
+        .pcard:hover .pcard__img { transform: scale(1.1); }
+        .pcard__buy-btn {
+            position: relative;
+            background: #000;
+            color: #fff !important;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.85rem;
+            border-radius: 99px;
+            text-align: center;
+            text-decoration: none !important;
+            transition: all .3s ease;
+            z-index: 5;
+            margin-top: 0.75rem;
+            display: block;
+        }
+        .pcard__buy-btn:hover { background: #333; transform: scale(1.02); }
+        .pcard__body {
+            padding: 0 0.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            flex-grow: 1;
+        }
+        .pcard__name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.4;
+            margin: 0;
+            color: #1a1a1a;
+        }
+        .pcard__name a { color: inherit; text-decoration: none; }
+        .pcard__price {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .pcard__price-container { display: flex; align-items: baseline; gap: 0.5rem; }
+        .pcard__price-old { text-decoration: line-through; color: #999; font-size: 0.8rem; }
+        .pcard__price-main { color: var(--c-ink, #1a1a1a); }
+        .pcard__badge, .top-badge-right {
+            position: absolute;
+            top: 0.75rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            z-index: 5;
+            letter-spacing: 0.02em;
+        }
+        .pcard__badge { left: 0.75rem; background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .top-badge-right { right: 0.75rem; background: #000; color: #fff; }
+
+        @media (max-width: 767px) {
+            .pcard:hover { transform: none; box-shadow: none; }
+            .pcard__img-wrap { aspect-ratio: 3/4; margin-bottom: 0.5rem; }
+            .pcard__buy-btn-mobile {
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 0.2rem 0.75rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 6px;
+                background: var(--tertiary-color, #000);
+                color: #fff !important;
+                z-index: 10;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-size: 0.7rem;
+                margin: 0;
+                white-space: nowrap;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.02em;
+            }
+
+            .pcard__name { 
+                font-size: clamp(0.8rem, 3.5vw, 0.95rem) !important; 
+                line-height: 1.2;
+            }
+            .pcard__price { font-size: clamp(0.9rem, 4vw, 1rem) !important; }
+            .pcard__price-container { flex-direction: column; align-items: flex-start; gap: 0; }
+            .pcard__badge { 
+                left: auto !important; 
+                right: 0.75rem !important; 
+                top: 2.25rem !important; 
+            }
+            .pcard__subtitle { display: none !important; }
+            .pcard__body { padding: 0 0.25rem 0.5rem; }
+        }
+
         @media (max-width: 768px) {
             .cookie-banner {
                 padding: 1rem;
@@ -228,6 +406,33 @@
                 width: 100%;
             }
         }
+
+        /* ── Global Back Button ── */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--c-muted, #666);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-back:hover {
+            color: var(--c-ink, #000);
+            transform: translateX(-5px);
+        }
+        .btn-back i {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
@@ -240,12 +445,12 @@
             {% include "_carousel.html.twig" %}
         {% endif %}
         
-        <div class="container main-content-wrap {% if carousel is not defined %}mt-5 pt-5{% else %}mt-5{% endif %}">
+        <div class="container main-content-wrap">
             {% for label, messages in app.flashes %}
                 {% if label != 'success_contact' %}
                     {% for message in messages %}
-                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show rounded-pill px-4 shadow-sm border-0 mb-4" role="alert">
-                            <i class="bi bi-info-circle-fill me-2"></i>
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show px-4 shadow-sm border-0 mb-4" role="alert" style="border-radius: 4px;">
+                            <i class="bi bi-info-circle-fill mr-2"></i>
                             {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -263,22 +468,49 @@
     {# Floating Buttons #}
     {# Left Side: Scroll to Top (Only Home) #}
     {% if app.request.attributes.get('_route') == 'home' %}
-        <button id="scrollToTop" class="btn rounded-circle shadow-lg d-none align-items-center justify-content-center" style="font-size: 1.5rem; position: fixed; bottom: 30px; left: 30px; z-index: 9999; width: 70px; height: 70px; transition: all 0.3s ease; opacity: 1; background-color: var(--primary-color, #000); color: white; border: 2px solid rgba(255,255,255,0.2);">
-            <i class="bi bi-chevron-up"></i>
+        <button id="scrollToTop" class="btn shadow-lg d-none align-items-center justify-content-center" style="font-size: 1.5rem; position: fixed; bottom: 30px; left: 30px; z-index: 9999; width: 60px; height: 60px; transition: all 0.3s ease; opacity: 1; background-color: #ffffffff; color: black; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+            <i class="bi bi-chevron-up text-dark"></i>
         </button>
     {% endif %}
 
     {# Right Side: WhatsApp Button #}
     {% if personalize.whatsapp %}
-        <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" id="whatsappBtn" class="btn btn-success rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="font-size: 1.5rem; position: fixed; bottom: 30px; right: 30px; z-index: 9999; width: 70px; height: 70px; transition: all 0.3s ease; opacity: 1; background-color: #25d366; border: none;">
-            <i class="bi bi-whatsapp"></i>
-        </a>
+        <div id="whatsappFloatingContainer" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: row; align-items: flex-end; transition: opacity 0.3s ease;">
+            
+            <div id="whatsappBotBubble" style="position: relative; background-color: #fff; color: #333; padding: 12px 16px; border-radius: 12px 12px 0 12px; margin-right: 14px; margin-bottom: 6px; max-width: 260px; font-size: 0.9rem; font-weight: 500; line-height: 1.3; opacity: 1; transform: translateX(0) scale(1); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: center right; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));">
+                <span onclick="var b=document.getElementById('whatsappBotBubble'); if(b){ b.style.opacity='0'; b.style.transform='translateX(20px) scale(0.8)'; b.style.pointerEvents='none'; setTimeout(()=>b.remove(), 600); }" style="position: absolute; top: 4px; right: 6px; cursor: pointer; color: #999; font-size: 1.2rem; line-height: 1; z-index: 10;"><i class="bi bi-x"></i></span>
+                <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" style="text-decoration: none; color: inherit; display: block; padding-right: 12px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                        <div style="background-color: #25d366; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin-right: 8px;">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <span style="font-weight: 700; font-size: 0.9rem; color: #25d366;">Asistente</span>
+                    </div>
+                    <span style="color: #444; display: block; line-height: 1.4;">¿En qué podemos ayudarte? ¡No dudes en consultarnos!</span>
+                </a>
+            </div>
+
+            <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" id="whatsappBtn" class="btn btn-success shadow-lg d-flex align-items-center justify-content-center" style="font-size: 1.8rem; width: 60px; height: 60px; transition: all 0.3s ease; background-color: #25d366; border: none; border-radius: 50%; color: white;">
+                <i class="bi bi-whatsapp"></i>
+            </a>
+        </div>
     {% endif %}
 
     <style>
-        #whatsappBtn:hover, #scrollToTop:hover {
+        #whatsappBotBubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            right: -10px;
+            width: 0;
+            height: 0;
+            border-bottom: 12px solid #fff;
+            border-right: 12px solid transparent;
+        }
+
+        #whatsappBtn:hover, #scrollToTop:hover, #whatsappBotBubble:hover {
             opacity: 1 !important;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         
         /* Class for scrolled state transparency */
@@ -295,32 +527,65 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Cart Badge Pop Animation */
+        @keyframes headerBadgePop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); color: #dc3545; border-color: #dc3545; }
+            100% { transform: scale(1); }
+        }
+        .badge-pop-anim {
+            animation: headerBadgePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
     </style>
 
     <div id="cookieBanner" class="cookie-banner">
         <p class="cookie-banner__text">
-            <i class="bi bi-info-circle-fill me-2" style="color: var(--primary-color);"></i>
+            <i class="bi bi-info-circle-fill mr-2" style="color: var(--primary-color);"></i>
             Utilizamos cookies propias y de terceros para mejorar tu experiencia de navegación y ofrecerte contenidos de interés. Al continuar navegando, aceptas nuestra política de cookies.
         </p>
-        <button id="acceptCookies" class="btn btn-dark rounded-pill px-4 fw-bold">Entendido</button>
+        <button id="acceptCookies" class="btn btn-dark px-4 fw-bold" style="border-radius: 4px;">Entendido</button>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="{{asset('assets/js/bootstrap.bundle.js')}}"></script>
     <script>
+        // Global function to update cart count and animate the badge
+        window.updateGlobalCartCount = function(count) {
+            const badges = document.querySelectorAll('.cart-badge');
+            if (badges.length > 0) {
+                badges.forEach(b => {
+                    b.textContent = count;
+                    b.classList.remove('badge-pop-anim');
+                    void b.offsetWidth; // trigger reflow to reset animation
+                    b.classList.add('badge-pop-anim');
+                });
+            } else {
+                document.querySelectorAll('.cart-btn').forEach(cartBtn => {
+                    const badge = document.createElement('span');
+                    badge.className = 'cart-badge badge-pop-anim';
+                    badge.textContent = count;
+                    cartBtn.appendChild(badge);
+                });
+            }
+        };
+
         window.addEventListener('scroll', function() {
+            const whatsappContainer = document.getElementById('whatsappFloatingContainer');
             const whatsappBtn = document.getElementById('whatsappBtn');
+            const targetEl = whatsappContainer ? whatsappContainer : whatsappBtn;
+            
             const scrollToTop = document.getElementById('scrollToTop');
             const scrollPos = window.scrollY;
 
             // Transparency logic: if scrolled more than 100px, make them semi-transparent
             if (scrollPos > 100) {
-                whatsappBtn.classList.add('scrolled-control');
+                if (targetEl) targetEl.classList.add('scrolled-control');
                 if (scrollToTop) {
                     scrollToTop.classList.add('scrolled-control');
                 }
             } else {
-                whatsappBtn.classList.remove('scrolled-control');
+                if (targetEl) targetEl.classList.remove('scrolled-control');
                 if (scrollToTop) {
                     scrollToTop.classList.remove('scrolled-control');
                 }
@@ -345,19 +610,32 @@
                 });
             });
         }
+
+        // WhatsApp Bot Bubble Hide Logic (7 seconds)
+        const whatsappBotBubble = document.getElementById('whatsappBotBubble');
+        if (whatsappBotBubble) {
+            setTimeout(() => {
+                whatsappBotBubble.style.opacity = '0';
+                whatsappBotBubble.style.transform = 'translateX(20px) scale(0.8)';
+                whatsappBotBubble.style.pointerEvents = 'none';
+                setTimeout(() => whatsappBotBubble.remove(), 600);
+            }, 7000);
+        }
     </script>
     {% block javascripts %}{% endblock %}
     <script>
             // Global AJAX Cart Add logic for .pcard__buy-btn
             document.addEventListener('click', function(e) {
                 const btn = e.target.closest('.pcard__buy-btn');
-                if (!btn || btn.getAttribute('id') === 'pd-submit') return; // pd-submit has its own logic
+                if (!btn || btn.getAttribute('id') === 'pd-submit') return; 
                 
                 e.preventDefault();
                 const url = new URL(btn.href);
                 url.searchParams.set('ajax', '1');
                 
                 const originalHtml = btn.innerHTML;
+                const btnWidth = btn.offsetWidth;
+                btn.style.minWidth = btnWidth + 'px';
                 btn.classList.add('disabled');
                 btn.style.pointerEvents = 'none';
 
@@ -367,22 +645,20 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update cart badges
-                        const badges = document.querySelectorAll('.cart-badge');
-                        if (badges.length > 0) {
-                            badges.forEach(b => b.textContent = data.cartCount);
+                        if (window.updateGlobalCartCount) {
+                            window.updateGlobalCartCount(data.cartCount);
                         }
                         
-                        // Check animation
                         const oldBg = btn.style.background;
                         btn.style.background = '#198754';
-                        btn.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.25rem;"></i></span>';
+                        btn.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.1rem;"></i></span>';
                         
                         setTimeout(() => {
                             btn.style.background = oldBg;
                             btn.innerHTML = originalHtml;
                             btn.classList.remove('disabled');
                             btn.style.pointerEvents = 'auto';
+                            btn.style.minWidth = '';
                         }, 1000);
                     }
                 })
@@ -393,72 +669,7 @@
                 });
             });
 
-            // Quick View Modal AJAX Add to Cart
-            document.addEventListener('DOMContentLoaded', function() {
-                const quickViewModal = document.getElementById('quickViewModal');
-                if (quickViewModal) {
-                    quickViewModal.addEventListener('submit', function(e) {
-                        const qvForm = e.target.closest('#quickViewModal form');
-                        if (!qvForm) return;
-
-                        e.preventDefault();
-                        const qvSubmit = qvForm.querySelector('#pd-submit');
-                        const originalHtml = qvSubmit.innerHTML;
-                        const bsModal = bootstrap.Modal.getInstance(quickViewModal);
-
-                        qvSubmit.disabled = true;
-                        qvSubmit.style.pointerEvents = 'none';
-
-                        const formData = new FormData(qvForm);
-                        formData.append('ajax', '1');
-
-                        fetch(qvForm.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const badges = document.querySelectorAll('.cart-badge');
-                                if (badges.length > 0) {
-                                    badges.forEach(b => b.textContent = data.cartCount);
-                                }
-
-                                qvSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
-                                qvSubmit.style.background = '#198754';
-                                
-                                setTimeout(() => {
-                                    if (bsModal) {
-                                        bsModal.hide();
-                                    } else if (window.jQuery) {
-                                        $('#quickViewModal').modal('hide');
-                                    }
-                                    // reset state
-                                    setTimeout(() => {
-                                        qvSubmit.style.background = '';
-                                        qvSubmit.innerHTML = originalHtml;
-                                        qvSubmit.disabled = false;
-                                        qvSubmit.style.pointerEvents = 'auto';
-                                    }, 300);
-                                }, 1000);
-                            } else {
-                                // Handle error or display message
-                                console.error('Error adding to cart from quick view:', data.error);
-                                qvSubmit.disabled = false;
-                                qvSubmit.style.pointerEvents = 'auto';
-                                qvSubmit.innerHTML = originalHtml;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Fetch error:', error);
-                            qvSubmit.disabled = false;
-                            qvSubmit.style.pointerEvents = 'auto';
-                            qvSubmit.innerHTML = originalHtml;
-                        });
-                    });
-                }
-            });
+            // Quick View Modal AJAX Add to Cart is handled in _quick_view_modal.html.twig
 
             // Cookie Banner Logic
             const banner = document.getElementById('cookieBanner');
@@ -498,6 +709,19 @@
                     }, 300);
                 });
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function adjustBodyPadding() {
+                const header = document.querySelector('.header-wrapper');
+                if (header) {
+                    document.body.style.paddingTop = header.offsetHeight + 'px';
+                }
+            }
+            adjustBodyPadding();
+            window.addEventListener('resize', adjustBodyPadding);
+            setTimeout(adjustBodyPadding, 500);
         });
     </script>
 </body>

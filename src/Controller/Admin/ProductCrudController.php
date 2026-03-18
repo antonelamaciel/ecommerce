@@ -3,42 +3,54 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Product;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ProductCrudController extends AbstractCrudController
 {
+    private string $uploadDir;
+
+    public function __construct(KernelInterface $kernel)
+    {
+        $this->uploadDir = $kernel->getProjectDir() . '/public/uploads/';
+    }
+
     public static function getEntityFqcn(): string
     {
         return Product::class;
     }
 
-    public function configureActions(Actions $actions): Actions 
+    public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->add('index', 'detail');
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name', 'Nombre'),
+            TextField::new('name', 'Nombre')->setRequired(true),
             SlugField::new('slug')->setTargetFieldName('name')->hideOnIndex(),
-            
+
             // --- PORTADA ---
             ImageField::new('image', 'Subir/Cambiar Portada')
                 ->setBasePath('uploads/')
@@ -55,40 +67,47 @@ class ProductCrudController extends AbstractCrudController
             ImageField::new('image', 'Portada')
                 ->setTemplatePath('admin/fields/banner_image.html.twig')
                 ->hideOnForm(),
-            
-            // --- GALERÍA ---
-            ImageField::new('images', 'Subir muchas imágenes (Selecciona varias con Ctrl)')
-                ->setBasePath('uploads/')
-                ->setUploadDir('public/uploads/')
-                ->setUploadedFileNamePattern('[randomhash].[extension]')
+
+            // --- GALERÍA (Colección dinámica de EasyAdmin) ---
+            Field::new('imagesUpload', 'Galería de imágenes')
+                ->setFormType(FileType::class)
                 ->setFormTypeOptions([
                     'multiple' => true,
-                    'attr' => ['multiple' => 'multiple']
+                    'mapped' => false,
+                    'required' => false,
+                    'attr' => [
+                        'accept' => 'image/*'
+                    ]
                 ])
-                ->onlyOnForms()
-                ->setRequired(false),
+                ->onlyOnForms(),
 
-            TextField::new('images_gallery', 'Fotos actuales en galería')
+            TextField::new('gallery_preview', 'Imágenes cargadas')
                 ->onlyOnForms()
-                ->setTemplatePath('admin/fields/product_gallery.html.twig')
+                ->setTemplatePath('admin/fields/product_images_gallery.html.twig')
                 ->setFormTypeOption('mapped', false),
-            
-            CollectionField::new('images', 'Galería completa')
-                ->setTemplatePath('admin/fields/product_gallery.html.twig')
-                ->hideOnForm()->hideOnIndex(),
 
-            TextField::new('subtitle', 'Subtítulo')->hideOnIndex(),
-            TextareaField::new('description', 'Descripción')->hideOnIndex(),
-            MoneyField::new('price', 'Precio')->setCurrency('ARS'),
+            ArrayField::new('images', 'Imágenes cargadas')
+                ->hideOnForm()
+                ->hideOnIndex()
+                ->setTemplatePath('admin/fields/product_images_gallery.html.twig'),
+
+            TextField::new('subtitle', 'Subtítulo')->hideOnIndex()->setRequired(false),
+            TextareaField::new('description', 'Descripción')->hideOnIndex()->setRequired(false),
+            MoneyField::new('price', 'Precio')->setCurrency('ARS')->setRequired(true),
+            IntegerField::new('stock', 'Cantidad de Stock (opcional)')
+                ->setRequired(false)
+                ->setHelp('Unidades disponibles en inventario.'),
             MoneyField::new('oldPrice', 'Precio Tachado (ARS)')
                 ->setCurrency('ARS')
                 ->setRequired(false)
                 ->setHelp('Precio anterior que aparecerá tachado.'),
-            AssociationField::new('category', 'Categoría'),
+            AssociationField::new('category', 'Categoría')->setRequired(true),
             AssociationField::new('subcategories', 'Subcategorías')
-                ->setFormTypeOptions(['by_reference' => false])->hideOnIndex(),
-            BooleanField::new('isInHome', 'Lo mas buscado'),
-            
+                ->setFormTypeOptions(['by_reference' => false])
+                ->hideOnIndex(),
+            BooleanField::new('isInHome', 'Producto Destacado')
+                ->setFormTypeOption('disabled', $pageName === Crud::PAGE_INDEX),
+
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Opciones del Producto'),
             CollectionField::new('options', 'Talles, Colores o Variantes')
                 ->setEntryType(\App\Form\ProductOptionType::class)
@@ -97,93 +116,328 @@ class ProductCrudController extends AbstractCrudController
                 ->allowDelete()
                 ->setHelp('Ej: Escribe "Color: Rojo", y marca si está disponible. Puedes agregar varios.')
                 ->hideOnIndex()
-                ->setCssClass('padded-options-collection')
+                ->setCssClass('padded-options-collection'),
         ];
     }
-    
+
+    // ─── CRUD configuration ───────────────────────────────────────────────────
+
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
             ->setEntityLabelInSingular('Producto')
             ->setEntityLabelInPlural('Productos')
-            ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
             ->overrideTemplate('crud/index', 'admin/sales/products.html.twig')
+            ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
         ;
     }
 
+    private function handleImages($request, Product $product): void
+    {
+        $files = $request->files->all()['Product']['imagesUpload'] ?? [];
+        if (!is_array($files)) {
+            $files = [$files];
+        }
+
+        $currentImages = $product->getImages() ?? [];
+
+        // Procesar eliminación de imágenes manual
+        $deleteImages = $request->request->all()['delete_images'] ?? [];
+        if (!empty($deleteImages) && is_array($deleteImages)) {
+            $currentImages = array_filter($currentImages, function($img) use ($deleteImages) {
+                return !in_array($img, $deleteImages);
+            });
+            // Eliminar archivos físicos
+            foreach ($deleteImages as $imgToDelete) {
+                if (is_string($imgToDelete) && file_exists($this->uploadDir . $imgToDelete)) {
+                    @unlink($this->uploadDir . $imgToDelete);
+                }
+            }
+        }
+
+
+        foreach ($files as $file) {
+            if ($file instanceof UploadedFile) {
+                $fileName = bin2hex(random_bytes(10)) . '.' . $file->guessExtension();
+
+                $file->move($this->uploadDir, $fileName);
+
+                $currentImages[] = $fileName;
+            }
+        }
+
+        $product->setImages(array_values($currentImages));
+    }
+
+    public function persistEntity(EntityManagerInterface $em, $entity): void
+    {
+        if ($entity instanceof Product) {
+            $this->handleImages($this->getContext()->getRequest(), $entity);
+        }
+
+        parent::persistEntity($em, $entity);
+    }
+
+    public function updateEntity(EntityManagerInterface $em, $entity): void
+    {
+        if ($entity instanceof Product) {
+            $this->handleImages($this->getContext()->getRequest(), $entity);
+        }
+
+        parent::updateEntity($em, $entity);
+    }
+
+
+
     public function configureAssets(Assets $assets): Assets
     {
-        return $assets->addHtmlContentToHead(<<<HTML
+        return $assets->addHtmlContentToHead(<<<'HTML'
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const initSubcategories = () => {
-            // Usamos selectores más flexibles por si cambia el nombre del formulario
             const catInput = document.querySelector('select[name*="[category]"]');
             const subInput = document.querySelector('select[name*="[subcategories]"]');
-            
             if (catInput && subInput && subInput.tomselect) {
                 const ts = subInput.tomselect;
-                
-                // CRÍTICO: Capturamos los valores seleccionados directamente del HTML al cargar
-                // Esto asegura que no dependamos del estado interno de TomSelect que puede estar inicializándose
-                const originalSelectedValues = Array.from(subInput.options)
-                    .filter(opt => opt.selected)
-                    .map(opt => opt.value);
-
+                const originalSelectedValues = Array.from(subInput.options).filter(opt => opt.selected).map(opt => opt.value);
                 const loadSubcategories = async (catId, isInitial = false) => {
-                    if (!catId) {
-                        ts.clear();
-                        ts.clearOptions();
-                        return;
-                    }
-
-                    // Determinar qué valores queremos mantener/restaurar
+                    if (!catId) { ts.clear(); ts.clearOptions(); return; }
                     let valuesToRestore = isInitial ? originalSelectedValues : ts.getValue();
-                    if (!Array.isArray(valuesToRestore)) {
-                        valuesToRestore = valuesToRestore ? [valuesToRestore] : [];
-                    }
-
+                    if (!Array.isArray(valuesToRestore)) valuesToRestore = valuesToRestore ? [valuesToRestore] : [];
                     try {
                         const response = await fetch('/admin/ajax/subcategories/' + catId);
                         const data = await response.json();
-                        
-                        // Limpiamos y cargamos las nuevas opciones filtradas por categoría
-                        ts.clearOptions();
-                        ts.addOptions(data);
-                        
-                        // Restauramos los valores. TomSelect solo mostrará aquellos que estén en 'data'
-                        // lo cual es correcto ya que filtramos por categoría.
-                        if (valuesToRestore.length > 0) {
-                            ts.setValue(valuesToRestore);
-                        }
-                    } catch (e) {
-                        console.error("Error en la carga de subcategorías:", e);
-                    }
+                        ts.clearOptions(); ts.addOptions(data);
+                        if (valuesToRestore.length > 0) ts.setValue(valuesToRestore);
+                    } catch (e) { console.error(e); }
                 };
-
                 catInput.addEventListener('change', function() {
-                    // Si el usuario cambia manualmente la categoría, limpiamos las subcategorías anteriores
-                    ts.clear();
-                    loadSubcategories(this.value, false);
+                    ts.clear(); loadSubcategories(this.value, false);
                 });
-
-                // Si hay una categoría ya seleccionada (modo edición), cargamos sus subcategorías
-                if (catInput.value) {
-                    loadSubcategories(catInput.value, true);
-                }
+                if (catInput.value) loadSubcategories(catInput.value, true);
             } else if (catInput && subInput && !subInput.tomselect) {
-                // Si TomSelect todavía no se ha acoplado al <select>, reintentamos
                 setTimeout(initSubcategories, 100);
             }
         };
 
-        // Damos un margen para la inicialización nativa de EasyAdmin
         setTimeout(initSubcategories, 500);
+
+        // ── Image Picker Logic (Visual Dropdown) ──
+        const initImagePickers = () => {
+            const getImagesFromDOM = () => {
+                const images = new Set();
+                const allImgs = document.querySelectorAll('img');
+                
+                allImgs.forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (!src || src.startsWith('data:')) return;
+                    
+                    const fileName = src.split('/').pop().split('?')[0];
+                    
+                    if (fileName.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+                        if (img.closest('.v-dropdown-menu')) return;
+                        if (img.classList.contains('v-trigger-img')) return;
+                        
+                        if (img.width > 30 || img.height > 30 || img.closest('.product-gallery-container, .ea-img-preview, .d-inline-block')) {
+                            images.add(fileName);
+                        }
+                    }
+                });
+                return Array.from(images);
+            };
+
+            const inputs = document.querySelectorAll('.variant-image-select');
+            
+            inputs.forEach(input => {
+                if (input.dataset.pickerInitialized) return;
+                input.dataset.pickerInitialized = 'true';
+
+                input.style.display = 'none';
+                const parent = input.parentElement;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'custom-v-dropdown';
+                
+                const trigger = document.createElement('button');
+                trigger.type = 'button';
+                trigger.className = 'v-dropdown-trigger';
+                
+                const updateTriggerContent = () => {
+                    if (input.value) {
+                        trigger.innerHTML = `
+                            <div class="d-flex align-items-center">
+                                <img src="/uploads/${input.value}" class="v-trigger-img">
+                                <span class="v-trigger-text text-truncate">${input.value}</span>
+                                <i class="fas fa-chevron-down ml-auto"></i>
+                            </div>
+                        `;
+                    } else {
+                        trigger.innerHTML = `
+                            <div class="d-flex align-items-center">
+                                <div class="v-trigger-placeholder"><i class="fas fa-image"></i></div>
+                                <span class="v-trigger-text text-muted">Vincular a imagen...</span>
+                                <i class="fas fa-chevron-down ml-auto"></i>
+                            </div>
+                        `;
+                    }
+                };
+                updateTriggerContent();
+                
+                const menu = document.createElement('div');
+                menu.className = 'v-dropdown-menu d-none';
+                
+                const refreshMenu = () => {
+                    const currentImages = getImagesFromDOM();
+                    menu.innerHTML = '';
+                    
+                    if (currentImages.length > 0) {
+                        const clearOpt = document.createElement('div');
+                        clearOpt.className = 'v-dropdown-item v-clear-opt';
+                        clearOpt.innerHTML = '<i class="fas fa-times-circle mr-2"></i> Sin imagen';
+                        clearOpt.onclick = () => {
+                            input.value = '';
+                            updateTriggerContent();
+                            menu.classList.add('d-none');
+                        };
+                        menu.appendChild(clearOpt);
+
+                        currentImages.forEach(imgName => {
+                            const item = document.createElement('div');
+                            item.className = 'v-dropdown-item';
+                            if (input.value === imgName) item.classList.add('active');
+                            
+                            item.innerHTML = `
+                                <img src="/uploads/${imgName}" class="v-item-img">
+                                <span class="v-item-text text-truncate">${imgName}</span>
+                            `;
+                            
+                            item.onclick = () => {
+                                input.value = imgName;
+                                updateTriggerContent();
+                                menu.classList.add('d-none');
+                            };
+                            menu.appendChild(item);
+                        });
+                    } else {
+                        menu.innerHTML = '<div class="p-3 text-muted small">Carga imágenes en la galería para verlas aquí.</div>';
+                    }
+                };
+
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(menu);
+                parent.appendChild(wrapper);
+
+                trigger.onclick = (e) => {
+                    e.preventDefault();
+                    refreshMenu();
+                    menu.classList.toggle('d-none');
+                };
+
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) menu.classList.add('d-none');
+                });
+            });
+        };
+
+        setTimeout(initImagePickers, 800);
+        document.addEventListener('ea.collection.item-added', () => setTimeout(initImagePickers, 200));
     });
 </script>
 <style>
-    .product-gallery-item img { transition: transform 0.2s; }
-    .product-gallery-item:hover img { transform: scale(1.1); z-index: 10; position: relative; }
+    /* ── Enhanced Image Dropdown Styling ── */
+    .custom-v-dropdown {
+        position: relative;
+        width: 100%;
+        margin-top: 5px;
+    }
+    .v-dropdown-trigger {
+        width: 100%;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 8px 12px;
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+    .v-dropdown-trigger:hover {
+        border-color: #3b82f6;
+    }
+    .v-trigger-img {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-right: 12px;
+    }
+    .v-trigger-placeholder {
+        width: 32px;
+        height: 32px;
+        background: #f3f4f6;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        color: #9ca3af;
+    }
+    .v-trigger-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+        max-width: 200px;
+    }
+    .v-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin-top: 4px;
+        max-height: 250px;
+        overflow-y: auto;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .v-dropdown-item {
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .v-dropdown-item:last-child {
+        border-bottom: none;
+    }
+    .v-dropdown-item:hover {
+        background: #eff6ff;
+    }
+    .v-dropdown-item.active {
+        background: #f0f7ff;
+        border-left: 3px solid #3b82f6;
+    }
+    .v-item-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-right: 12px;
+    }
+    .v-item-text {
+        font-size: 0.85rem;
+        color: #374151;
+    }
+    .v-clear-opt {
+        color: #dc2626;
+        font-weight: 600;
+        font-size: 0.85rem;
+        background: #fff5f5;
+    }
+    .v-clear-opt:hover {
+        background: #fee2e2;
+    }
 </style>
 HTML
         );

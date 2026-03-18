@@ -5,6 +5,9 @@
 {% block body %}
 <div class="register-page-modern py-5">
     <div class="container">
+        <button type="button" onclick="window.history.back()" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
         <div class="row justify-content-center">
             <div class="col-12 col-md-10 col-lg-8 col-xl-7">
                 {# Header Section #}
@@ -67,7 +70,7 @@
                                 <label class="form-label mini-label fw-bold text-muted text-uppercase mb-2">Confirmar</label>
                                 <div class="input-wrapper-lux">
                                     <i class="bi bi-shield-check"></i>
-                                    {{ form_widget(form.password.second, {'attr': {'class': 'form-control-lux', 'placeholder': 'Ingresa tu contraseña ...'}}) }}
+                                    {{ form_widget(form.password.second, {'attr': {'class': 'form-control-lux', 'placeholder': 'Confirma tu contraseña ...'}}) }}
                                     <button type="button" class="btn-toggle-lux" onclick="togglePassword('{{ form.password.second.vars.id }}', this)">
                                         <i class="bi bi-eye"></i>
                                     </button>
@@ -87,7 +90,7 @@
                     {{ form_end(form) }}
 
                     <div class="text-center mt-4">
-                        <p class="text-muted">¿Ya tienes una cuenta? <a href="{{ path('app_login') }}" class="fw-bold text-decoration-none" style="color: var(--primary-color);">Inicia Sesión aquí</a></p>
+                        <p class="text-muted">¿Ya tienes una cuenta? <a href="{{ path('app_login') }}" class="fw-bold text-decoration-none" style="color: var(--secondary-color);">Inicia Sesión aquí</a></p>
                     </div>
                 </div>
             </div>
@@ -166,7 +169,7 @@
     }
 
     .btn-primary-lux {
-        background: var(--primary-color);
+        background: var(--secondary-color);
         color: white !important;
         border: none;
         border-radius: 1rem;

@@ -78,6 +78,38 @@ class ProductController extends AbstractController
             'relatedProducts' => $relatedProducts
         ]);
     }
+
+    #[Route('/search-ajax', name: 'search_ajax', methods: ['GET'])]
+    public function searchAjax(ProductRepository $repository, Request $request): Response
+    {
+        $query = $request->query->get('q', '');
+        
+        if (mb_strlen($query) < 2) {
+            return $this->json([]);
+        }
+        
+        $search = new Search();
+        $search->setString($query);
+        $products = $repository->findWithSearch($search);
+        
+        $data = [];
+        $domain = $request->getSchemeAndHttpHost();
+        
+        foreach ($products as $product) {
+            $discount = $product->getMaxDiscount();
+            $finalPrice = $discount > 0 ? $product->getPrice() * (1 - $discount / 100) : $product->getPrice();
+
+            $data[] = [
+                'name' => $product->getName(),
+                'slug' => $product->getSlug(),
+                'price' => number_format($finalPrice / 100, 2, ',', '.'),
+                'oldPrice' => $discount > 0 ? number_format($product->getPrice() / 100, 2, ',', '.') : null,
+                'image' => $product->getImage() ? $domain . '/uploads/' . $product->getImage() : null,
+            ];
+        }
+        
+        return $this->json($data);
+    }
 }
 
 

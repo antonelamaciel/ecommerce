@@ -35,7 +35,7 @@
 
   /* ── Header ── */
   .address-header {
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
   }
   .address-title {
     font-size: clamp(1.8rem, 4vw, 2.5rem);
@@ -117,24 +117,15 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   }
 
-  .btn-back-account {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    color: var(--c-muted);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: var(--transition);
-  }
-  .btn-back-account:hover { color: var(--c-ink); transform: translateX(-4px); }
 
   /* Grid Fixes */
   .row { --bs-gutter-y: 1.5rem; }
 </style>
 
 <div class="address-container">
+    <button type="button" onclick="window.history.back()" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Volver
+    </button>
     <header class="address-header">
         <h1 class="address-title">Guardar una dirección</h1>
         <p class="address-subtitle">Completa los datos para agilizar tus envíos.</p>
@@ -214,8 +205,6 @@
         {{ form_end(form) }}
     </div>
 
-    <a href="{{ path('account') }}" class="btn-back-account">
-        <i class="bi bi-arrow-left"></i> Volver a mi cuenta
-    </a>
+    
 </div>
 {% endblock %}

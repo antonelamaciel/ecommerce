@@ -25,13 +25,13 @@ class Personalize
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $tertiaryColor = null;
 
-    #[ORM\Column(length: 40, nullable: true)]
+    #[ORM\Column(length: 40)]
     private ?string $companyName = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 50)]
     private ?string $whatsapp = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -58,10 +58,10 @@ class Personalize
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $address = null;
 
-    #[ORM\Column(length: 10, nullable: true)]
+    #[ORM\Column(length: 10)]
     private ?string $postal = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $aliasCbu = null;
 
 

@@ -1,0 +1,85 @@
+{# templates/_navbar.html.twig #}
+<nav class="site-navbar fixed-top">
+    <div class="site-navbar__inner">
+        {# Logo #}
+        <a class="site-navbar__brand" href="{{ path('home') }}">
+            {% if personalize and personalize.logo %}
+                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo">
+            {% else %}
+                <span>{{ personalize.companyName ?? 'Empresa' }}</span>
+            {% endif %}
+        </a>
+
+        {# Search (Desktop) #}
+        <div class="site-navbar__search d-none d-lg-flex">
+            <form action="{{ path('product') }}" method="GET">
+                <i class="bi bi-search"></i>
+                <input type="search" name="string" placeholder="Buscar productos..." autocomplete="off">
+            </form>
+        </div>
+
+        {# Actions #}
+        <div class="site-navbar__actions">
+            {% if app.user %}
+                <div class="dropdown">
+                    <button class="site-navbar__btn" data-toggle="dropdown">
+                        <i class="bi bi-person"></i>
+                        <span class="d-none d-md-inline">{{ app.user.firstname }}</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="{{ path('account') }}">Mi Perfil</a>
+                        <a class="dropdown-item" href="{{ path('account_orders') }}">Mis Pedidos</a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin">Administración</a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="{{ path('app_logout') }}">Cerrar Sesión</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="site-navbar__btn">
+                    <i class="bi bi-person"></i>
+                    <span class="d-none d-md-inline">Ingresar</span>
+                </a>
+            {% endif %}
+
+            <div class="site-navbar__cart">
+                <a href="{{ path('cart') }}" class="site-navbar__btn site-navbar__btn--cart">
+                    <i class="bi bi-bag"></i>
+                    {% if cartCount > 0 %}
+                        <span class="cart-badge">{{ cartCount }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+            <button class="site-navbar__hamburger d-lg-none" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+{# Mobile Menu #}
+<div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu__header">
+        <span>Menú</span>
+        <button id="mobileMenuClose"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="mobile-menu__body">
+        <div class="mobile-menu__search">
+            <form action="{{ path('product') }}" method="GET">
+                <i class="bi bi-search"></i>
+                <input type="search" name="string" placeholder="Buscar productos...">
+            </form>
+        </div>
+        
+        <div class="mobile-menu__section">
+            <p class="mobile-menu__label">Categorías</p>
+            <a href="{{ path('product') }}">Ver todo</a>
+            {# Iterate categories if needed, for now simplicity #}
+        </div>
+    </div>
+</div>

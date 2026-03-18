@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContactController extends AbstractController
 {
     #[Route('/contact', name: 'contact')]
-    public function index(Request $request, \App\Repository\PersonalizeRepository $personalizeRepository): Response
+    public function index(Request $request, \App\Repository\PersonalizeRepository $personalizeRepository, Mail $mail): Response
     {
         $personalize = $personalizeRepository->findOneBy([]);
         $companyName = $personalize ? $personalize->getCompanyName() : 'Mi Ecommerce';
@@ -26,13 +26,18 @@ class ContactController extends AbstractController
             
             $recipientEmail = ($personalize && $personalize->getEmail()) ? $personalize->getEmail() : 'antonelamaciel2024@gmail.com';
             
-            $mail = new Mail();
             $success = $mail->send($recipientEmail, $companyName, "Nuevo mensaje de contacto - $companyName", $content);
 
             if ($success) {
+                if ($request->isXmlHttpRequest()) {
+                    return $this->json(['success' => true, 'message' => '¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaremos muy pronto.']);
+                }
                 $this->addFlash('success_contact', '¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaremos muy pronto.');
                 return $this->redirectToRoute('contact');
             } else {
+                if ($request->isXmlHttpRequest()) {
+                    return $this->json(['success' => false, 'message' => 'Lo sentimos, hubo un problema al enviar tu mensaje. Por favor, inténtalo de nuevo más tarde.']);
+                }
                 $this->addFlash('error', 'Lo sentimos, hubo un problema al enviar tu mensaje. Por favor, inténtalo de nuevo más tarde.');
             }
         }

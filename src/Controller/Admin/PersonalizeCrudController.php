@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Entity\Personalize;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 
@@ -14,6 +16,12 @@ class PersonalizeCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Personalize::class;
+    }
+
+    public function configureActions(Actions $actions): Actions 
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -57,7 +65,7 @@ class PersonalizeCrudController extends AbstractCrudController
 
         return [
             Field\FormField::addPanel('Información General')->setCssClass('padded-internal-panel'),
-            Field\TextField::new('companyName', 'Nombre de la empresa'),
+            Field\TextField::new('companyName', 'Nombre de la empresa')->setRequired(true),
             Field\ImageField::new('logo')
                 ->setBasePath('uploads/logo/')
                 ->setUploadDir('public/uploads/logo/')
@@ -65,6 +73,8 @@ class PersonalizeCrudController extends AbstractCrudController
                 ->setRequired(false),
 
             Field\FormField::addPanel('Ubicación')->setCssClass('padded-internal-panel'),
+            Field\TextField::new('postal', 'C.P. (Código Postal)')
+                ->hideOnIndex(),
             Field\ChoiceField::new('province', 'Provincia')
                 ->setChoices($provinces)
                 ->setFormTypeOption('placeholder', 'Selecciona una provincia') 
@@ -77,21 +87,18 @@ class PersonalizeCrudController extends AbstractCrudController
                 ])
                 ->hideOnIndex(),
 
-            Field\TextField::new('postal', 'C.P. (Código Postal)')
-                ->hideOnIndex(),
-
             Field\TextField::new('address', 'Dirección Exacta'),
 
             Field\FormField::addPanel('Branding (Colores)')->setCssClass('padded-internal-panel'),
             Field\ColorField::new('primaryColor', 'Color primario'),
             Field\ColorField::new('secondaryColor', 'Color secundario'),
-            Field\ColorField::new('tertiaryColor', 'Color terciario'),
+            Field\ColorField::new('tertiaryColor', 'Color de textos y botones'),
 
             Field\FormField::addPanel('Contacto Principal y Pagos')->setCssClass('padded-internal-panel'),
+            Field\TextField::new('whatsapp', 'WhatsApp (ej: +549...)'),
             Field\EmailField::new('email', 'Email de contacto')
                 ->hideOnIndex(),
-            Field\TextField::new('whatsapp', 'WhatsApp (ej: +549...)'),
-            Field\TextField::new('aliasCbu', 'Alias o CBU (para transferencias)')->setRequired(false),
+            Field\TextField::new('aliasCbu', 'Alias o CBU (para transferencias)')->setRequired(true),
 
             Field\FormField::addPanel('Redes Sociales')->setCssClass('padded-internal-panel'),
             Field\TextField::new('instagram', 'Instagram URL')

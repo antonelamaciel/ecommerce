@@ -24,7 +24,7 @@
 
             {# Filas de la lista #}
             {% for entity in entities %}
-                <div class="ea-list-row">
+                <div class="ea-list-row" data-id="{{ entity.primaryKeyValueAsString }}">
                     {% block ea_list_row %}{% endblock %}
                 </div>
             {% else %}
@@ -43,8 +43,23 @@
         {% endif %}
     </div>
 
+    {# MODALS REQUISITOS POR EASYADMIN #}
+    {% block delete_form %}
+        {{ include('@EasyAdmin/crud/includes/_delete_form.html.twig', with_context = false) }}
+    {% endblock delete_form %}
+
+    {% set has_filters = filters|length > 0 %}
+    {% if has_filters %}
+        {{ include('@EasyAdmin/crud/includes/_filters_modal.html.twig') }}
+    {% endif %}
+
+    {% set has_batch_actions = batch_actions|length > 0 %}
+    {% if has_batch_actions %}
+        {{ include('@EasyAdmin/crud/includes/_batch_action_modal.html.twig', {}, with_context = false) }}
+    {% endif %}
+
     {# Macro para el botón de acciones común #}
-    {% macro action_button(entity) %}
+    {% macro action_button(entity, ea) %}
         {% if entity.actions.count > 0 %}
             <div class="dropdown dropdown-actions" style="justify-self: end;">
                 <a class="btn-modern-action" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

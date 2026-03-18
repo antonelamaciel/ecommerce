@@ -1,5 +1,7 @@
-<nav class="navbar-custom fixed-top">
+<div class="header-wrapper fixed-top" style="z-index: 1030; transition: all 0.3s ease;">
+<nav class="navbar-custom">
     <div class="navbar-inner">
+
 
         <!-- IZQUIERDA: HAMBURGUESA (mobile) -->
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menú" type="button">
@@ -19,24 +21,35 @@
 
         <!-- CENTRO: BUSCADOR + CATEGORÍAS -->
         <div class="navbar-center">
-            <form action="{{ path('product') }}" method="GET" class="search-wrapper">
+            <form action="{{ path('product') }}" method="GET" class="search-wrapper position-relative" id="desktopSearchForm">
                 <div class="search-box">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="search" name="string" placeholder="Buscar…" autocomplete="off">
+                    <input type="search" name="string" id="desktopSearchInput" placeholder="Buscar…" autocomplete="off">
+                </div>
+                <!-- Desktop Live Search Dropdown -->
+                <div id="desktopSearchDropdown" class="dropdown-menu w-100 shadow-lg border-0" style="display:none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; max-height: 400px; overflow-y: auto; z-index: 1050; border-radius: 14px;">
+                    <div id="desktopSearchResults" class="list-group list-group-flush"></div>
+                    <div id="desktopSearchLoading" class="text-center py-3 d-none text-muted"><div class="spinner-border spinner-border-sm"></div></div>
+                    <div id="desktopSearchEmpty" class="text-center py-3 d-none text-muted small">No se encontraron coincidencias.</div>
                 </div>
             </form>
             <button class="search-toggle-btn" id="searchToggle" aria-label="Buscar" type="button">
                 <i class="bi bi-search"></i>
             </button>
 
-            <div class="search-overlay" id="searchOverlay">
-                <form action="{{ path('product') }}" method="GET" class="search-overlay-form">
+            <div class="search-overlay position-relative" id="searchOverlay">
+                <form action="{{ path('product') }}" method="GET" class="search-overlay-form position-relative" id="mobileSearchForm">
                     <i class="bi bi-search search-overlay-icon"></i>
-                    <input type="search" name="string" id="searchOverlayInput"
-                        placeholder="Buscar…" autocomplete="off">
+                    <input type="search" name="string" id="searchOverlayInput" placeholder="Buscar…" autocomplete="off">
                     <button type="button" class="search-close-btn" id="searchClose">
                         <i class="bi bi-x-lg"></i>
                     </button>
+                    <!-- Mobile Live Search Dropdown -->
+                    <div id="mobileSearchDropdown" class="dropdown-menu w-100 shadow-lg border-0" style="display:none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; max-height: 250px; overflow-y: auto; z-index: 1050; border-radius: 14px;">
+                        <div id="mobileSearchResults" class="list-group list-group-flush"></div>
+                        <div id="mobileSearchLoading" class="text-center py-3 d-none text-muted"><div class="spinner-border spinner-border-sm"></div></div>
+                        <div id="mobileSearchEmpty" class="text-center py-3 d-none text-muted small">No se encontraron productos.</div>
+                    </div>
                 </form>
             </div>
 
@@ -54,14 +67,14 @@
                 <div class="dropdown-menu nav-dropdown shadow-xl dropdown-animated"
                      aria-labelledby="dropdownMenuCategories">
                     <a class="nav-dropdown-item fw-semibold" href="{{ path('product') }}">
-                        <b>Categorías de productos</b>
+                        <b>Todos los productos</b>
                     </a>
                     <div class="dropdown-divider"></div>
                     {% for category in allCategories %}
                         {% if category.subcategories|length > 0 %}
                             <div class="nav-category-group">
                                 <a class="nav-dropdown-item d-flex align-items-center justify-content-between" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDesktopCat{{ category.id }}" aria-expanded="false" onclick="event.preventDefault(); event.stopPropagation(); $('#collapseDesktopCat{{ category.id }}').collapse('toggle'); let exp = this.getAttribute('aria-expanded') === 'true'; this.setAttribute('aria-expanded', !exp);">
-                                    <span><i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}</span>
+                                    <span><i class="bi bi-tag opacity-50 mr-2"></i>{{ category.name }}</span>
                                     <i class="bi bi-chevron-down opacity-50 ms-2" style="font-size: 0.75rem; transition: transform 0.2s;"></i>
                                 </a>
                                 <div class="collapse" id="collapseDesktopCat{{ category.id }}">
@@ -79,7 +92,7 @@
                             </div>
                         {% else %}
                             <a class="nav-dropdown-item" href="{{ path('product', {'categories[]': category.id}) }}">
-                                <i class="bi bi-tag opacity-50 me-2"></i>{{ category.name }}
+                                <i class="bi bi-tag opacity-50 mr-2"></i>{{ category.name }}
                             </a>
                         {% endif %}
                     {% endfor %}
@@ -118,20 +131,44 @@
                 </div>
             {% else %}
                 <a class="btn-login desktop-login" href="{{ path('app_login') }}">
-                    <i class="bi bi-person me-1"></i><span class="btn-login-label">Ingresar/Registrarse</span>
+                    <i class="bi bi-person mr-1"></i><span class="btn-login-label">Ingresar/Registrarse</span>
                 </a>
             {% endif %}
 
-            <a href="{{ path('cart') }}" class="cart-btn" aria-label="Ver carrito">
-                <i class="bi bi-bag fs-5"></i>
-                {% if cartCount > 0 %}
-                    <span class="cart-badge">{{ cartCount }}</span>
-                {% endif %}
-            </a>
+            <div class="cart-btn-container">
+                <a href="{{ path('cart') }}" class="cart-btn" aria-label="Ver carrito">
+                    <i class="bi bi-bag fs-5"></i>
+                    {% if cartCount > 0 %}
+                        <span class="cart-badge">{{ cartCount }}</span>
+                    {% endif %}
+                </a>
+                <div id="cartNotification" class="cart-added-toast">
+                    <i class="bi bi-check-lg"></i>
+                    <span>Producto agregado</span>
+                </div>
+            </div>
         </div>
 
     </div>
 </nav>
+
+{% if bannerBundles is defined and bannerBundles %}
+    {% for bundle in bannerBundles %}
+        <div class="bundle-banner-full marquee-container" style="background-color: {{ bundle.bannerColor ?? '#1a1a1a' }}; width: 100vw; padding: 0.6rem 0; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+            <div class="marquee-content" style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em;">
+                {% set repeatedText %}
+                    {{ bundle.bannerText }} &nbsp;&nbsp;•&nbsp;&nbsp;
+                    {{ bundle.bannerText }} &nbsp;&nbsp;•&nbsp;&nbsp;
+                    {{ bundle.bannerText }} &nbsp;&nbsp;•&nbsp;&nbsp;
+                    {{ bundle.bannerText }} &nbsp;&nbsp;•&nbsp;&nbsp;
+                {% endset %}
+                <span>{{ repeatedText|raw }}</span>
+                <span>{{ repeatedText|raw }}</span>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+</div>
 
 <!-- MOBILE DRAWER -->
 <div class="mobile-drawer-overlay" id="drawerOverlay"></div>
@@ -145,49 +182,68 @@
 
     <div class="drawer-body">
 
-        <!-- SECCIÓN CATEGORÍAS (primero en mobile) -->
+        <!-- INICIO -->
+        <a class="drawer-item fw-bold" href="{{ path('home') }}">
+            <i class="bi bi-house-door mr-2"></i>Inicio
+        </a>
+
+        <!-- SECCIÓN PRODUCTOS (Desplegable) -->
         <div class="drawer-section">
-            <div class="drawer-section-title">
-                <i class="bi bi-tags mr-2"></i>Categorías
-            </div>
-            <div class="drawer-section-content">
-                <a class="drawer-item fw-semibold" href="{{ path('product') }}">
-                    <i class="bi bi-grid mr-2"></i><b>Todas las categorías</b>
-                </a>
-                <div class="drawer-divider"></div>
-                {% for category in allCategories %}
-                    {% if category.subcategories|length > 0 %}
-                        <div class="nav-drawer-category-group">
-                            <a class="drawer-item d-flex align-items-center justify-content-between drawer-cat-toggle" href="#" data-target="collapseMobileCat{{ category.id }}" onclick="event.preventDefault(); toggleDrawerSub(this);">
-                                <span><i class="bi bi-tag opacity-50 mr-2"></i>{{ category.name }}</span>
-                                <i class="bi bi-chevron-down drawer-cat-arrow opacity-50 ms-2" style="font-size: 0.85rem; transition: transform 0.25s;"></i>
-                            </a>
-                            <div class="drawer-subcats" id="collapseMobileCat{{ category.id }}" style="max-height: 0; overflow: hidden; transition: max-height 0.35s ease;">
-                                <div class="ps-4 pe-2 py-1 mb-2 border-start ms-3 mt-1" style="border-color: rgba(255,255,255,0.18) !important;">
-                                    <a class="drawer-item py-1 fw-bold text-primary fw-semibold" href="{{ path('product', {'categories[]': category.id}) }}" style="font-size: 0.85rem; color: #fff;">
-                                        Ver todo en {{ category.name }}
-                                    </a>
-                                    {% for sub in category.subcategories %}
-                                        <a class="drawer-item py-1" href="{{ path('product', {'categories[]': category.id, 'subcategories[]': sub.id}) }}" style="font-size: 0.85rem; opacity: 0.8;">
-                                            {{ sub.name }}
+            <a class="drawer-item d-flex align-items-center justify-content-between drawer-cat-toggle fw-bold" 
+               href="#" 
+               data-target="collapseMobileProducts" 
+               onclick="event.preventDefault(); toggleDrawerSub(this);">
+                <span><i class="bi bi-tags mr-2"></i>Productos</span>
+                <i class="bi bi-chevron-down drawer-cat-arrow opacity-50 ml-2" style="font-size: 0.85rem; transition: transform 0.25s;"></i>
+            </a>
+
+            <div class="drawer-subcats" id="collapseMobileProducts" style="max-height: 0; overflow: hidden; transition: max-height 0.35s ease;">
+                <div class="ps-3">
+                    <a class="drawer-item fw-semibold" href="{{ path('product') }}">
+                        <i class="bi bi-grid mr-2 text-primary"></i><b>Ver todos los productos</b>
+                    </a>
+                    
+                    <div class="drawer-divider"></div>
+
+                    {% for category in allCategories %}
+                        {% if category.subcategories|length > 0 %}
+                            <div class="nav-drawer-category-group">
+                                <a class="drawer-item d-flex align-items-center justify-content-between drawer-cat-toggle" 
+                                   href="#" 
+                                   data-target="collapseMobileCat{{ category.id }}" 
+                                   onclick="event.preventDefault(); toggleDrawerSub(this);">
+                                    <span><i class="bi bi-tag opacity-50 mr-2"></i>{{ category.name }}</span>
+                                    <i class="bi bi-chevron-down drawer-cat-arrow opacity-50 ml-2" style="font-size: 0.85rem; transition: transform 0.25s;"></i>
+                                </a>
+                                <div class="drawer-subcats" id="collapseMobileCat{{ category.id }}" style="max-height: 0; overflow: hidden; transition: max-height 0.35s ease;">
+                                    <div class="ps-4 pe-2 py-1 mb-2 border-start ms-3 mt-1" style="border-color: rgba(0,0,0,0.08) !important;">
+                                        <a class="drawer-item py-1 fw-bold text-primary fw-semibold" href="{{ path('product', {'categories[]': category.id}) }}" style="font-size: 0.85rem;">
+                                            Ver todo en {{ category.name }}
                                         </a>
-                                    {% endfor %}
+                                        {% for sub in category.subcategories %}
+                                            <a class="drawer-item py-1" href="{{ path('product', {'categories[]': category.id, 'subcategories[]': sub.id}) }}" style="font-size: 0.85rem; opacity: 0.8;">
+                                                {{ sub.name }}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% else %}
-                        <a class="drawer-item" href="{{ path('product', {'categories[]': category.id}) }}">
-                            <i class="bi bi-tag opacity-50 mr-2"></i>{{ category.name }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
+                        {% else %}
+                            <a class="drawer-item" href="{{ path('product', {'categories[]': category.id}) }}">
+                                <i class="bi bi-tag opacity-50 mr-2"></i>{{ category.name }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
-        <!-- SECCIÓN USUARIO (segundo en mobile) -->
+        <div class="drawer-divider my-3"></div>
+
+        <!-- SECCIÓN USUARIO -->
         <div class="drawer-section">
             <div class="drawer-section-title">
-                <i class="bi bi-person-circle me-2"></i>
+                <i class="bi bi-person-circle mr-2"></i>
                 {% if app.user %}{{ app.user.firstname }}{% else %}Mi Cuenta{% endif %}
             </div>
             <div class="drawer-section-content">
@@ -210,6 +266,26 @@
 </div>
 
 <style>
+/* ── Marquee Animation ── */
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.marquee-content {
+    display: inline-block;
+    animation: marquee-animation 40s linear infinite;
+}
+.marquee-content span {
+    display: inline-block;
+}
+@keyframes marquee-animation {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
 /* ── Base ── */
 .navbar-custom {
     background: var(--primary-color);
@@ -270,8 +346,7 @@
 }
 .navbar-brand-custom:hover { opacity: .8; transform: scale(1.02); }
 .navbar-logo {
-    width: 130px; height: 70px;
-    border-radius: 5%;
+    height: 100px;
     object-fit: cover;
     display: block;
 }
@@ -389,6 +464,65 @@
     border: 1.5px solid var(--primary-color);
 }
 
+/* ── Cart Notification Toast ── */
+.cart-btn-container {
+    position: relative;
+    display: flex;
+}
+.cart-added-toast {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #ffffff;
+    padding: 10px 18px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    z-index: 2000;
+    border: 1px solid rgba(0,0,0,0.05);
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+.cart-added-toast.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.cart-added-toast i {
+    color: #198754;
+    font-size: 1.2rem;
+    background: #e7f5ed;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+.cart-added-toast span {
+    color: #333;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+@media (max-width: 991px) {
+    .cart-added-toast {
+        right: -65px;
+        padding: 6px 12px;
+        gap: 6px;
+    }
+    .cart-added-toast i {
+        width: 24px; height: 24px; font-size: 1rem;
+    }
+    .cart-added-toast span {
+        font-size: 0.8rem;
+    }
+}
+
+
 /* ── Dropdown ── */
 .navbar-center .dropdown,
 .navbar-right .dropdown {
@@ -504,16 +638,20 @@
 }
 .search-overlay-form input::placeholder { color: rgba(255,255,255,.5); }
 .search-close-btn {
-    background: rgba(255,255,255,.15);
+    background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255,255,255,.2);
     border-radius: 50%;
     width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center;
-    color: #fff; cursor: pointer; flex-shrink: 0;
+    color: var(--secondary-color, #fff) !important; cursor: pointer; flex-shrink: 0;
     transition: background .2s;
 }
 .search-close-btn:hover { background: rgba(255,255,255,.28); }
 
+input[type="search"]::-webkit-search-cancel-button {
+    filter: invert(1);
+    cursor: pointer;
+}
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -626,8 +764,8 @@
 
 .drawer-divider {
     height: 1px;
-    background: #f0f0f0;
-    margin: .35rem 1.25rem;
+    background: #e5e7eb;
+    margin: 0.5rem 0;
 }
 
 /* ══════════════════════════════
@@ -648,7 +786,7 @@
         margin-left: auto;
         order: 10;
     }
-    .navbar-logo { width: 38px; height: 38px; }
+    .navbar-logo { height: 60px; }
 
     /* Centro: icono búsqueda pegado a hamburguesa */
     .navbar-center {
@@ -773,30 +911,136 @@ document.addEventListener('DOMContentLoaded', function () {
             el.addEventListener('mouseleave', () => el.style.backgroundColor = '');
         });
     });
+
+    /* ── Live Search AJAX logic ── */
+    function setupHeaderLiveSearch(inputId, dropdownId, resultsId, loadingId, emptyId) {
+        const input = document.getElementById(inputId);
+        const dropdown = document.getElementById(dropdownId);
+        const resultsContainer = document.getElementById(resultsId);
+        const loading = document.getElementById(loadingId);
+        const empty = document.getElementById(emptyId);
+        
+        if (!input || !dropdown) return;
+        
+        let timeout = null;
+        let controller = null;
+        
+        // Hide dropdown when clicking outward
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+        
+        // Re-show if has query
+        input.addEventListener('focus', () => {
+            if (input.value.trim().length > 1) {
+                dropdown.style.display = 'block';
+            }
+        });
+
+        input.addEventListener('input', () => {
+            const query = input.value.trim();
+            
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                if (controller) controller.abort();
+                return;
+            }
+            
+            dropdown.style.display = 'block';
+            resultsContainer.innerHTML = '';
+            empty.classList.add('d-none');
+            loading.classList.remove('d-none');
+            
+            clearTimeout(timeout);
+            
+            timeout = setTimeout(() => {
+                if (controller) controller.abort();
+                controller = new AbortController();
+                
+                fetch(`/search-ajax?q=${encodeURIComponent(query)}`, { signal: controller.signal })
+                    .then(res => res.json())
+                    .then(data => {
+                        loading.classList.add('d-none');
+                        if (data.length === 0) {
+                            empty.classList.remove('d-none');
+                        } else {
+                            empty.classList.add('d-none');
+                            let html = '';
+                            data.forEach(p => {
+                                const imgHtml = p.image 
+                                    ? `<img src="${p.image}" alt="${p.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; margin-right: 12px; flex-shrink: 0;">` 
+                                    : `<div style="width: 44px; height: 44px; background: #f8fafc; border-radius: 8px; margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="bi bi-bag text-muted"></i></div>`;
+                                
+                                const priceFormat = p.oldPrice 
+                                    ? `<span class="text-danger fw-bold" style="font-size: 0.85rem;">$${p.price}</span> <span class="text-decoration-line-through text-muted ms-1" style="font-size: 0.75rem;">$${p.oldPrice}</span>` 
+                                    : `<span class="fw-bold" style="font-size: 0.85rem; color: #1e293b;">$${p.price}</span>`;
+                                    
+                                html += `
+                                    <a href="/products/${p.slug}" class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3 border-0 border-bottom" style="transition: background 0.2s;">
+                                        ${imgHtml}
+                                        <div class="flex-grow-1 overflow-hidden d-flex flex-column justify-content-center">
+                                            <div class="text-truncate fw-semibold mb-1" style="font-size: 0.85rem; line-height: 1.2; color: #334155;">${p.name}</div>
+                                            <div>${priceFormat}</div>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                            resultsContainer.innerHTML = html;
+                        }
+                    })
+                    .catch(err => {
+                        if (err.name === 'AbortError') return;
+                        loading.classList.add('d-none');
+                    });
+            }, 300);
+        });
+    }
+
+    // Init for Desktop Setup
+    setupHeaderLiveSearch('desktopSearchInput', 'desktopSearchDropdown', 'desktopSearchResults', 'desktopSearchLoading', 'desktopSearchEmpty');
+    
+    // Init for Mobile Overlay
+    setupHeaderLiveSearch('searchOverlayInput', 'mobileSearchDropdown', 'mobileSearchResults', 'mobileSearchLoading', 'mobileSearchEmpty');
+
 });
+
+window.showCartNotification = function() {
+    const toast = document.getElementById('cartNotification');
+    if (!toast) return;
+    
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+};
 
 /* ── Drawer subcategory accordion (vanilla JS, no jQuery/BS collapse needed) ── */
 function toggleDrawerSub(trigger) {
     const targetId = trigger.getAttribute('data-target');
     const panel = document.getElementById(targetId);
+    if (!panel) return;
+    
     const arrow = trigger.querySelector('.drawer-cat-arrow');
     const isOpen = panel.style.maxHeight && panel.style.maxHeight !== '0px';
 
-    // Close all other open panels first
-    document.querySelectorAll('.drawer-subcats').forEach(function(p) {
-        p.style.maxHeight = '0px';
-    });
-    document.querySelectorAll('.drawer-cat-toggle').forEach(function(t) {
-        t.setAttribute('aria-expanded', 'false');
-        const a = t.querySelector('.drawer-cat-arrow');
-        if (a) a.style.transform = 'rotate(0deg)';
-    });
-
-    // Toggle the clicked one
-    if (!isOpen) {
-        panel.style.maxHeight = panel.scrollHeight + 200 + 'px';
+    if (isOpen) {
+        panel.style.maxHeight = '0px';
+        trigger.setAttribute('aria-expanded', 'false');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    } else {
+        // Just open this one. If we want parents to grow, scrollHeight is enough.
+        panel.style.maxHeight = panel.scrollHeight + 'px';
         trigger.setAttribute('aria-expanded', 'true');
         if (arrow) arrow.style.transform = 'rotate(180deg)';
+        
+        // If nested, we need to update parent's maxHeight
+        let parent = panel.parentElement.closest('.drawer-subcats');
+        while (parent) {
+            parent.style.maxHeight = (parent.scrollHeight + panel.scrollHeight) + 'px';
+            parent = parent.parentElement.closest('.drawer-subcats');
+        }
     }
 }
 </script>

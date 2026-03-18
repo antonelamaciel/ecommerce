@@ -26,3 +26,4 @@ services:
     App\Service\MercadoPagoService:
         arguments:
             $accessToken: '%env(MERCADOPAGO_ACCESS_TOKEN)%'
+
