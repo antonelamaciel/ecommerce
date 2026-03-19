@@ -8,21 +8,26 @@ use App\Service\Shipping\Carrier\NationalCourierCarrier;
 use App\Service\Shipping\Carrier\PickupCarrier;
 use App\Service\Shipping\StoreLocationService;
 
+use App\Repository\CarrierRepository;
+
 class ShippingCalculatorService
 {
     private ProvinceResolver $provinceResolver;
     private StoreLocationService $storeLocationService;
+    private CarrierRepository $carrierRepository;
     private array $carriers;
 
     public function __construct(
         ProvinceResolver $provinceResolver,
         StoreLocationService $storeLocationService,
+        CarrierRepository $carrierRepository,
         MotoCarrier $motoCarrier,
         NationalCourierCarrier $nationalCourierCarrier,
         PickupCarrier $pickupCarrier
     ) {
         $this->provinceResolver = $provinceResolver;
         $this->storeLocationService = $storeLocationService;
+        $this->carrierRepository = $carrierRepository;
         $this->carriers = [
             $pickupCarrier,
             $motoCarrier,
@@ -32,70 +37,89 @@ class ShippingCalculatorService
 
     public function calculateShipping(string $destCp, float $cartTotal): array
     {
-        // 1. obtener código postal de la tienda (configurado en EasyAdmin)
-        $storeCp = $this->storeLocationService->getStorePostalCode();
+        $options = [];
+        $dbCarriers = $this->carrierRepository->findAll();
+        
+        // 1. Separar carriers por tipo
+        $standardCarriers = [];
+        $longDistanceCarriers = [];
+        foreach ($dbCarriers as $c) {
+            if ($c->getType() === 'standard') $standardCarriers[] = $c;
+            if ($c->getType() === 'long_distance') $longDistanceCarriers[] = $c;
+        }
 
-        // 2. normalizar código postal tienda y cliente
-        $originCpInt = $this->provinceResolver->normalizeCp($storeCp);
-        $destCpInt = $this->provinceResolver->normalizeCp($destCp);
-
-        // 3. verificar si son iguales (Early Verification)
-        if ($originCpInt > 0 && $originCpInt === $destCpInt) {
-            $calculatedShippingPrice = 4800.0;
-            
-            // Implementación obligatoria: precio del envío nunca puede superar el 83% del valor del carrito
-            $finalShippingPrice = min($calculatedShippingPrice, $cartTotal * 0.83);
-
-            return [
-                [
-                    'id' => md5('Correo local'),
-                    'name' => 'Correo local',
-                    'price' => $finalShippingPrice,
-                    'eta' => '1-2 días',
-                    'type' => 'standard',
-                    'description' => 'Entrega estimada: 1-2 días'
-                ],
-                [
-                    'id' => md5('Retirar en sucursal'),
-                    'name' => 'Retirar en sucursal',
-                    'price' => 0.0,
-                    'eta' => '-',
-                    'type' => 'pickup',
-                    'description' => 'Retiro gratuito en tienda'
-                ]
+        // 2. Procesar carriers COSTO FIJO (standard)
+        foreach ($standardCarriers as $carrier) {
+            $options[] = [
+                'id' => (string)$carrier->getId(),
+                'name' => $carrier->getName(),
+                'price' => (float)($carrier->getPrice() / 100),
+                'eta' => 'Coordinar con el vendedor',
+                'type' => 'standard',
+                'description' => $carrier->getDescription()
             ];
         }
 
-        // 5. si no son iguales, continuar con flujo habitual
+        // 3. Preparar variables para cálculo dinámico (CP)
+        $storeCp = $this->storeLocationService->getStorePostalCode();
+        $originCpInt = $this->provinceResolver->normalizeCp($storeCp);
+        $destCpInt = $this->provinceResolver->normalizeCp($destCp);
         
         $provOrigin = $this->provinceResolver->getProvinceFromCp($originCpInt);
         $provDest = $this->provinceResolver->getProvinceFromCp($destCpInt);
-
         $coordOrig = $this->provinceResolver->getCapitalCoordinates($provOrigin);
         $coordDest = $this->provinceResolver->getCapitalCoordinates($provDest);
+        $distanceKm = $this->provinceResolver->distanceKm($coordOrig['lat'], $coordOrig['lon'], $coordDest['lat'], $coordDest['lon']);
 
-        $distanceKm = $this->provinceResolver->distanceKm(
-            $coordOrig['lat'], $coordOrig['lon'],
-            $coordDest['lat'], $coordDest['lon']
-        );
+        // Buscamos el motor de cálculo nacional (el que calcula por distancia en distancias largas)
+        /** @var \App\Service\Shipping\Carrier\NationalCourierCarrier $courierEngine */
+        $courierEngine = null;
+        foreach ($this->carriers as $c) {
+            if ($c instanceof NationalCourierCarrier) {
+                $courierEngine = $c;
+                break;
+            }
+        }
 
-        foreach ($this->carriers as $carrier) {
-            if ($carrier->isAvailable($storeCp, $destCp, $distanceKm)) {
-                $calculatedShippingPrice = $carrier->calculatePrice($storeCp, $destCp, $distanceKm);
-                
-                // Implementación obligatoria: precio del envío nunca puede superar el 83% del valor del carrito
-                $finalShippingPrice = min($calculatedShippingPrice, $cartTotal * 0.83);
+        if ($courierEngine) {
+            $calculatedPrice = $courierEngine->calculatePrice($storeCp, $destCp, $distanceKm);
+            $finalPrice = min($calculatedPrice, $cartTotal * 0.83);
 
-                $carrierName = $carrier->getName($storeCp, $destCp);
+            // 4. Procesar carriers LARGA DISTANCIA (DB)
+            foreach ($longDistanceCarriers as $carrier) {
                 $options[] = [
-                    'id' => md5($carrierName),
-                    'name' => $carrierName,
-                    'price' => $finalShippingPrice,
-                    'eta' => $carrier->getEta(),
-                    'type' => ($carrier instanceof PickupCarrier) ? 'pickup' : 'standard', 
-                    'description' => 'Entrega estimada: ' . $carrier->getEta()
+                    'id' => (string)$carrier->getId(),
+                    'name' => $carrier->getName(),
+                    'price' => $finalPrice,
+                    'eta' => $courierEngine->getEta(),
+                    'type' => 'long_distance',
+                    'description' => $carrier->getDescription()
                 ];
             }
+
+            // Fallback: si no hay long_distance en DB pero CP es lejano, mostrar el genérico
+            if ($originCpInt !== $destCpInt && empty($longDistanceCarriers)) {
+                $options[] = [
+                    'id' => 'correo_nacional_fallback',
+                    'name' => 'Correo Nacional',
+                    'price' => $finalPrice,
+                    'eta' => $courierEngine->getEta(),
+                    'type' => 'standard',
+                    'description' => 'Servicio de mensajería para largas distancias'
+                ];
+            }
+        }
+
+        // 5. Pickup (si el CP es el mismo)
+        if ($originCpInt > 0 && $originCpInt === $destCpInt) {
+            $options[] = [
+                'id' => 'pickup_store',
+                'name' => 'Retirar en local',
+                'price' => 0.0,
+                'eta' => '-',
+                'type' => 'pickup',
+                'description' => 'Retiro gratuito en tienda'
+            ];
         }
 
         return $options;

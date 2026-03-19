@@ -264,7 +264,7 @@
                     Dirección de Envío
                 </div>
                 <div class="info-card__content">
-                    {{ order.delivery|raw }}
+                    <small>{{ order.delivery|raw }}</small>
                 </div>
             </div>
 
@@ -332,11 +332,10 @@
                                         <i class="bi {{ carrier.type == 'pickup' ? 'bi-geo-alt' : 'bi-truck' }}"></i>
                                     </div>
                                     <div class="selection-card__info">
-                                        
-                                        <div class="selection-card__desc">
-                                            {{ carrier.description }}
-                                        </div>
-                                    </div>
+                                         <div class="selection-card__name">
+                                             {{ carrier.name }}
+                                         </div>
+                                     </div>
                                     <div class="selection-card__price">
                                         {% if carrier.price == 0 %}
                                             Gratis
@@ -561,7 +560,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedCarrier = pickupInput.value;
                 checkConfirmation(); // Enable button immediately for better UX
                 updateCarrierOnServer(pickupInput.value);
-                return;
             }
         } else {
             // Show all carriers

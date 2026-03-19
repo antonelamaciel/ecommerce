@@ -133,14 +133,30 @@ class CartController extends AbstractController
         try {
             $options = $calculator->calculateShipping($cp, $cartDetails['totals']['price'] / 100);
             
-            // Format prices for JSON response
-            foreach ($options as &$opt) {
-                $opt['formatted'] = ($opt['price'] > 0) ? '$ ' . number_format($opt['price'], 2, ',', '.') : 'Gratis';
+            // Simplificar para mostrar solo lo solicitado por el usuario
+            $shippingPrice = 0;
+            foreach ($options as $opt) {
+                if ($opt['type'] !== 'pickup') {
+                    $shippingPrice = max($shippingPrice, $opt['price']);
+                }
             }
 
-            return $this->json(['success' => true, 'options' => $options]);
+            $simplifiedOptions = [
+                [
+                    'name' => 'Envío por correo',
+                    'formatted' => '$ ' . number_format($shippingPrice, 2, ',', '.'),
+                    'eta' => 'Entrega estimada: 3-7 días'
+                ],
+                [
+                    'name' => 'Retirar en sucursal',
+                    'formatted' => '¡Gratis!',
+                    'eta' => 'Retiro inmediato'
+                ]
+            ];
+
+            return $this->json(['success' => true, 'options' => $simplifiedOptions]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Error al calcular envío: ' . $e->getMessage()], 500);
+            return $this->json(['error' => 'Error al calcular envío'], 500);
         }
     }
 }

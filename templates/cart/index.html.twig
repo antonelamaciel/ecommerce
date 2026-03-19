@@ -406,7 +406,7 @@
                         Ver info de envíos
                     </button>
 
-                    <p class="small text-muted mb-0 mt-3" style="line-height: 1.4;">El envío y los impuestos finales se calcularán en el siguiente paso.</p>
+                    <p class="small text-muted mb-0 mt-3" style="line-height: 1.4;">El envío y los impuestos finales se calcularán en los proximos pasos.</p>
 
                     <div class="summary-row total mb-3">
                         <span class="total-label">Subtotal estimado</span>
@@ -607,15 +607,42 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="modal-body p-4">
                 <div class="selection-list">
+                    {# 1. Retiro en Sucursal (Manual/Configurado en Personalize) #}
                     <div class="selection-card">
                         <div class="selection-card__body">
                             <div class="selection-card__icon"><i class="bi bi-geo-alt"></i></div>
                             <div class="selection-card__info">
-                                <div class="selection-card__name">Retiro en sucursal <span class="text-success small fw-bold ms-1">GRATIS</span></div>
+                                <div class="selection-card__name">Retiro en local <span class="text-success small fw-bold ms-1">GRATIS</span></div>
                                 <div class="selection-card__desc">{{ personalize.address }}</div>
                             </div>
                         </div>
                     </div>
+
+                    {# 2. Envíos Dinámicos desde el Backend (Costo Fijo) #}
+                    {% for carrier in carriers %}
+                        {% if carrier.type == 'standard' %}
+                            <div class="selection-card">
+                                <div class="selection-card__body">
+                                    <div class="selection-card__icon"><i class="bi bi-truck"></i></div>
+                                    <div class="selection-card__info">
+                                        <div class="selection-card__name">
+                                            {{ carrier.name }}
+                                            <span class="text-success small fw-bold ml-2">
+                                                {% if carrier.price == 0 %}
+                                                    GRATIS
+                                                {% else %}
+                                                    $ {{ (carrier.price / 100)|number_format(2, ',', '.') }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="selection-card__desc">{{ carrier.description }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# 3. Envíos por Coordinar (Manual/WhatsApp) #}
                     <div class="selection-card">
                         <div class="selection-card__body">
                             <div class="selection-card__icon text-success"><i class="bi bi-whatsapp"></i></div>
@@ -629,9 +656,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
 
+                    {# 4. Nota informativa sobre otros métodos #}
                     <div class="selection-card">
                         <div class="selection-card__body">
-                           <small class="text-muted">Al final del pedido te mostraremos otros metodos de envío dependiendo de tu ubicación y método de pago.</small>
+                           <small class="text-muted">Calcularemos otros métodos (como correos nacionales) según tu Código Postal en el siguiente paso.</small>
                         </div>
                     </div>
                 </div>
