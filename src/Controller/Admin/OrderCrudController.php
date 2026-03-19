@@ -16,6 +16,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\HttpFoundation\Response;
+
 class OrderCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -25,8 +29,13 @@ class OrderCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions 
     {
+        $modify = Action::new('modify', 'Modificar', 'fa fa-edit')
+            ->linkToCrudAction(Action::EDIT)
+            ->setCssClass('btn btn-secondary');
+
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_DETAIL, $modify)
             ->remove(Crud::PAGE_INDEX, Action::NEW)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
             ->remove(Crud::PAGE_DETAIL, Action::DELETE);
@@ -71,9 +80,10 @@ class OrderCrudController extends AbstractCrudController
             DateTimeField::new('createdAt', 'Fecha del pedido')->hideOnIndex()->setFormTypeOptions(['attr' => ['readonly' => true]]),
             TextField::new('user.fullName', 'Cliente')->hideOnForm(),
             TextField::new('productSummary', 'Resumen Productos')->onlyOnIndex(),
-            MoneyField::new('total')->setCurrency('ARS')->hideOnForm(),
+            MoneyField::new('total', 'Total')->setCurrency('ARS'),
+            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS'),
             MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS')->setFormTypeOptions(['attr' => ['readonly' => true]]),
-            ChoiceField::new('state', 'Estado del pedido')->setChoices([
+            ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,
                 'Pagado' => 1,
                 'En preparación' => 2,

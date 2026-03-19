@@ -628,9 +628,16 @@
             document.addEventListener('click', function(e) {
                 const btn = e.target.closest('.pcard__buy-btn');
                 if (!btn || btn.getAttribute('id') === 'pd-submit') return; 
+
+                const item = btn.closest('.pcard');
+                if (item && item.dataset.stock && parseInt(item.dataset.stock) <= 0) {
+                    return;
+                }
                 
                 e.preventDefault();
-                const url = new URL(btn.href);
+                const urlStr = btn.dataset.addCartUrl || btn.href;
+                if (!urlStr) return;
+                const url = new URL(urlStr, window.location.origin);
                 url.searchParams.set('ajax', '1');
                 
                 const originalHtml = btn.innerHTML;

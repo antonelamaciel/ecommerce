@@ -13,12 +13,14 @@ use App\Entity\User;
 use App\Entity\FAQ;
 use App\Entity\ShippingReturn;
 use App\Entity\About;
+use App\Entity\Supplier;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Controller\Admin\NotificationCrudController;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DashboardController extends AbstractDashboardController
@@ -58,8 +60,22 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
+        /** @var EntityManagerInterface $em */
+        $em = $this->container->get('doctrine')->getManager();
+        $notificationCount = $em->getRepository(Order::class)->count(['isRead' => false]);
+
         yield MenuItem::linkToDashboard('Inicio', 'fa fa-th-large');
         yield MenuItem::linkToUrl('Ver Web', 'fas fa-external-link-alt', '/');
+
+        // Sección de Notificaciones
+        if ($notificationCount > 0) {
+            yield MenuItem::linkToCrud('Notificaciones', 'fas fa-bell', Order::class)
+                ->setController(NotificationCrudController::class)
+                ->setBadge($notificationCount, 'danger');
+        } else {
+            yield MenuItem::linkToCrud('Notificaciones', 'fas fa-bell', Order::class)
+                ->setController(NotificationCrudController::class);
+        }
 
         yield MenuItem::subMenu('Ventas', 'fas fa-shopping-basket')->setSubItems([
             MenuItem::linkToCrud('Pedidos', 'fas fa-clipboard-list', Order::class),
@@ -69,6 +85,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Catálogo', 'fas fa-tags')->setSubItems([
             MenuItem::linkToCrud('Productos', 'fas fa-box', Product::class),
             MenuItem::linkToCrud('Categorías', 'fas fa-folder-open', Category::class),
+            MenuItem::linkToCrud('Proveedores', 'fas fa-truck-loading', Supplier::class),
             MenuItem::linkToCrud('Promociones', 'fas fa-fire', Bundle::class),
         ]);
 

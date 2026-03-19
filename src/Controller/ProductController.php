@@ -53,17 +53,12 @@ class ProductController extends AbstractController
         $relatedProducts = array_filter($relatedProducts, function($p) use ($product) {
             return $p->getId() !== $product->getId();
         });
-        $relatedProducts = array_slice($relatedProducts, 0, 7);
 
         // Fallback to random products if there are less than 7
         if (count($relatedProducts) < 7) {
             $allProducts = $repository->findAll();
-            $allProducts = array_filter($allProducts, function($p) use ($product, $relatedProducts) {
-                if ($p->getId() === $product->getId()) return false;
-                foreach ($relatedProducts as $rp) {
-                    if ($rp->getId() === $p->getId()) return false;
-                }
-                return true;
+            $allProducts = array_filter($allProducts, function($p) use ($product) {
+                return $p->getId() !== $product->getId();
             });
             
             shuffle($allProducts);
@@ -71,6 +66,17 @@ class ProductController extends AbstractController
             $randomProducts = array_slice($allProducts, 0, $needed);
             $relatedProducts = array_merge($relatedProducts, $randomProducts);
         }
+
+        // Ensure absolute uniqueness by ID
+        $uniqueRelated = [];
+        $ids = [];
+        foreach ($relatedProducts as $p) {
+            if (!isset($ids[$p->getId()])) {
+                $ids[$p->getId()] = true;
+                $uniqueRelated[] = $p;
+            }
+        }
+        $relatedProducts = array_slice($uniqueRelated, 0, 7);
 
         return $this->render('product/show.html.twig', [
             'product' => $product,

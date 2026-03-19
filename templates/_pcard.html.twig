@@ -1,5 +1,4 @@
 {# templates/_pcard.html.twig #}
-{% set product = product %}
 {% set is_popular = is_popular|default(false) %}
 {% set buy_btn_text = buy_btn_text|default('Comprar') %}
 {% set suffix = suffix|default('gen') %}
@@ -10,7 +9,8 @@
 <article class="pcard" 
          data-price="{{ finalPrice }}"
          data-stock="{{ product.stock }}"
-         data-date="{{ product.id }}">
+         data-date="{{ product.id }}"
+         data-url="{{ path('product_show', {slug: product.slug}) }}">
          
     {% if is_popular %}
         <span class="pcard__badge mt-2">Popular</span>

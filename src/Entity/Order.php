@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
+#[ORM\HasLifecycleCallbacks]
 class Order
 {
     #[ORM\Id]
@@ -47,9 +48,68 @@ class Order
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $paymentMethod = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $isRead = false;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $grossProfit = 0;
+
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
+        $this->isRead = false;
+        $this->grossProfit = 0;
+    }
+
+    public function getGrossProfit(): ?float
+    {
+        return $this->grossProfit;
+    }
+
+    public function setGrossProfit(?float $grossProfit): self
+    {
+        $this->grossProfit = $grossProfit;
+
+        return $this;
+    }
+
+    /**
+     * Recalculates the gross profit based on current order details.
+     * Useful when creating the order.
+     */
+    public function calculateGrossProfit(): float
+    {
+        $profit = 0;
+        foreach ($this->getOrderDetails() as $detail) {
+            $cost = $detail->getPurchaseCost() ?? 0;
+            $profit += ($detail->getPrice() - $cost) * $detail->getQuantity();
+        }
+        $this->grossProfit = $profit;
+        return $profit;
+    }
+
+    public function isRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): self
+    {
+        $this->isRead = $isRead;
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(?string $paymentMethod): self
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
     }
 
     public function getId(): ?int
@@ -203,18 +263,6 @@ class Order
         return $this;
     }
 
-    public function getPaymentMethod(): ?string
-    {
-        return $this->paymentMethod;
-    }
-
-    public function setPaymentMethod(?string $paymentMethod): self
-    {
-        $this->paymentMethod = $paymentMethod;
-
-        return $this;
-    }
-
     /**
      * Virtual property for EasyAdmin index summary
      */
@@ -226,5 +274,12 @@ class Order
             $summary[] = $detail->getProduct() . $variants . " x" . $detail->getQuantity();
         }
         return implode(", ", $summary);
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateGrossProfit(): void
+    {
+        $this->calculateGrossProfit();
     }
 }

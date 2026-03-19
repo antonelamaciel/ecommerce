@@ -32,6 +32,9 @@ class OrderDetails
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $variants = null;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $purchaseCost = null;
+
     #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Product $productObject = null;
@@ -128,5 +131,17 @@ class OrderDetails
     public function __toString()
     {
         return $this->getProduct() . 'x' . $this->getQuantity();
+    }
+
+    public function getPurchaseCost(): ?float
+    {
+        return $this->purchaseCost;
+    }
+
+    public function setPurchaseCost(?float $purchaseCost): self
+    {
+        $this->purchaseCost = $purchaseCost;
+
+        return $this;
     }
 }

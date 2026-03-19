@@ -118,10 +118,15 @@ class OrderController extends AbstractController
                     ->setVariants($item['variants'])
                     ->setQuantity($item['quantity'])
                     ->setPrice($item['product']->getPrice())
+                    ->setPurchaseCost($item['product']->getPurchaseCost())
                     ->setTotal($item['product']->getPrice() * $item['quantity'])
                 ;
                 $em->persist($orderDetails);
             }
+
+            // Calcul de la ganancia bruta
+            $order->calculateGrossProfit();
+            
             $em->flush();
 
             $cartProducts = $cart->getDetails();

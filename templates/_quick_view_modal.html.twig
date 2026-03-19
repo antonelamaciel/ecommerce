@@ -276,6 +276,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    // Si no hay stock, no abrimos el popup
+    const stock = item.dataset.stock;
+    if (stock !== "" && stock !== null && stock !== undefined && parseInt(stock) <= 0) {
+        return;
+    }
+    
     const imgEl = item.querySelector('.pcard__img');
     const nameEl = item.querySelector('.pcard__name-text');
     const pillsWrap = item.querySelector('.pcard__pills-wrap');

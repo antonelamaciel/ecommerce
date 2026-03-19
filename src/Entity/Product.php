@@ -9,8 +9,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Product
 {
+    #[ORM\PrePersist]
+    public function generateSlug(): void
+    {
+        if (!$this->slug) {
+            $base = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->name)));
+            $this->slug = $base . '-' . bin2hex(random_bytes(3));
+        }
+    }
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -30,12 +39,10 @@ class Product
     #[ORM\Column(type: 'json', nullable: true)]
     private $images = [];
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $subtitle;
 
-    #[ORM\Column(type: 'text')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     #[ORM\Column(type: 'float')]
@@ -66,11 +73,56 @@ class Product
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductOption::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $options;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $purchaseCost = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $purchaseDate = null;
+
+    #[ORM\ManyToOne(targetEntity: Supplier::class, inversedBy: 'products')]
+    private ?Supplier $supplier = null;
+
     public function __construct()
     {
         $this->subcategories = new ArrayCollection();
         $this->bundles = new ArrayCollection();
         $this->options = new ArrayCollection();
+    }
+
+    public function getSupplier(): ?Supplier
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?Supplier $supplier): self
+    {
+        $this->supplier = $supplier;
+
+        return $this;
+    }
+
+    public function getPurchaseCost(): ?float
+    {
+        return $this->purchaseCost;
+    }
+
+    public function setPurchaseCost(?float $purchaseCost): self
+    {
+        $this->purchaseCost = $purchaseCost;
+
+        return $this;
+    }
+
+    public function getPurchaseDate(): ?\DateTimeInterface
+    {
+        return $this->purchaseDate;
+    }
+
+    public function setPurchaseDate(?\DateTimeInterface $purchaseDate): self
+    {
+        $this->purchaseDate = $purchaseDate;
+
+        return $this;
     }
 
     public function __toString(): string

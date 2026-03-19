@@ -186,6 +186,7 @@
 
   .related-track { 
     display: flex;
+    flex-wrap: nowrap;
     gap: 1.5rem; 
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
@@ -303,7 +304,7 @@
 
                 {% if product.stock is not null %}
                     <span class="stock-badge" style="background:{{ product.stock <= 0 ? '#fff0f0; color:#dc3545;' : '#f0fff5; color:#198754;' }}">
-                        {{ product.stock <= 0 ? 'Sin stock' : (product.stock <= 5 ? 'Últimas ' ~ product.stock ~ ' unid.' : 'En stock') }}
+                        {{ product.stock <= 0 ? 'Sin stock' : (product.stock <= 5 ? 'Última(s) ' ~ product.stock ~ ' unid.' : 'En stock') }}
                     </span>
                 {% endif %}
             </div>
@@ -364,7 +365,11 @@
                 <form id="product-add-form" action="{{ path('add_to_cart', {id: product.id}) }}" method="GET" style="flex-grow: 1;">
                     <input type="hidden" name="variants" id="variants-input">
                     <button type="submit" id="pd-submit" class="add-cart-btn w-100 py-3" {{ product.stock is not null and product.stock <= 0 ? 'disabled' : '' }}>
-                        <i class="bi bi-bag-plus"></i> Añadir al carrito
+                        {% if product.stock is not null and product.stock <= 0 %}
+                            Sin stock
+                        {% else %}
+                            <i class="bi bi-bag-plus"></i> Añadir al carrito
+                        {% endif %}
                     </button>
                 </form>
             </div>
@@ -405,7 +410,12 @@
             <div class="related-track" id="related-track">
                 {% for related in relatedProducts %}
                     <div class="pcard-wrapper">
-                        {% include "_pcard.html.twig" with {'product': related, 'is_related': true} %}
+                        {% include "_pcard.html.twig" with {
+                            'product': related, 
+                            'is_related': true,
+                            'personalize': personalize,
+                            'suffix': 'rel'
+                        } only %}
                     </div>
                 {% endfor %}
             </div>
@@ -573,10 +583,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             function updateSlider(animate = true) {
-                const itemWidth = track.parentElement.offsetWidth / getItemsInView();
-                const gap = 24; // 1.5rem
-                const move = index * (itemWidth);
+                const firstItem = track.children[0];
+                if (!firstItem) return;
                 
+                const itemWidth = firstItem.offsetWidth;
+                const gap = 24; // 1.5rem (matches gap: 1.5rem)
+                
+                // On mobile it might be different, let's get it from computed style
+                const computedGap = parseInt(window.getComputedStyle(track).gap) || 24;
+                
+                const move = index * (itemWidth + computedGap);
+                
+                track.style.flexWrap = 'nowrap';
                 track.style.transition = animate ? 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
                 track.style.transform = `translateX(-${move}px)`;
             }
@@ -613,6 +631,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Initial position
             setTimeout(() => updateSlider(false), 100);
+
+            // Plan B: Forza Re direccion en clics al carril de recomendados
+            track.addEventListener('click', (e) => {
+                const card = e.target.closest('.pcard');
+                const buyBtn = e.target.closest('.pcard__buy-btn');
+                
+                // Si pulsamos la tarjeta pero NO el boton de comprar (que el popup ya maneja)
+                if (card && !buyBtn) {
+                    const url = card.getAttribute('data-url');
+                    if (url) {
+                        window.location.href = url;
+                    }
+                }
+            });
         }
     }
 
