@@ -73,8 +73,8 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Logística', 'fas fa-truck-moving')->setSubItems([
-            MenuItem::linkToCrud('Envíos', 'fas fa-truck', Carrier::class),
-            MenuItem::linkToCrud('Devoluciones', 'fas fa-undo-alt', ShippingReturn::class),
+            MenuItem::linkToCrud('Transportistas', 'fas fa-truck', Carrier::class),
+            MenuItem::linkToCrud('Envíos y Devoluciones', 'fas fa-undo-alt', ShippingReturn::class),
         ]);
 
         yield MenuItem::subMenu('Diseño', 'fas fa-palette')->setSubItems([

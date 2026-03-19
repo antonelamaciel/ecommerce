@@ -8,6 +8,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 class CategoryCrudController extends AbstractCrudController
@@ -34,11 +36,16 @@ class CategoryCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name', 'Nombre'),
-            \EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField::new('subcategories', 'Subcategorías')
+            TextField::new('name', 'Nombre')
+                ->setHelp('Titulo identificativo de la categoria (Ej: talles)'),
+            ArrayField::new('subcategories', 'Subcategorías')
+                ->hideOnForm(),
+            CollectionField::new('subcategories', 'Subcategorías')
+                ->setHelp('Subcategorias de la categoria (Ej: talle S, talle M, talle L)')
                 ->setEntryType(\App\Form\SubcategoryType::class)
                 ->showEntryLabel(false)
                 ->setFormTypeOptions(['by_reference' => false])
+                ->onlyOnForms(),
         ];
     }
 }

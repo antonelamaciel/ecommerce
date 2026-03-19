@@ -36,8 +36,10 @@ class FAQCrudController extends AbstractCrudController
     {
         return [
             TextField::new('question', 'Pregunta'),
-            TextEditorField::new('answer', 'Respuesta'),
-            BooleanField::new('isPublished', 'Publicada'),
+            TextEditorField::new('answer', 'Respuesta')->hideOnDetail()->hideOnIndex(),
+            TextEditorField::new('answer', 'Respuesta')->hideOnDetail()->hideOnForm()->hideOnIndex(),
+            TextField::new('answer', 'Respuesta')->hideOnForm()->hideOnIndex()->renderAsHtml(),
+            BooleanField::new('isPublished', 'Publicada')->setHelp('Si esta marcado, esta pregunta se mostrara en la pagina de preguntas frecuentes'),
         ];
     }
 }

@@ -16,10 +16,10 @@ class About
     #[ORM\Column(type: 'string', length: 255)]
     private $title;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $content;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $priority = 0;
 
     #[ORM\Column(type: 'boolean')]

@@ -1,0 +1,14 @@
+{# templates/admin/fields/category_subcategories_detail.html.twig #}
+{% set subcategories = field.value|default([]) %}
+
+{% if subcategories is empty %}
+    <span class="text-muted small italic">Sin subcategorías cargadas</span>
+{% else %}
+    <div class="d-flex flex-wrap gap-2 mt-1">
+        {% for sub in subcategories %}
+            <span class="badge bg-secondary px-3 py-2" style="font-size: 0.85rem; border-radius: 12px; font-weight: 500;">
+                {{ sub.name|default(sub.toString|default(sub)) }}
+            </span>
+        {% endfor %}
+    </div>
+{% endif %}

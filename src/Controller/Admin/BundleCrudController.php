@@ -78,6 +78,10 @@ class BundleCrudController extends AbstractCrudController
                         margin-right: 0 !important;
                     }
                 } 
+
+                .content-header{
+                z-index: 1200 !important;
+                }
                     
             </style>
             
@@ -120,11 +124,11 @@ class BundleCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Configuración General')->setCssClass('padded-internal-panel'),
+            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Configuración General')->setCssClass('padded-internal-panel')->hideOnDetail(),
             TextField::new('title', 'Título de la promo')
             ->setHelp('Esto te ayudara a identificar la promo en el panel de administración.'),
 
-            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Productos')->setCssClass('padded-internal-panel'),
+            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('1. Productos')->setCssClass('padded-internal-panel')->hideOnDetail(),
             ChoiceField::new('type', 'Etiqueta Lateral')
                 ->setChoices([
                     'Ninguna' => '',
@@ -132,11 +136,11 @@ class BundleCrudController extends AbstractCrudController
                     'Últimos en stock!' => 'ultimos_stock',
                     'Apurate, quedan pocas unidades!' => 'pocas_unidades',
                 ])
-                ->setHelp('Aparecera del alado del nombre de cada producto seleccionado.')
+                ->setHelp('Aparecera del alado del nombre de cada "producto seleccionado".')
                 ->setRequired(false),
 
             \EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField::new('discountPercentage', 'descuento (%)')
-                ->setHelp('Aplica un descuento automático a todos los productos seleccionados. Dejar vacío si no quieres hacer un descuento.')
+                ->setHelp('Aplica un descuento automático a todos los "productos seleccionados". Dejar vacío si no quieres hacer un descuento.')
                 ->setRequired(false),
             ChoiceField::new('topRightBadge', 'Etiqueta Superior Derecha')
                 ->setChoices([
@@ -156,11 +160,11 @@ class BundleCrudController extends AbstractCrudController
                         return ['data-image' => '/uploads/' . ($choice->getImage() ?: 'default.png')];
                     },
                 ])
-                ->setHelp('Busca los productos a los que deseas aplicar esta etiqueta especial.'),
+                ->setHelp('Busca los productos a los que deseas aplicar estas etiquetas y descuento.'),
 
-            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Cuenta Regresiva')->setCssClass('padded-internal-panel'),
+            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('2. Cuenta Regresiva')->setCssClass('padded-internal-panel')->hideOnDetail(),
             TextField::new('countdownTitle', 'Ocasión cuenta regresiva')
-                ->setHelp('Ej: Black Friday, Cyber Monday, Promoción Especial. Aparecerá con un emoji de fuego.')
+                ->setHelp('Ej: Black Friday, Cyber Monday, Promoción Especial. Aparecerá primero en el inicio.')
                 ->setMaxLength(30)
                 ->setFormTypeOptions(['attr' => ['maxlength' => 30]])
                 ->setRequired(false),
@@ -171,19 +175,19 @@ class BundleCrudController extends AbstractCrudController
                 ->setRequired(false)
                 ->hideOnIndex(),
             \EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField::new('countdownHours', 'Tiempo (Horas)')
-                ->setHelp('Agrega la cantidad de horas. Si cambias este valor, el contador SE REINICIARÁ desde ahora.')
+                ->setHelp('Agrega la cantidad de horas que dura la cuenta regresiva. Si cambias este valor, el contador SE REINICIARÁ desde ahora.')
                 ->setRequired(false),
             \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('isPromoActive', 'Cuenta Regresiva Activa')
                 ->setHelp('Activa o desactiva el banner de la promo en el inicio.'),
 
-            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Banner Superior (Ancho Total)')->setCssClass('padded-internal-panel'),
+            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('3. Banner Superior (Ancho Total)')->setCssClass('padded-internal-panel')->hideOnDetail(),
             TextField::new('bannerText', 'Texto del Banner')
-                ->setHelp('Ej: ¡Envío GRATIS en compras superiores a $50,000!'),
+                ->setHelp('Aparecera justo debajo del menu y se ira desplazando. Ej: ¡Envío GRATIS en compras superiores a $50,000!'),
             \EasyCorp\Bundle\EasyAdminBundle\Field\ColorField::new('bannerColor', 'Color del Banner')
                 ->setHelp('Selecciona el color de fondo para el banner.')
                 ->setCssClass('wide-color-field'),
             \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('isBannerActive', 'Banner Activo')
-                ->setHelp('Si se activa, aparecerá un cartel de ancho total debajo del contador.'),
+                ->setHelp('Si se activa sera visible para el cliente, sino, no lo sera.'),
         ];
     }
 }

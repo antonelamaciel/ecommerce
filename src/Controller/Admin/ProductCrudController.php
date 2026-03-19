@@ -48,7 +48,10 @@ class ProductCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name', 'Nombre')->setRequired(true),
+            \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Información Básica')
+                ->addCssClass('padded-internal-panel'),
+            TextField::new('name', 'Nombre')->setRequired(true)
+            ->setHelp('Nombre del producto visible en la tienda'),
             SlugField::new('slug')->setTargetFieldName('name')->hideOnIndex(),
 
             // --- PORTADA ---
@@ -57,7 +60,8 @@ class ProductCrudController extends AbstractCrudController
                 ->setUploadDir('public/uploads/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false)
-                ->onlyOnForms(),
+                ->onlyOnForms()
+                ->setHelp('Portada del producto visible en la tienda'),
 
             TextField::new('image_preview', 'Portada actual')
                 ->onlyOnForms()
@@ -71,6 +75,7 @@ class ProductCrudController extends AbstractCrudController
             // --- GALERÍA (Colección dinámica de EasyAdmin) ---
             Field::new('imagesUpload', 'Galería de imágenes')
                 ->setFormType(FileType::class)
+                ->setHelp('Galería de imágenes del producto visible en la tienda')
                 ->setFormTypeOptions([
                     'multiple' => true,
                     'mapped' => false,
@@ -91,21 +96,30 @@ class ProductCrudController extends AbstractCrudController
                 ->hideOnIndex()
                 ->setTemplatePath('admin/fields/product_images_gallery.html.twig'),
 
-            TextField::new('subtitle', 'Subtítulo')->hideOnIndex()->setRequired(false),
-            TextareaField::new('description', 'Descripción')->hideOnIndex()->setRequired(false),
-            MoneyField::new('price', 'Precio')->setCurrency('ARS')->setRequired(true),
-            IntegerField::new('stock', 'Cantidad de Stock (opcional)')
-                ->setRequired(false)
-                ->setHelp('Unidades disponibles en inventario.'),
-            MoneyField::new('oldPrice', 'Precio Tachado (ARS)')
-                ->setCurrency('ARS')
-                ->setRequired(false)
-                ->setHelp('Precio anterior que aparecerá tachado.'),
-            AssociationField::new('category', 'Categoría')->setRequired(true),
+            TextField::new('subtitle', 'Subtítulo')->hideOnIndex()->setRequired(false)
+            ->setHelp('Subtítulo del producto visible en la tienda'),
+            TextareaField::new('description', 'Descripción')->hideOnIndex()->setRequired(false)
+            ->setHelp('Descripción del producto visible en la tienda'),
+            AssociationField::new('category', 'Categoría')->setRequired(true)
+            ->setHelp('Categoría principal del producto'),
             AssociationField::new('subcategories', 'Subcategorías')
+            ->setHelp('Categorias mas especificas del producto')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->hideOnIndex(),
+            MoneyField::new('price', 'Precio')->setCurrency('ARS')->setRequired(true)
+            ->setHelp('Precio del producto visible en la tienda'),
+            MoneyField::new('oldPrice', 'Precio Tachado (ARS)')
+            ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).')
+            ->setCurrency('ARS')
+                ->setRequired(false)
+                ->setHelp('Precio anterior que aparecerá tachado.'),
+            IntegerField::new('stock', 'Cantidad de Stock (opcional)')
+            ->setHelp('Unidades disponibles en inventario (no obligatorio).')
+                ->setRequired(false)
+                ->setHelp('Unidades disponibles en inventario.'),
+           
             BooleanField::new('isInHome', 'Producto Destacado')
+            ->setHelp('El producto aparecera entre los primeros en la pagina de inicio? si/no.')
                 ->setFormTypeOption('disabled', $pageName === Crud::PAGE_INDEX),
 
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Opciones del Producto'),
@@ -437,6 +451,14 @@ class ProductCrudController extends AbstractCrudController
     }
     .v-clear-opt:hover {
         background: #fee2e2;
+    }
+    @media (max-width: 768px) {
+        .content-wrapper,
+        .field-form_panel{
+            width: 330px !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
     }
 </style>
 HTML

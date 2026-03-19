@@ -64,43 +64,43 @@ class PersonalizeCrudController extends AbstractCrudController
         ];
 
         return [
-            Field\FormField::addPanel('Información General')->setCssClass('padded-internal-panel'),
+            Field\FormField::addPanel('Información General')->setCssClass('padded-internal-panel')->hideOnDetail(),
             Field\TextField::new('companyName', 'Nombre de la empresa')->setRequired(true),
-            Field\ImageField::new('logo')
+            Field\ImageField::new('logo', "Logo de la empresa")
                 ->setBasePath('uploads/logo/')
                 ->setUploadDir('public/uploads/logo/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false),
 
-            Field\FormField::addPanel('Ubicación')->setCssClass('padded-internal-panel'),
-            Field\TextField::new('postal', 'C.P. (Código Postal)')
-                ->hideOnIndex(),
+            Field\FormField::addPanel('Ubicación de la empresa')->setCssClass('padded-internal-panel')->hideOnDetail(),
             Field\ChoiceField::new('province', 'Provincia')
                 ->setChoices($provinces)
-                ->setFormTypeOption('placeholder', 'Selecciona una provincia') 
+                ->setFormTypeOption('placeholder', 'Busca la provincia de la empresa ...') 
                 ->hideOnIndex(),
             
             Field\TextField::new('city', 'Localidad')
                 ->setFormTypeOption('attr', [
                     'data-current-city' => true,
-                    'placeholder' => 'Selecciona una localidad'
+                    'placeholder' => 'Busca la localidad de la empresa ...'
                 ])
                 ->hideOnIndex(),
+            Field\TextField::new('postal', 'C.P. (Código Postal)')
+                ->hideOnIndex(),    
+            Field\TextField::new('address', 'Dirección Exacta del local'),
 
-            Field\TextField::new('address', 'Dirección Exacta'),
+            Field\FormField::addPanel('Branding (Colores)')->setCssClass('padded-internal-panel')->hideOnDetail(),
+            Field\ColorField::new('primaryColor', 'Color primario')
+                ->setHelp('Color principal de la empresa, sera el color de fondo del menu y otros items'),
+            Field\ColorField::new('tertiaryColor', 'Color de textos y botones') ->setHelp('Sera el color principal de los textos y botones'),
+            Field\ColorField::new('secondaryColor', 'Color extras') ->setHelp('Sera el color de algunos pocos items y botones'),
 
-            Field\FormField::addPanel('Branding (Colores)')->setCssClass('padded-internal-panel'),
-            Field\ColorField::new('primaryColor', 'Color primario'),
-            Field\ColorField::new('secondaryColor', 'Color secundario'),
-            Field\ColorField::new('tertiaryColor', 'Color de textos y botones'),
-
-            Field\FormField::addPanel('Contacto Principal y Pagos')->setCssClass('padded-internal-panel'),
-            Field\TextField::new('whatsapp', 'WhatsApp (ej: +549...)'),
-            Field\EmailField::new('email', 'Email de contacto')
+            Field\FormField::addPanel('Contacto Principal de la Empresa y Pagos')->setCssClass('padded-internal-panel')->hideOnDetail(),
+            Field\TextField::new('whatsapp', 'WhatsApp de la Empresa (ej: +549...)'),
+            Field\EmailField::new('email', 'Email de la Empresa')
                 ->hideOnIndex(),
-            Field\TextField::new('aliasCbu', 'Alias o CBU (para transferencias)')->setRequired(true),
+            Field\TextField::new('aliasCbu', 'Alias o CBU')->setRequired(true)->setHelp('Alias o CBU de la cuenta en la que los clientes haran el deposito del dinero.'),
 
-            Field\FormField::addPanel('Redes Sociales')->setCssClass('padded-internal-panel'),
+            Field\FormField::addPanel('Redes Sociales de la empresa')->setCssClass('padded-internal-panel')->hideOnDetail(),
             Field\TextField::new('instagram', 'Instagram URL')
                 ->hideOnIndex(),
             Field\TextField::new('twitter', 'Twitter / X URL')

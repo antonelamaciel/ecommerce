@@ -35,10 +35,13 @@ class ShippingReturnCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('title', 'Título'),
-            TextField::new('icon', 'Icono Bootstrap bi')->setHelp('Icono Bootstrap bi (ej: bi-truck, bi-box-seam)')->setRequired(false),
-            TextEditorField::new('content', 'Contenido'),
-            BooleanField::new('isPublished', 'Publicada'),
+            TextField::new('title', 'Título')
+            ->setHelp('por ej: Envíos, Retiros, Garantías'),
+            TextField::new('icon', 'Icono Bootstrap bi')->setHelp('Icono Bootstrap bi (ej: "bi-truck" {camion}, "bi-box-seam" {caja} )')->setRequired(false),
+            TextField::new('content', 'Contenido')->onlyOnIndex()->renderAsHtml(),
+            TextField::new('content', 'Contenido')->onlyOnDetail()->renderAsHtml(),
+            TextEditorField::new('content', 'Contenido')->onlyOnForms() ->setHelp('por ej: Esta es nuestra política de envío/devolución: "..."'),
+            BooleanField::new('isPublished', 'Mostrar en el sitio web')->setHelp('Mostraras esta política en el sitio web? si/no'),
         ];
     }
 }

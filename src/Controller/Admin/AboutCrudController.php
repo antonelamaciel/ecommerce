@@ -37,10 +37,13 @@ class AboutCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('title', 'Título'),
-            TextEditorField::new('content', 'Contenido'),
-            IntegerField::new('priority', 'Prioridad'),
-            BooleanField::new('isPublished', 'Publicada'),
+            TextField::new('title', 'Título')
+            ->setHelp('Titulo que se mostrara en la seccion, por ej: sobre nosotros, nuestra mision, nuestros comienzos, etc.'),
+            TextField::new('content', 'Contenido')->onlyOnDetail()->renderAsHtml()->setRequired(false),
+            TextEditorField::new('content', 'Contenido')->onlyOnForms()->setRequired(false),
+            IntegerField::new('priority', 'Prioridad')->setRequired(false)
+            ->setHelp('prioridad 1: se muestra primero, prioridad 2: se muestra segundo, etc.'),
+            BooleanField::new('isPublished', 'Publicada')->setRequired(false),
         ];
     }
 }

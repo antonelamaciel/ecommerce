@@ -30,16 +30,19 @@ class CarrierCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name', 'Nombre'),
+            TextField::new('name', 'Nombre')
+            ->setHelp('Nombre del transportista'),
+            TextareaField::new('description', 'Descripción')
+            ->setHelp('Especificaciones adicionales del transportista'),
             ChoiceField::new('type', 'Tipo de Envío')
                 ->setChoices([
                     'Estándar (Costo Fijo)' => 'standard',
-                    'Larga Distancia (Cálculo por CP)' => 'long_distance',
+                    'Larga Distancia (Cálcular por CP)' => 'long_distance',
                     'Local / Moto (A convenir)' => 'special',
-                    'Retiro en sucursal' => 'pickup'
                 ]),
-            TextareaField::new('description', 'Descripción'),
+
             MoneyField::new('price', 'Precio')
+            ->setHelp('Precio del envío')
                 ->setCurrency('ARS')
                 ->setRequired(false)
                 ->setFormTypeOption('attr', ['class' => 'field-carrier-price'])
