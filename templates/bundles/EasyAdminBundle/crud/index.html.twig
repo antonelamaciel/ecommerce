@@ -6,18 +6,29 @@
 {% endblock %}
 
 {% block main %}
+
+<style>
+    .ea-stat-card {
+        min-width: 260px !important;
+    }
+</style>
     <div class="ea-modern-wrapper">
         
         {# DASHBOARD STATS SECTION #}
         {% block ea_stats_grid %}
         <div class="ea-stats-grid">
             <div class="ea-stat-card">
-                <div class="ea-stat-icon" style="color: #6366f1; background: #f5f3ff;">
-                    <i class="bi bi-layers-half"></i>
+                <div class="ea-stat-icon" style="color: {% if total_balance is defined %}#10b981{% else %}#6366f1{% endif %}; background: {% if total_balance is defined %}#ecfdf5{% else %}#f5f3ff{% endif %};">
+                    <i class="bi {% if total_balance is defined %}bi-cash-coin{% else %}bi-layers-half{% endif %}"></i>
                 </div>
                 <div class="ea-stat-info">
-                    <span class="label">Total {{ ea.crud.entityLabelInPlural }}</span>
-                    <span class="value">{{ paginator.numResults }}</span>
+                    {% if total_balance is defined %}
+                        <span class="label">monto calculado</span>
+                        <span class="value">${{ total_balance|number_format(2, ',', '.') }}</span>
+                    {% else %}
+                        <span class="label">Total {{ ea.crud.entityLabelInPlural }}</span>
+                        <span class="value">{{ paginator.numResults }}</span>
+                    {% endif %}
                 </div>
             </div>
         </div>

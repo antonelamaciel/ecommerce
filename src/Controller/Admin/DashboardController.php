@@ -77,6 +77,9 @@ class DashboardController extends AbstractDashboardController
                 ->setController(NotificationCrudController::class);
         }
 
+        yield MenuItem::linkToCrud('Movimientos de caja', 'fas fa-cash-register', \App\Entity\CashMovement::class);
+        yield MenuItem::linkToCrud('Transportistas', 'fas fa-truck', Carrier::class);
+
         yield MenuItem::subMenu('Ventas', 'fas fa-shopping-basket')->setSubItems([
             MenuItem::linkToCrud('Pedidos', 'fas fa-clipboard-list', Order::class),
             MenuItem::linkToCrud('Clientes', 'fas fa-users', User::class),
@@ -89,19 +92,17 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Promociones', 'fas fa-fire', Bundle::class),
         ]);
 
-        yield MenuItem::subMenu('Logística', 'fas fa-truck-moving')->setSubItems([
-            MenuItem::linkToCrud('Transportistas', 'fas fa-truck', Carrier::class),
-            MenuItem::linkToCrud('Envíos y Devoluciones', 'fas fa-undo-alt', ShippingReturn::class),
-        ]);
-
         yield MenuItem::subMenu('Diseño', 'fas fa-palette')->setSubItems([
             MenuItem::linkToCrud('Empresa', 'fas fa-store-alt', Personalize::class),
             MenuItem::linkToCrud('Banners', 'fas fa-images', Headers::class),
         ]);
 
-        yield MenuItem::subMenu('Soporte', 'fas fa-comment-dots')->setSubItems([
+        yield MenuItem::subMenu('Informacion', 'fas fa-comment-dots')->setSubItems([
             MenuItem::linkToCrud('FAQs', 'fas fa-question-circle', FAQ::class),
             MenuItem::linkToCrud('Nosotros', 'fas fa-id-card', About::class),
+            MenuItem::linkToCrud('Envíos y Devoluciones', 'fas fa-undo-alt', ShippingReturn::class),
+
         ]);
+
     }
 }
