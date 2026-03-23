@@ -77,7 +77,9 @@ class DashboardController extends AbstractDashboardController
                 ->setController(NotificationCrudController::class);
         }
 
+        yield MenuItem::linkToRoute('Estadísticas Premium', 'fas fa-chart-pie', 'admin_stats');
         yield MenuItem::linkToCrud('Movimientos de caja', 'fas fa-cash-register', \App\Entity\CashMovement::class);
+
         yield MenuItem::linkToCrud('Transportistas', 'fas fa-truck', Carrier::class);
 
         yield MenuItem::subMenu('Ventas', 'fas fa-shopping-basket')->setSubItems([

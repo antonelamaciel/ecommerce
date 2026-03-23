@@ -46,6 +46,14 @@
   .breadcrumb-nav a { color: var(--c-muted); text-decoration: none; }
   .breadcrumb-nav span { color: var(--c-border); margin: 0 0.5rem; }
 
+  /* ── Back Button ── */
+  .btn-back {
+    background: transparent; border: none; padding: 0.5rem 0; margin: 0;
+    color: var(--c-muted); font-size: 0.85rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.5rem; transition: var(--transition);
+  }
+  .btn-back:hover { color: var(--c-ink); }
+
   /* ── Gallery ── */
   .gallery-container {
     background: var(--c-surface);
@@ -163,13 +171,27 @@
 
   /* ── Mobile Optimization ── */
   @media (max-width: 991px) {
-    .product-page { padding-top: 1rem; }
-    .product-info { padding-left: 0; margin-top: 2rem; }
+    .product-page { padding-top: 0 !important; }
+    .product-info { padding-left: 0; margin-top: 1rem; }
     .main-img-wrap { aspect-ratio: 1/1; }
-    .product-title { font-size: 1.8rem; }
-    .purchase-grid { flex-direction: column; }
-    .qty-selector { justify-content: space-between; width: 100%; }
-    .add-cart-btn { padding: 1.1rem; }
+    .product-title { font-size: 1.4rem; margin-bottom: 0.5rem; }
+    .price-main { font-size: 1.5rem; }
+    .price-old { font-size: 0.9rem; }
+    .price-stock-row { margin-bottom: 1rem; }
+    
+    .purchase-grid { 
+        flex-direction: row !important; 
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    .qty-selector { 
+        width: 120px !important; 
+        flex-shrink: 0;
+    }
+    .add-cart-btn { 
+        padding: 0.8rem !important; 
+        font-size: 0.9rem;
+    }
   }
 
   /* ── Related Products Slider (Unified Style) ── */
@@ -237,7 +259,7 @@
 </style>
 
 <div class="container product-page">
-    <button type="button" onclick="window.history.back()" class="btn-back">
+    <button type="button" onclick="window.history.back()" class="btn-back" style="margin-bottom: 0.5rem;">
         <i class="bi bi-arrow-left"></i> Volver
     </button>
     {# Breadcrumb #}
@@ -285,7 +307,6 @@
 
         {# Column Right: Info & Purchase #}
         <div class="col-lg-6 product-info">
-            <span class="product-brand">Categoría</span>
             <h1 class="product-title">{{ product.name }}</h1>
             {% if product.subtitle %}
                 <p class="product-subtitle">{{ product.subtitle }}</p>

@@ -1,0 +1,96 @@
+{% block _Order_orderDetails_entry_productObject_widget %}
+    {# Render the widget but with JS to initialize TomSelect with images #}
+    {{ form_widget(form) }}
+
+    <style>
+        /* Modern visual dropdown styles */
+        .ts-wrapper.custom-tomselect .ts-dropdown .option {
+            display: flex !important;
+            align-items: center !important;
+            padding: 8px 12px !important;
+            gap: 15px !important;
+            border-bottom: 1px solid #f1f1f1 !important;
+        }
+        .ts-wrapper.custom-tomselect .ts-dropdown .option:last-child {
+            border-bottom: none !important;
+        }
+        .ts-wrapper.custom-tomselect .option img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ts-wrapper.custom-tomselect .option-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #2c3e50;
+        }
+        .ts-wrapper.custom-tomselect .ts-control {
+            border-radius: 8px !important;
+            padding: 10px 15px !important;
+            min-height: 48px !important;
+        }
+        .ts-wrapper.custom-tomselect .ts-control .item {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+    </style>
+
+    <script>
+        (function() {
+            /**
+             * Initializes custom TomSelect for product selectors with images
+             */
+            const initCustomSubselectors = () => {
+                const selectors = document.querySelectorAll('.custom-tomselect:not(.ts-setup)');
+                
+                selectors.forEach(select => {
+                    // Check if TomSelect is available globally
+                    if (typeof TomSelect !== 'undefined' && !select.classList.contains('ts-setup')) {
+                        new TomSelect(select, {
+                            // Extract data-img from each option
+                            onInitialize: function() {
+                                const self = this;
+                                this.settings.options = Array.from(select.options).map(opt => {
+                                    return {
+                                        value: opt.value,
+                                        text: opt.innerText,
+                                        img: opt.getAttribute('data-img') || '/assets/img/placeholder.png'
+                                    };
+                                });
+                                this.clearOptions();
+                                this.addOptions(this.settings.options);
+                            },
+                            render: {
+                                option: function(data, escape) {
+                                    return `
+                                        <div class="option" style="display: flex; align-items: center; gap: 15px; padding: 5px;">
+                                            <img src="${data.img}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px;" />
+                                            <span style="font-weight: 500;">${escape(data.text)}</span>
+                                        </div>
+                                    `;
+                                },
+                                item: function(data, escape) {
+                                    return `<div>${escape(data.text)}</div>`;
+                                }
+                            }
+                        });
+                        select.classList.add('ts-setup');
+                    }
+ else {
+                        // Retry if TS is not yet loaded in some EA versions
+                        setTimeout(initCustomSubselectors, 500);
+                    }
+                });
+            };
+
+            // Hook into EA events and page load
+            document.addEventListener('DOMContentLoaded', initCustomSubselectors);
+            document.addEventListener('ea.collection.item-added', () => {
+                setTimeout(initCustomSubselectors, 100);
+            });
+        })();
+    </script>
+{% endblock %}

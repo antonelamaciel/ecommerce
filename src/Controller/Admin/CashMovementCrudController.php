@@ -29,7 +29,7 @@ class CashMovementCrudController extends AbstractCrudController
         $em = $this->container->get('doctrine')->getManager();
         $totalBalance = $em->getRepository(CashMovement::class)->getTotalBalance();
 
-        $responseParameters->set('total_balance', $totalBalance);
+        $responseParameters->set('total_balance', $totalBalance / 100);
 
         return $responseParameters;
     }
@@ -69,9 +69,9 @@ class CashMovementCrudController extends AbstractCrudController
         
         $amountIndex = MoneyField::new('amount', 'Monto')
             ->setCurrency('ARS')
-            ->setStoredAsCents(false)
+            ->setStoredAsCents(true)
             ->formatValue(function ($value, $entity) {
-                $rawAmount = $entity->getAmount() ?? 0.0;
+                $rawAmount = ($entity->getAmount() ?? 0.0) / 100;
                 $prefix = $entity->getType() === CashMovement::TYPE_INGRESS ? '+' : '-';
                 $color = $entity->getType() === CashMovement::TYPE_INGRESS ? 'text-success' : 'text-danger';
                 return sprintf('<span class="%s fw-bold">%s $ %s</span>', $color, $prefix, number_format($rawAmount, 2, ',', '.'));
@@ -80,7 +80,7 @@ class CashMovementCrudController extends AbstractCrudController
 
         $amountForm = MoneyField::new('amount', 'Monto')
                 ->setCurrency('ARS')
-                ->setStoredAsCents(false)
+                ->setStoredAsCents(true)
                 ->setRequired(true)
                 ->hideOnIndex();
 

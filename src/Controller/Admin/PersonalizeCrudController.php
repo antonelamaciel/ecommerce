@@ -92,7 +92,7 @@ class PersonalizeCrudController extends AbstractCrudController
             Field\ColorField::new('primaryColor', 'Color primario')
                 ->setHelp('Color principal de la empresa, sera el color de fondo del menu y otros items'),
             Field\ColorField::new('tertiaryColor', 'Color de textos y botones') ->setHelp('Sera el color principal de los textos y botones'),
-            Field\ColorField::new('secondaryColor', 'Color extras') ->setHelp('Sera el color de algunos pocos items y botones'),
+            Field\ColorField::new('secondaryColor', 'Color del footer') ->setHelp('Sera el color del footer'),
 
             Field\FormField::addPanel('Contacto Principal de la Empresa y Pagos')->setCssClass('padded-internal-panel')->hideOnDetail(),
             Field\TextField::new('whatsapp', 'WhatsApp de la Empresa (ej: +549...)'),

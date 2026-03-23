@@ -1,0 +1,520 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content_title %}Dashboard Premium Monkai{% endblock %}
+
+{% block main %}
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+            grid-column: span 1; /* Default to 1 column on mobile */
+        }
+
+        @media (min-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-span-2 {
+                grid-column: span 2 !important;
+            }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .stat-title {
+
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #6366f1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .product-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .product-stock {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .stock-low {
+            color: #ef4444;
+        }
+
+        .stock-none {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-premium {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+        .btn-premium:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .product-name-popup {
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .product-y-item:hover .product-name-popup,
+        .product-y-item.active .product-name-popup {
+            opacity: 1;
+            visibility: visible;
+            bottom: 120%;
+        }
+
+        .product-name-caption {
+            font-size: 0.73rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 5px;
+            overflow: visible;
+            white-space: normal;
+            line-height: 1.1;
+            max-width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+
+            .product-name-caption {
+                max-height: 0;
+                opacity: 0;
+                margin-top: 0;
+            }
+            .product-footer-item.active .product-name-caption {
+                max-height: 50px;
+                opacity: 1;
+                margin-top: 5px;
+                white-space: normal;
+                line-height: 1.1;
+            }
+        }
+
+        .product-footer-item img {
+            transition: transform 0.2s;
+        }
+
+        .product-footer-item:hover img,
+        .product-footer-item.active img {
+            transform: scale(1.1);
+            border: 2px solid #6366f1 !important;
+        }
+        
+        @media (max-width: 992px) {
+
+
+            .main-content, .content-wrapper, .content{
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+            }
+            .content-wrapper, .stat-card {
+                min-width: 340px !important;
+            }
+            .content-top.ea-search-disabled{
+                z-index: -999 !important;
+            }
+        @media (min-width: 768px) {
+            .min-width-md-600 {
+                min-width: 600px !important;
+            }
+        }
+    </style>
+
+    <div class="ea-modern-wrapper p-3">
+        
+        <form method="GET" class="filter-controls shadow-sm">
+            {% for name, value in app.request.query.all %}
+                {% if name not in ['month', 'year'] %}
+                    <input type="hidden" name="{{ name }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
+            <div class="d-flex align-items-center gap-2">
+                <label class="fw-bold">Ventas Mensuales - Mes:</label>
+                {% set monthNames = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] %}
+                <select name="month" class="form-select form-select-sm" style="width: 120px;">
+                    {% for m in 1..12 %}
+                        <option value="{{ "%02d"|format(m) }}" {% if month == "%02d"|format(m) %}selected{% endif %}>
+                            {{ monthNames[m] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <label class="fw-bold">Ventas Mensuales - Año:</label>
+                <select name="year" class="form-select form-select-sm" style="width: 100px;">
+                    {% for y in 2024..2026 %}
+                        <option value="{{ y }}" {% if year == y %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-premium ms-auto"><i class="fas fa-filter me-2"></i> Actualizar</button>
+        </form>
+
+
+        <div class="stats-grid">
+            {# 1. Sales Chart #}
+            <div class="stat-card grid-span-2">
+                <div class="stat-title"><i class="fas fa-chart-line text-primary"></i> Ventas Mensuales (Día a Día)</div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            {# 2. Cash Box #}
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-cash-register text-success"></i> Movimientos de Caja</div>
+                <div class="stat-value">{{ cashCalculated|number_format(2, ',', '.') }} $</div>
+                <div class="stat-label">Monto calculado total en caja</div>
+            </div>
+
+
+            {# 6. Weekly Sales #}
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-calendar-week text-warning"></i> Ventas de la Semana</div>
+                <div class="chart-container">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            </div>
+
+            {# 3. Top 10 Products #}
+            <div class="stat-card grid-span-2">
+                <div class="stat-title">
+                    <i class="fas fa-trophy text-warning"></i> 
+                    <span class="d-none d-md-inline">Top 10 Productos Más Vendidos</span>
+                    <span class="d-inline d-md-none">Top 5 Productos Más Vendidos</span>
+                </div>
+                
+                <div class="overflow-x-auto custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+                    <div style="min-width: 320px; position: relative;" class="min-width-md-600">
+                        <div class="chart-container" style="height: 380px;">
+                            <canvas id="topProductsChart"></canvas>
+                        </div>
+                        {# Footer items positioned relatively to match bars #}
+                        <div id="topProductsFooter" class="d-flex justify-content-around mt-3 px-2" style="padding-left: 45px !important; padding-right: 15px !important;">
+                            {% for p in topProducts %}
+                                <div class="text-center product-footer-item cursor-pointer {{ loop.index > 5 ? 'd-none d-md-block' : '' }}" style="width: 50px; flex-shrink: 1;" onclick="toggleProductCaption(event, this)">
+                                    <div class="position-relative">
+                                        <img src="/uploads/{{ p.image }}" class="product-img mb-1" style="width: 38px; height: 38px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%23f1f5f9%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2210%22%3EN/A%3C%2Ftext%3E%3C%2Fsvg%3E';">
+                                        <div class="product-name-caption">{{ p.name }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-2 small text-muted d-md-none"> <i class="fas fa-info-circle me-1"></i> Pulsa una imagen para ver el nombre </div>
+            </div>
+
+
+
+            {# 4. Least Sold #}
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-arrow-down text-danger"></i> Productos Menos Vendidos</div>
+                <ul class="product-list">
+                    {% for p in leastSoldProducts %}
+                        <li class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">{{ p.name }}</div>
+                            </div>
+                            <div class="badge bg-light text-dark">{{ p.totalSold }} vendidos</div>
+                        </li>
+                    {% endfor %}
+                    {% if leastSoldProducts|length == 0 %}
+                        <p class="text-muted small">No hay datos para este periodo.</p>
+                    {% endif %}
+                </ul>
+            </div>
+
+            {# 5. Stock Alerts #}
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-exclamation-triangle text-danger"></i> Alertas de Stock</div>
+                <ul class="product-list">
+                    {% for p in stockAlerts %}
+                        <li class="product-item">
+                            <img src="/uploads/{{ p.image }}" class="product-img" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2280%22%20height%3D%2280%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%23f1f5f9%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2210%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';">
+                            <div class="product-info">
+                                <div class="product-name">{{ p.name }}</div>
+                            </div>
+                            <div class="product-stock stock-none">
+                                {{ p.stock == 0 ? 'SIN STOCK' : 'Últimas ' ~ p.stock ~ ' u.' }}
+                            </div>
+                        </li>
+                    {% endfor %}
+                    {% if stockAlerts|length == 0 %}
+                        <p class="text-success small"><i class="fas fa-check-circle"></i> Todo el stock está al día.</p>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ salesData.labels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Ventas ($)',
+                        data: {{ salesData.data|json_encode|raw }},
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: {{ salesData.maxMoney }},
+                            ticks: {
+                                callback: function(value) { return '$' + value.toLocaleString(); }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 6. Weekly Chart
+            const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+            new Chart(weeklyCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ weeklySales.labels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Ventas ($)',
+                        data: {{ weeklySales.data|json_encode|raw }},
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // 3. Top Products Chart
+            const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+            let topProductsData = {{ topProducts|json_encode|raw }};
+            const isMobile = window.innerWidth < 768;
+            
+            // Limit to Top 5 on mobile
+            if (isMobile) {
+                topProductsData = topProductsData.slice(0, 5);
+            }
+            
+            const topProductsChart = new Chart(topProductsCtx, {
+                type: 'bar',
+                data: {
+                    labels: topProductsData.map(p => p.name),
+                    datasets: [{
+                        label: 'Unidades Vendidas',
+                        data: topProductsData.map(p => p.totalSold),
+                        backgroundColor: '#10b981',
+                        borderRadius: 10,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    indexAxis: 'x', // Always vertical bars (growing Y)
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Vendidos: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true, 
+                            ticks: { display: false }, // Hide names, images are below
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+
+            window.toggleProductCaption = function(event, element) {
+                event.stopPropagation();
+                const isActive = element.classList.contains('active');
+                
+                // Close all others
+                document.querySelectorAll('.product-footer-item.active').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                // Toggle current only if it wasn't already active (or toggle it off if you prefer)
+                if (!isActive) {
+                    element.classList.add('active');
+                }
+            };
+
+            // Global click handler to remove actives
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.product-footer-item')) {
+                    document.querySelectorAll('.product-footer-item.active').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+        });
+    </script>
+{% endblock %}

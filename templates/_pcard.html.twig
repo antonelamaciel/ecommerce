@@ -64,15 +64,9 @@
     <div class="pcard__body">
         <h3 class="pcard__name">
             <a href="{{ path('product_show', {slug: product.slug}) }}">
-                <span class="pcard__name-text">{{ product.name }}</span>
+                <span class="pcard__name-text"><b>{{ product.name }}</b></span>
             </a>
         </h3>
-        
-        {% if product.subtitle %}
-            <p class="pcard__subtitle" style="font-size: 0.75rem; color: #777; margin: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ product.subtitle }}
-            </p>
-        {% endif %}
 
         {% if product.bundles|length > 0 %}
             <div class="pcard__pills-wrap" style="display: flex; gap: 4px; margin-top: 2px;">
@@ -89,12 +83,12 @@
                 {% if maxBundleDiscount > 0 or (product.oldPrice and product.oldPrice != product.price) %}
                     {% set oldPrice = product.oldPrice ?: product.price %}
                     <span class="pcard__price-old">{{ (oldPrice / 100)|number_format(2, ',', '.') }}$</span>
-                    <span class="pcard__price-main" style="{{ maxBundleDiscount > 0 ? 'color: #dc3545;' : '' }}">
+                    <span class="pcard__price-main" style="{% if maxBundleDiscount > 0 %}color: #dc3545;{% elseif personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">
                         {{ (finalPrice / 100)|number_format(2, ',', '.') }}$ 
                         {% if maxBundleDiscount > 0 %}{{ maxBundleDiscount }}%OFF{% endif %}
                     </span>
                 {% else %}
-                    <span class="pcard__price-main">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
+                    <span class="pcard__price-main" style="{% if personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
                 {% endif %}
             </div>
         </div>

@@ -6,15 +6,18 @@ use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use App\Form\OrderDetailType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -36,9 +39,27 @@ class OrderCrudController extends AbstractCrudController
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_DETAIL, $modify)
-            ->remove(Crud::PAGE_INDEX, Action::NEW)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
             ->remove(Crud::PAGE_DETAIL, Action::DELETE);
+    }
+
+    public function createEntity(string $entityFqcn): Order
+    {
+        $order = new Order();
+        $order->setState(0); // No pagado
+        $order->setCarrierName('Retiro en tienda / Presencial');
+        $order->setCarrierPrice('0');
+        $order->setDelivery('Venta Presencial');
+        $order->setPaymentMethod('Efectivo');
+        
+        // Find 'Presencial' user if exists
+        $entityManager = $this->container->get('doctrine')->getManager();
+        $presencialUser = $entityManager->getRepository(\App\Entity\User::class)->findOneBy(['firstname' => 'Presencial']);
+        if ($presencialUser) {
+            $order->setUser($presencialUser);
+        }
+
+        return $order;
     }
 
 
@@ -49,8 +70,83 @@ class OrderCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Pedidos')
             ->setDefaultSort(['id' => 'DESC'])
             ->overrideTemplate('crud/index', 'admin/sales/orders.html.twig')
-            // ->overrideTemplate('crud/edit', 'admin/product/edit.html.twig')
             ;
+    }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            // Include TomSelect CDN to ensure the search bar and product images work correctly
+            ->addCssFile('https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css')
+            ->addJsFile('https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js')
+            ->addHtmlContentToHead('
+                <style>
+                    /* Premium Styling for Product Selector */
+                    .ts-wrapper.custom-tomselect .ts-dropdown .option {
+                        display: flex !important;
+                        align-items: center !important;
+                        padding: 10px 15px !important;
+                        gap: 15px !important;
+                        border-bottom: 1px solid #f3f4f6 !important;
+                    }
+                    .ts-wrapper.custom-tomselect .option img {
+                        width: 45px;
+                        height: 45px;
+                        object-fit: cover;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    }
+                    .ts-wrapper.custom-tomselect .ts-control {
+                        border-radius: 10px !important;
+                        padding: 12px 16px !important;
+                        border: 1px solid #d1d5db !important;
+                        font-weight: 500;
+                    }
+                </style>
+            ')
+            ->addHtmlContentToBody('
+                <script>
+                    (function() {
+                        const initCustomOrdersTS = () => {
+                            const selects = document.querySelectorAll(".custom-tomselect:not(.ts-setup)");
+                            selects.forEach(el => {
+                                if (window.TomSelect) {
+                                    new TomSelect(el, {
+                                        plugins: ["dropdown_input"],
+                                        onInitialize: function() {
+                                            const options = Array.from(el.options).map(opt => ({
+                                                value: opt.value,
+                                                text: opt.innerText,
+                                                img: opt.getAttribute("data-img") || "/assets/img/placeholder.png"
+                                            }));
+                                            this.clearOptions();
+                                            this.addOptions(options);
+                                        },
+                                        render: {
+                                            option: (data, escape) => `
+                                                <div class="option">
+                                                    <img src="${data.img}" />
+                                                    <div class="d-flex flex-column">
+                                                        <span style="font-weight: 700; color: #111;">${escape(data.text)}</span>
+                                                    </div>
+                                                </div>
+                                            `
+                                        }
+                                    });
+                                    el.classList.add("ts-setup");
+                                }
+                            });
+                        };
+                        
+                        document.addEventListener("DOMContentLoaded", initCustomOrdersTS);
+                        document.addEventListener("ea.collection.item-added", () => setTimeout(initCustomOrdersTS, 300));
+                        
+                        // Safety interval
+                        setInterval(initCustomOrdersTS, 2000);
+                    })();
+                </script>
+            ')
+        ;
     }
 
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
@@ -70,19 +166,41 @@ class OrderCrudController extends AbstractCrudController
 
         return $responseParameters;
     }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof Order) {
+            if (!$entityInstance->getCreatedAt()) {
+                $entityInstance->setCreatedAt(new \DateTime());
+            }
+            if (!$entityInstance->getReference()) {
+                $date = new \DateTime();
+                $entityInstance->setReference($date->format('dmy') . '-' . uniqid());
+            }
+        }
+        parent::persistEntity($entityManager, $entityInstance);
+    }
     
  
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('reference', 'ID del pedido')->setFormTypeOptions(['attr' => ['readonly' => true]]),
-            DateTimeField::new('createdAt', 'Fecha del pedido')->hideOnIndex()->setFormTypeOptions(['attr' => ['readonly' => true]]),
-            TextField::new('user.fullName', 'Cliente')->hideOnForm(),
-            TextField::new('productSummary', 'Resumen Productos')->onlyOnIndex(),
-            MoneyField::new('total', 'Total')->setCurrency('ARS'),
-            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS'),
-            MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS')->setFormTypeOptions(['attr' => ['readonly' => true]]),
+            TextField::new('reference', 'ID del pedido')->onlyOnIndex(),
+            DateTimeField::new('createdAt', 'Fecha del pedido')->onlyOnDetail(),
+            AssociationField::new('user', 'Cliente'),
+            CollectionField::new('orderDetails', 'Productos del Pedido')
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(OrderDetailType::class)
+                ->setFormTypeOption('by_reference', false)
+                ->setTemplatePath('admin/field/order_details.html.twig')
+                ->hideOnIndex(),
+            MoneyField::new('total', 'Total')->setCurrency('ARS')->hideOnForm(),
+            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex(),
+            MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS'),
+            TextField::new('carrierName', 'Empresa de Transporte'),
+            TextField::new('delivery', 'Detalle de entrega / Dirección')->hideOnIndex(),
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,
                 'Pagado' => 1,
@@ -92,7 +210,7 @@ class OrderCrudController extends AbstractCrudController
                 'Cancelado' => 5,
             ]
             ),
-            TextField::new('paymentMethod', 'Método de pago')->hideOnForm()->onlyOnDetail(),
+            TextField::new('paymentMethod', 'Método de pago')->onlyOnDetail(),
             CollectionField::new('orderDetails', 'Resumen de Productos')
                 ->setTemplatePath('admin/field/order_details.html.twig')
                 ->onlyOnDetail()
