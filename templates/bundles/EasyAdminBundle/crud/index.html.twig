@@ -24,7 +24,7 @@
                 <div class="ea-stat-info">
                     {% if total_balance is defined %}
                         <span class="label">monto calculado</span>
-                        <span class="value">${{ total_balance|number_format(2, ',', '.') }}</span>
+                        <span class="value">ARS {{ total_balance|number_format(2, ',', '.') }}</span>
                     {% else %}
                         <span class="label">Total {{ ea.crud.entityLabelInPlural }}</span>
                         <span class="value">{{ paginator.numResults }}</span>
@@ -70,7 +70,7 @@
                         </div>
                     {% endfor %}
 
-                    {# ACTION BUTTON #}
+                    {# ACTION DROPDOWN #}
                     <div class="text-end">
                         {% if entity.actions.count > 0 %}
                             <div class="dropdown">
@@ -78,10 +78,12 @@
                                     <i class="bi bi-three-dots"></i>
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-right p-2 shadow-lg border-0" style="border-radius: 18px; min-width: 180px;">
-                                    {% for action in entity.actions %}
-                                        {{ include(action.templatePath, { action: action, entity: entity, isIncludedInDropdown: true }, with_context = false) }}
-                                    {% endfor %}
+                                <div class="dropdown-menu dropdown-menu-right p-2 shadow-lg border-0" style="border-radius: 12px; min-width: 180px;">
+                                    <div class="d-flex flex-column gap-1">
+                                        {% for action in entity.actions %}
+                                            {{ include(action.templatePath, { action: action, entity: entity, isIncludedInDropdown: false }, with_context = false) }}
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         {% endif %}

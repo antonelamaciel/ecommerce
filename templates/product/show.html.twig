@@ -169,6 +169,25 @@
   @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
   .animate-fade-up { animation: fadeUp 0.6s ease forwards; }
 
+  @keyframes cartRoll {
+    0% { transform: translateX(-80px); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateX(80px); opacity: 0; }
+  }
+  
+  .cart-rolling {
+    display: inline-block;
+    animation: cartRoll 0.5s linear infinite;
+    font-size: 1.4rem;
+  }
+  
+  .btn-added-success {
+    background-color: #198754 !important;
+    color: #fff !important;
+    border-color: #198754 !important;
+  }
+
   /* ── Mobile Optimization ── */
   @media (max-width: 991px) {
     .product-page { padding-top: 0 !important; }
@@ -316,11 +335,11 @@
                 {% set maxDiscount = product.getMaxDiscount() %}
                 {% if maxDiscount > 0 %}
                     <div class="d-flex flex-column">
-                        <span class="price-old">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
-                        <span class="price-main" style="color:#dc3545">{{ (product.price * (1 - maxDiscount/100) / 100)|number_format(2, ',', '.') }}$</span>
+                        <span class="price-old">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
+                        <span class="price-main" style="color:#dc3545">ARS {{ (product.price * (1 - maxDiscount/100) / 100)|number_format(2, ',', '.') }}</span>
                     </div>
                 {% else %}
-                    <span class="price-main">{{ (product.price / 100)|number_format(2, ',', '.') }}$</span>
+                    <span class="price-main">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
                 {% endif %}
 
                 {% if product.stock is not null %}
@@ -682,28 +701,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
         pdSubmit.disabled = true;
         const originalHtml = pdSubmit.innerHTML;
-        pdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        
+        // Rolling cart animation - no text as requested
+        pdSubmit.innerHTML = '<i class="bi bi-cart3 cart-rolling"></i>';
 
         fetch(url).then(r => r.json()).then(data => {
             if (data.success) {
-                pdSubmit.innerHTML = '<i class="bi bi-check-lg"></i> ¡Añadido!';
-                pdSubmit.style.background = '#198754';
-                
-                // Update cart badges with animation
-                if (window.updateGlobalCartCount) {
-                    window.updateGlobalCartCount(data.cartCount);
-                } else {
-                    document.querySelectorAll('.cart-badge').forEach(b => b.textContent = data.cartCount);
-                }
-                
-                if (window.showCartNotification) window.showCartNotification();
-
+                // Wait for the requested 0.5 seconds of animation before showing success
                 setTimeout(() => {
-                    pdSubmit.innerHTML = originalHtml;
-                    pdSubmit.style.background = '';
-                    pdSubmit.disabled = false;
-                }, 2000);
+                    // Change to success state (Green)
+                    pdSubmit.classList.add('btn-added-success');
+                    pdSubmit.innerHTML = '<i class="bi bi-check-lg" style="font-size: 1.2rem;"></i> Agregado';
+                    
+                    // Update cart badges with animation
+                    if (window.updateGlobalCartCount) {
+                        window.updateGlobalCartCount(data.cartCount);
+                    } else {
+                        document.querySelectorAll('.cart-badge').forEach(b => b.textContent = data.cartCount);
+                    }
+                    
+                    if (window.showCartNotification) window.showCartNotification();
+
+                    setTimeout(() => {
+                        pdSubmit.classList.remove('btn-added-success');
+                        pdSubmit.innerHTML = originalHtml;
+                        pdSubmit.disabled = false;
+                    }, 500);
+                }, 500);
+            } else {
+                pdSubmit.innerHTML = originalHtml;
+                pdSubmit.disabled = false;
             }
+        }).catch(err => {
+            pdSubmit.innerHTML = originalHtml;
+            pdSubmit.disabled = false;
         });
     });
 });

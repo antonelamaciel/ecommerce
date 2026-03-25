@@ -9,7 +9,7 @@
             </div>
         {% endif %}
         <div style="font-size: 0.85rem; margin-top: 0.25rem; font-weight: 700;">
-            $ {{ (detail.total / 100)|number_format(2, ',', '.') }} ARS
+            ARS {{ (detail.total / 100)|number_format(2, ',', '.') }}
         </div>
     </div>
 {% endfor %}

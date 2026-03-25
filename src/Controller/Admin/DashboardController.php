@@ -90,7 +90,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Catálogo', 'fas fa-tags')->setSubItems([
             MenuItem::linkToCrud('Productos', 'fas fa-box', Product::class),
             MenuItem::linkToCrud('Categorías', 'fas fa-folder-open', Category::class),
-            MenuItem::linkToCrud('Proveedores', 'fas fa-truck-loading', Supplier::class),
+            MenuItem::linkToCrud(' Proveedores', 'fas fa-truck-loading', Supplier::class),
             MenuItem::linkToCrud('Promociones', 'fas fa-fire', Bundle::class),
         ]);
 

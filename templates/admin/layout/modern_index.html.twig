@@ -67,10 +67,12 @@
                     <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem; opacity: 0.8;"></i>
                 </a>
 
-                <div class="dropdown-menu dropdown-menu-right p-2 shadow-lg border-0">
-                    {% for action in entity.actions %}
-                        {{ include(action.templatePath, { action: action, entity: entity, isIncludedInDropdown: true }, with_context = false) }}
-                    {% endfor %}
+                <div class="dropdown-menu dropdown-menu-right p-2 shadow-lg border-0" style="border-radius: 12px; min-width: 180px;">
+                    <div class="d-flex flex-column gap-1">
+                        {% for action in entity.actions %}
+                            {{ include(action.templatePath, { action: action, entity: entity, isIncludedInDropdown: false }, with_context = false) }}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         {% endif %}

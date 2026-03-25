@@ -102,13 +102,13 @@ class NotificationCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
+            IdField::new('id')->hideOnForm()->hideOnIndex()->hideOnDetail(),
             TextField::new('reference', 'ID del pedido'),
             DateTimeField::new('createdAt', 'Fecha')->setFormat('short', 'short'),
             TextField::new('user.fullName', 'Cliente'),
-            TextField::new('productSummary', 'Productos'),
+            TextField::new('productSummary', 'Resumen de Productos'),
             MoneyField::new('total', 'Total')->setCurrency('ARS'),
-            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS'),
+            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->hideOnDetail(),
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,
                 'Pagado' => 1,
@@ -118,7 +118,7 @@ class NotificationCrudController extends AbstractCrudController
                 'Cancelado' => 5,
             ]
             ),
-            CollectionField::new('orderDetails', 'Resumen de Productos')
+            CollectionField::new('orderDetails', 'Detalle de Productos')
                 ->setTemplatePath('admin/field/order_details.html.twig')
                 ->onlyOnDetail()
         ];

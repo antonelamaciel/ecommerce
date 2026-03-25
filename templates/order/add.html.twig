@@ -84,9 +84,11 @@
     border-radius: var(--radius-lg);
     padding: 2rem;
     box-shadow: var(--shadow-soft);
+    margin: 0px;
     margin-bottom: 2rem;
     animation: fadeInUp 0.5s ease backwards;
   }
+
   
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(15px); }
@@ -208,17 +210,20 @@
   @media (max-width: 991px) {
     .order-container { padding-top: 1rem; padding-bottom: 1rem; margin: 0 auto; }
     .order-grid { grid-template-columns: 1fr; gap: 1.5rem; width: 100%; }
-    .order-grid main, .order-grid aside { width: 100%; max-width: 500px; margin: 0 auto; }
+    .order-grid main, .order-grid aside { width: 100%; max-width: none; margin: 0; }
     
     .info-card, .summary-sidebar { 
       padding: 1.25rem; 
-      margin-left: auto; 
-      margin-right: auto; 
+      margin-left: 0; 
+      margin-right: 0; 
+      width: 95%;
     }
     
-    .info-card__title { justify-content: center; text-align: center; }
-    .info-card__content { text-align: center; }
-    .selection-card__body { justify-content: center; }
+    .info-card__title { justify-content: flex-start; text-align: left; }
+    .info-card__content { text-align: left; }
+    .selection-card__body { justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 0.75rem; }
+    .selection-card__icon { width: 36px; height: 36px; font-size: 1rem; }
+    .selection-card__price { width: 100%; margin-left: calc(36px + 0.75rem); font-size: 0.85rem; margin-top: -0.25rem; font-weight: 700; opacity: 0.8; }
     
     .checkout-steps { margin-bottom: 2rem; gap: 0.5rem; }
     .step-item { font-size: 0.75rem; }
@@ -227,6 +232,134 @@
     .back-link-wrapper { text-align: start; margin-bottom: 1rem; width: 100%; }
     #cash-shipping-notice { margin-left: 0 !important; text-align: center; }
   }
+
+  /* ── Success Overlay ── */
+  #order-success-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #198754;
+    z-index: 99999;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff !important;
+    text-align: center;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.6s;
+  }
+  #order-success-overlay.active {
+    display: flex;
+    transform: scale(1);
+    border-radius: 0;
+  }
+  .success-check-big { font-size: 6rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); }
+  .fw-900 { font-weight: 900 !important; }
+  .fw-800 { font-weight: 800 !important; }
+  .fw-700 { font-weight: 700 !important; }
+  .fw-500 { font-weight: 500 !important; }
+  .ls-wide { letter-spacing: 0.1em; }
+  .success-icon-bounce {
+    animation: bounceIn-success 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards 0.4s;
+    opacity: 0;
+  }
+  @keyframes bounceIn-success {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .success-logo-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 1rem auto;
+    padding: 1rem;
+    animation: bounceIn-success 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards 0.6s;
+    opacity: 0;
+  }
+  .success-logo-circle img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 100px; }
+
+  @media (max-width: 767px) {
+    #order-success-overlay .display-3 { font-size: 2.5rem !important; }
+    #order-success-overlay .h2 { font-size: 1.6rem !important; }
+    #order-success-overlay .h5 { font-size: 1.1rem !important; }
+    .success-logo-circle { width: 100px; height: 100px; padding: 0.75rem; }
+    .success-check-big { font-size: 4.5rem !important; }
+  }
+</style>
+
+<div id="order-success-overlay" style="color: #fff !important;">
+    <div class="success-content-wrapper" style="color: #fff !important;">
+        <div class="success-main-card" style="color: #fff !important;">
+            
+            <div class="success-icon-bounce mb-2">
+                <i class="bi bi-check-circle-fill" style="font-size: 3rem; color: #fff !important; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));"></i>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-center mb-2" style="color: #fff !important;">
+                {% if personalize and personalize.logo %}
+                    <div class="success-logo-circle-mini">
+                        <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo">
+                    </div>
+                {% endif %}
+                <h2 class="h5 fw-800 text-uppercase ls-wide p-0 m-0 mx-2" style="color: #fff !important;">
+                    {{ personalize.companyName ?? 'Nuestra Tienda' }}
+                </h2>
+            </div>
+
+            <div class="text-center px-4" style="color: #fff !important;">
+                <h1 class="display-6 fw-900 mb-1" style="letter-spacing: -0.05em; color: #fff !important;">¡Todo listo!</h1>
+                <p class="h6 fw-500 mb-3" style="color: rgba(255,255,255,0.85) !important;">Tu pedido fue procesado con éxito</p>
+                
+                <div>
+                     <span class="badge-thanks" style="color: #fff !important; border-color: rgba(255,255,255,0.4) !important;">GRACIAS POR ELEGIRNOS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+  .success-logo-circle-mini {
+    width: 50px; height: 50px;
+    border-radius: 100px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .success-logo-circle-mini img { max-width: 100%; max-height: 100%; object-fit: contain; }
+</style>
+
+<style>
+  .badge-thanks {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    padding: 0.6rem 1.25rem;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
+  }
+  .success-main-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    width: 90%;
+    animation: slideUpIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both 0.3s;
+  }
+  @keyframes slideUpIn {
+    0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .fw-900 { font-weight: 900 !important; }
+  .fw-800 { font-weight: 800 !important; }
+  .fw-700 { font-weight: 700 !important; }
+  .fw-500 { font-weight: 500 !important; }
+  .ls-wide { letter-spacing: 0.1em; }
 </style>
 
 <div class="container order-container">
@@ -340,7 +473,7 @@
                                         {% if carrier.price == 0 %}
                                             Gratis
                                         {% else %}
-                                            $ {{ carrier.price|number_format(2, ',', '.') }}
+                                            ARS {{ carrier.price|number_format(2, ',', '.') }}
                                         {% endif %}
                                     </div>
                                 </div>
@@ -382,7 +515,7 @@
                                 </div>
                             </div>
                             <div class="small fw-700">
-                                $ {{ ((item.quantity * item.product.price) / 100)|number_format(2,',','.') }}
+                                ARS {{ ((item.quantity * item.product.price) / 100)|number_format(2,',','.') }}
                             </div>
                         </div>
                     {% endfor %}
@@ -391,16 +524,16 @@
                 <div class="summary-breakdown">
                     <div class="breakdown-row">
                         <span class="text-muted">Subtotal</span>
-                        <span class="fw-600">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
+                        <span class="fw-600">ARS {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
                     <div class="breakdown-row">
                         <span class="text-muted">Envío</span>
-                        <span class="fw-600">$ {{ (order.carrierPrice/100)|number_format(2,',','.') }}</span>
+                        <span class="fw-600">ARS {{ (order.carrierPrice/100)|number_format(2,',','.') }}</span>
                     </div>
 
                     <div class="breakdown-row final-total">
                         <span>Total Final</span>
-                        <span>$ {{ ((totalPrice / 100) + order.carrierPrice / 100)|number_format(2,',','.') }}</span>
+                        <span>ARS {{ ((totalPrice / 100) + order.carrierPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
 
                     <div class="payment-opts" id="payment-buttons-container" style="opacity: 0.5; pointer-events: none;">
@@ -568,9 +701,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Reset price UI
-        if (shippingRow) shippingRow.textContent = '$ 0,00';
+        if (shippingRow) shippingRow.textContent = 'ARS 0,00';
         const subtotal = {{ totalPrice / 100 }};
-        if (finalRow) finalRow.textContent = `$ ${subtotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+        if (finalRow) finalRow.textContent = `ARS ${subtotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
         checkConfirmation();
     };
 
@@ -608,8 +741,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    if (shippingRow) shippingRow.textContent = `$ ${(data.carrierPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
-                    if (finalRow) finalRow.textContent = `$ ${(data.totalPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    if (shippingRow) shippingRow.textContent = `ARS ${(data.carrierPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    if (finalRow) finalRow.textContent = `ARS ${(data.totalPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                     checkConfirmation();
                     
                     // Smooth scroll to confirmation button for better UX
@@ -651,13 +784,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isComplete) return;
 
         if (selectedPayment === 'mercadopago') {
-            window.location.href = "{{ path('mercadopago_checkout', {reference: order.reference}) }}";
+            const overlay = document.getElementById('order-success-overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+            setTimeout(() => {
+                window.location.href = "{{ path('mercadopago_checkout', {reference: order.reference}) }}";
+            }, 2000);
         } else if (selectedPayment === 'cash') {
             $('#cashModal').modal('show');
         } else if (selectedPayment === 'transfer') {
             $('#transferModal').modal('show');
         }
     });
+
+    const triggerSuccessScreen = (callback) => {
+        const overlay = document.getElementById('order-success-overlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('active'), 10);
+        setTimeout(callback, 3500);
+    };
 
     const btnWhatsapp = document.getElementById('btn-whatsapp-transfer');
     if (btnWhatsapp) {
@@ -672,18 +817,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 message += "- {{ item.product.name }} x{{ item.quantity }}{% if item.variants %} ({{ item.variants }}){% endif %}\n";
             {% endfor %}
             const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-            setTimeout(() => {
+            
+            triggerSuccessScreen(() => {
+                window.open(whatsappUrl, '_blank');
                 window.location.href = "{{ path('order_confirm_transfer', {reference: order.reference}) }}";
-            }, 800);
+            });
         });
     }
 
     const btnCash = document.getElementById('pd-cash-confirm');
     if (btnCash) {
-        btnCash.addEventListener('click', function() {
-            btnCash.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span> Procesando...';
-            btnCash.classList.add('disabled');
+        btnCash.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.href;
+            triggerSuccessScreen(() => {
+                window.location.href = url;
+            });
         });
     }
 });

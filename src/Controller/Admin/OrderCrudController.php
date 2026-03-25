@@ -39,6 +39,7 @@ class OrderCrudController extends AbstractCrudController
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_DETAIL, $modify)
+            ->remove(Crud::PAGE_DETAIL, Action::EDIT)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
             ->remove(Crud::PAGE_DETAIL, Action::DELETE);
     }
@@ -185,8 +186,8 @@ class OrderCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('reference', 'ID del pedido')->onlyOnIndex(),
+            IdField::new('id')->hideOnForm()->hideOnIndex()->hideOnDetail(),
+            TextField::new('reference', 'ID del pedido'),
             DateTimeField::new('createdAt', 'Fecha del pedido')->onlyOnDetail(),
             AssociationField::new('user', 'Cliente'),
             CollectionField::new('orderDetails', 'Productos del Pedido')
@@ -195,12 +196,12 @@ class OrderCrudController extends AbstractCrudController
                 ->setEntryType(OrderDetailType::class)
                 ->setFormTypeOption('by_reference', false)
                 ->setTemplatePath('admin/field/order_details.html.twig')
-                ->hideOnIndex(),
+                ->hideOnDetail(),
             MoneyField::new('total', 'Total')->setCurrency('ARS')->hideOnForm(),
-            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex(),
+            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->hideOnDetail(),
             MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS'),
             TextField::new('carrierName', 'Empresa de Transporte'),
-            TextField::new('delivery', 'Detalle de entrega / Dirección')->hideOnIndex(),
+            TextField::new('delivery', 'Detalle de entrega / Dirección')->hideOnIndex()->renderAsHtml(),
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,
                 'Pagado' => 1,

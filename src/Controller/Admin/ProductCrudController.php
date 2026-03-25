@@ -53,7 +53,7 @@ class ProductCrudController extends AbstractCrudController
                 ->addCssClass('padded-internal-panel'),
             TextField::new('name', 'Nombre')->setRequired(true)
             ->setHelp('Nombre del producto visible en la tienda'),
-            SlugField::new('slug')->setTargetFieldName('name')->hideOnForm()->hideOnIndex(),
+            SlugField::new('slug')->setTargetFieldName('name')->hideOnForm()->hideOnIndex()->hideOnDetail(),
 
             // --- PORTADA ---
             ImageField::new('image', 'Subir/Cambiar Portada')

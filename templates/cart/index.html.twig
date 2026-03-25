@@ -270,7 +270,7 @@
 
   /* ── Responsive ── */
   @media (max-width: 991px) {
-    .cart-container { padding-top: .5rem; padding-bottom: .5rem; }
+    .cart-container { padding-top: 0px; padding-bottom: .5rem; }
     .cart-grid { grid-template-columns: 1fr; gap: 1rem; }
     .cart-summary { position: static; max-width: 100%; padding: 1.25rem; }
     .cart-items-list { padding: 1.25rem; gap: 1rem; }
@@ -337,8 +337,7 @@
         </div>
 
         <header class="cart-header">
-            <p class="cart-title">MI CARRITO</p>
-            <small class="text-muted mt-1 mb-0">Tienes <span class="js-cart-count fw-bold">{{ totalQuantity }}</span> producto(s) en tu carrito!</small>
+            <p class="cart-title">MI CARRITO ({{ totalQuantity }}) </p>
         </header>
 
         <div class="cart-grid">
@@ -383,8 +382,8 @@
                                     <i class="bi bi-trash3"></i>
                                 </a>
                                 <div class="cart-item__price-wrap">
-                                    <span class="price-total js-price-total">$ {{ (item.quantity * (item.product.price / 100))|number_format(2,',','.') }}</span>
-                                    <span class="price-unit js-price-unit" style="{{ item.quantity > 1 ? '' : 'display:none;' }}">$ {{ (item.product.price / 100)|number_format(2,',','.') }} ud.</span>
+                                    <span class="price-total js-price-total">ARS {{ (item.quantity * (item.product.price / 100))|number_format(2,',','.') }}</span>
+                                    <span class="price-unit js-price-unit" style="{{ item.quantity > 1 ? '' : 'display:none;' }}">ARS {{ (item.product.price / 100)|number_format(2,',','.') }} ud.</span>
                                 </div>
                             </div>
                         </article>
@@ -395,25 +394,25 @@
             <aside>
                 <div class="cart-summary js-cart-summary">
                     <h2 class="summary-title">Resumen de Pedido</h2>
-                    
-                    <div class="summary-row">
-                        <span>Productos (<span class="js-cart-count">{{ totalQuantity }}</span>)</span>
-                        <span class="fw-800 text-dark js-cart-total-price">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
+                
+
+                    <div class="summary-row total mb-3">
+                        <span class="total-label">Subtotal  {{ totalQuantity }} producto(s) </span>
+                        <span class="total-amount js-cart-total-price" data-raw-price="{{ totalPrice / 100 }}">ARS {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
+                    <hr>
+
+                    <a href="{{ path('order') }}" class="btn-checkout">
+                        <span>Seleccionar Dirección</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
 
                     <button type="button" class="btn-shipping-info" data-toggle="modal" data-target="#shippingMethodsModal">
                         <i class="bi bi-truck"></i>
                         Ver info de envíos
                     </button>
 
-                    <p class="small text-muted mb-0 mt-3" style="line-height: 1.4;">El envío se calculará en los proximos pasos.</p>
-
-                    <div class="summary-row total mb-3">
-                        <span class="total-label">Subtotal estimado</span>
-                        <span class="total-amount js-cart-total-price" data-raw-price="{{ totalPrice / 100 }}">$ {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
-                    </div>
-                    <hr>
-                    <!-- Shipping Calculator Input -->
                     <div class="shipping-calculator mt-3 pb-3 border-bottom">
                         <label for="shipping-cp" class="small fw-bold text-muted mb-2">Calcular costo de envío</label>
                         <div class="input-group mb-2">
@@ -428,13 +427,6 @@
                         <div id="shipping-error" class="text-danger small fw-bold d-none mt-1"></div>
                         <a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" class="small text-decoration-none text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle"></i> No sé mi código postal</a>
                     </div>
-
-
-                    <a href="{{ path('order') }}" class="btn-checkout">
-                        <span>Seleccionar Dirección</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-
                     <div class="mt-4 pt-4 border-top text-center opacity-75">
                         <small class="text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.75rem; font-weight: 700;">
                             <i class="bi bi-shield-check-fill " style="font-size: 1.1rem; color: #6ed197;"></i>
@@ -462,7 +454,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const formatPrice = (price) => {
-        return '$ ' + (price / 100).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return 'ARS ' + (price / 100).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
     const updateTotals = (data) => {
@@ -631,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 {% if carrier.price == 0 %}
                                                     GRATIS
                                                 {% else %}
-                                                    $ {{ (carrier.price / 100)|number_format(2, ',', '.') }}
+                                                    ARS {{ (carrier.price / 100)|number_format(2, ',', '.') }}
                                                 {% endif %}
                                             </span>
                                         </div>

@@ -280,7 +280,7 @@
             {# 2. Cash Box #}
             <div class="stat-card">
                 <div class="stat-title"><i class="fas fa-cash-register text-success"></i> Movimientos de Caja</div>
-                <div class="stat-value">{{ cashCalculated|number_format(2, ',', '.') }} $</div>
+                <div class="stat-value">ARS {{ cashCalculated|number_format(2, ',', '.') }}</div>
                 <div class="stat-label">Monto calculado total en caja</div>
             </div>
 
@@ -297,8 +297,8 @@
             <div class="stat-card grid-span-2">
                 <div class="stat-title">
                     <i class="fas fa-trophy text-warning"></i> 
-                    <span class="d-none d-md-inline">Top 10 Productos Más Vendidos</span>
-                    <span class="d-inline d-md-none">Top 5 Productos Más Vendidos</span>
+                    <span class="d-none d-md-inline">Top Productos Más Vendidos</span>
+                    <span class="d-inline d-md-none">Top Productos Más Vendidos</span>
                 </div>
                 
                 <div class="overflow-x-auto custom-scrollbar" style="-webkit-overflow-scrolling: touch;">

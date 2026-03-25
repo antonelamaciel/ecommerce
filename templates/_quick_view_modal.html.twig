@@ -135,6 +135,23 @@
     border-color: #dee2e6 !important;
 }
 
+@keyframes cartRollQV {
+  0% { transform: translateX(-80px); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateX(80px); opacity: 0; }
+}
+.cart-rolling-qv {
+  display: inline-block;
+  animation: cartRollQV 0.5s linear infinite;
+  font-size: 1.4rem;
+}
+.btn-added-success-qv {
+  background-color: #198754 !important;
+  color: #fff !important;
+  border-color: #198754 !important;
+}
+
 </style>
 
 <script>
@@ -417,12 +434,12 @@ document.addEventListener('DOMContentLoaded', function() {
         currentQvIndex = 0;
 
         if (allImages.length > 1) {
-            if (qvPrevImg) qvPrevImg.classList.remove('d-none');
-            if (qvNextImg) qvNextImg.classList.remove('d-none');
+            if (qvPrevImg) { qvPrevImg.classList.remove('d-none'); qvPrevImg.classList.add('d-md-flex'); }
+            if (qvNextImg) { qvNextImg.classList.remove('d-none'); qvNextImg.classList.add('d-md-flex'); }
             startQvAutoSlide();
         } else {
-            if (qvPrevImg) qvPrevImg.classList.add('d-none');
-            if (qvNextImg) qvNextImg.classList.add('d-none');
+            if (qvPrevImg) { qvPrevImg.classList.add('d-none'); qvPrevImg.classList.remove('d-md-flex'); }
+            if (qvNextImg) { qvNextImg.classList.add('d-none'); qvNextImg.classList.remove('d-md-flex'); }
         }
 
         // Ensure options are cleanly unselected and styles are reset
@@ -590,26 +607,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        const originalHtml = '<i class="bi bi-cart-plus mr-2 fs-5"></i><span>Comprar</span>'; // Fixed original state
+        const originalHtml = qvSubmit.innerHTML;
         const originalBackground = qvSubmit.style.background;
-        qvSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
-        qvSubmit.style.background = '#198754';
         
-        if (window.showCartNotification) window.showCartNotification();
-
+        // Phase 1: Rolling Cart (0.5s)
+        qvSubmit.innerHTML = '<span class="cart-rolling-qv"><i class="bi bi-cart"></i></span>';
+        
         setTimeout(() => {
-          if (bsModal) {
-              bsModal.hide();
-          } else if (window.jQuery) {
-              $('#quickViewModal').modal('hide');
-          }
-          // reset color
+          // Phase 2: Success Check (0.5s)
+          qvSubmit.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.5rem;"></i></span>';
+          qvSubmit.style.background = '#198754';
+          
+          if (window.showCartNotification) window.showCartNotification();
+
           setTimeout(() => {
-              qvSubmit.style.background = originalBackground;
-              qvSubmit.innerHTML = originalHtml;
-              qvSubmit.disabled = false;
-          }, 300);
-        }, 1000);
+            if (bsModal) {
+                bsModal.hide();
+            } else if (window.jQuery) {
+                $('#quickViewModal').modal('hide');
+            }
+            // reset state for next time
+            setTimeout(() => {
+                qvSubmit.style.background = originalBackground;
+                qvSubmit.innerHTML = originalHtml;
+                qvSubmit.disabled = false;
+            }, 300);
+          }, 500); // 0.5s for the check
+        }, 500); // 0.5s for the rolling cart
       }
     })
     .catch(err => {
