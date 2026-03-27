@@ -89,9 +89,9 @@ class PersonalizeCrudController extends AbstractCrudController
             Field\TextField::new('address', 'Dirección Exacta del local'),
 
             Field\FormField::addPanel('Branding (Colores)')->setCssClass('padded-internal-panel')->hideOnDetail(),
-            Field\ColorField::new('primaryColor', 'Color primario')
+            Field\ColorField::new('primaryColor', 'Color claro')
                 ->setHelp('Color principal de la empresa, sera el color de fondo del menu y otros items'),
-            Field\ColorField::new('tertiaryColor', 'Color de textos y botones') ->setHelp('Sera el color principal de los textos y botones'),
+            Field\ColorField::new('tertiaryColor', 'Color oscuro') ->setHelp('Sera el color principal de los textos y botones'),
             Field\ColorField::new('secondaryColor', 'Color del footer') ->setHelp('Sera el color del footer'),
 
             Field\FormField::addPanel('Contacto Principal de la Empresa y Pagos')->setCssClass('padded-internal-panel')->hideOnDetail(),
