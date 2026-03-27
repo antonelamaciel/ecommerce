@@ -228,6 +228,48 @@
       max-width: 480px;
     }
   }
+
+  /* ── Dark Mode Overrides for Home Page ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+  }
+  body.dark-mode .sort-wrapper {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+  }
+  body.dark-mode .sort-select {
+    color: #ffffff !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffffff' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !important;
+  }
+  body.dark-mode .sort-select option {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode .btn-load-more {
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode .btn-load-more:hover {
+    background-color: #ffffff !important;
+    color: #121212 !important;
+  }
+
+  /* ── Trending Expansion Animation ── */
+  @keyframes pulseImg {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  .trending-grid .pcard__img {
+    animation: pulseImg 4s ease-in-out infinite;
+  }
+  .trending-grid .pcard:nth-child(1) .pcard__img { animation-delay: 0s; }
+  .trending-grid .pcard:nth-child(2) .pcard__img { animation-delay: 0.8s; }
+  .trending-grid .pcard:nth-child(3) .pcard__img { animation-delay: 1.6s; }
+  .trending-grid .pcard:nth-child(4) .pcard__img { animation-delay: 2.4s; }
 </style>
 
 <!-- ═══════════════════════════════════════
@@ -385,7 +427,7 @@
     <span class="section-header__eyebrow">Tendencias del mes</span>
   </div>
 
-  <div class="products-grid">
+  <div class="products-grid trending-grid">
     {% for product in top_products %}
       {% include "_pcard.html.twig" with {
         'product': product,

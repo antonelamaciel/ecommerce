@@ -96,8 +96,9 @@
     transition: var(--transition);
   }
   .account-card:hover .card-icon {
-    background: var(--c-brand);
-    color: #fff;
+    background: var(--primary-color) !important;
+    color: var(--tertiary-color) !important;
+    border: 1px solid var(--tertiary-color);
   }
 
   .card-title {
@@ -132,6 +133,26 @@
     border-radius: 50px;
     font-weight: bold;
   }
+
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+  }
+  body.dark-mode .account-title { color: #ffffff !important; }
+  body.dark-mode .account-card { 
+    background-color: #1e1e1e !important; 
+    border-color: #333 !important;
+  }
+  body.dark-mode .account-card:hover { border-color: #ffffff !important; background-color: #252525 !important; }
+  body.dark-mode .card-icon { background-color: #252525 !important; }
+  body.dark-mode .account-card:hover .card-icon { background-color: var(--primary-color) !important; color: var(--tertiary-color) !important; }
+  body.dark-mode .card-title { color: #ffffff !important; }
+  body.dark-mode .admin-badge { background-color: #2b2100 !important; color: #ffd666 !important; }
+  body.dark-mode .btn-back:hover { color: #ffffff !important; }
 </style>
 
 <div class="account-wrap">
@@ -141,7 +162,7 @@
   <header class="account-header">
     <h1 class="account-title">Mi perfil</h1>
     <p class="account-greeting">Bienvenido de nuevo, <b>{{ app.user.firstname }}.</b></p>
-    <a class="drawer-item fw-bold btn btn-secondary" href="{{ path('home') }}">
+    <a class="drawer-item fw-bold btn" style="background-color: var(--primary-color); color: var(--tertiary-color); border: 1px solid var(--tertiary-color);" href="{{ path('home') }}">
         <i class="bi bi-house-door mr-2"></i>Ir al Inicio
     </a>
   </header>
@@ -172,6 +193,14 @@
         <div>
           <h3 class="card-title">Mis pedidos</h3>
           <p class="card-desc">Consulta el historial y los detalles de tus compras pasadas.</p>
+        </div>
+    </a>
+
+    <a href="{{ path('account_receipts') }}" class="account-card">
+        <div class="card-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+        <div>
+          <h3 class="card-title">Mis comprobantes</h3>
+          <p class="card-desc">Visualiza y descarga las facturas oficiales de tus compras.</p>
         </div>
     </a>
 

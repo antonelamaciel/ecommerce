@@ -86,6 +86,24 @@
   @media (max-width: 767px) {
     .card-premium { padding: 2rem; }
   }
+
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+    color: #f5f5f5;
+  }
+  body.dark-mode .page-title { color: #ffffff !important; }
+  body.dark-mode .card-premium {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode .card-premium h2 { color: #ffffff !important; }
+  body.dark-mode p, body.dark-mode li { color: #d0d0d0 !important; }
 </style>
 
 <div class="content-wrap">

@@ -2,12 +2,14 @@
 {% set imageValue = field.value ?: entity.instance.image|default(null) %}
 
 {% if imageValue %}
-    <div class="d-inline-block">
+    <div class="d-block my-3">
         <a href="{{ asset('uploads/' ~ imageValue) }}" target="_blank">
             <img src="{{ asset('uploads/' ~ imageValue) }}" 
-                 class="ea-img-preview" style="width: 100px; height: auto;">
+                 class="ea-img-preview" style="width: 120px; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         </a>
     </div>
 {% else %}
-    <span class="ea-modern-badge" style="background: #f1f5f9; color: #64748b;">Sin imagen</span>
+    <div class="mt-2 mb-1">
+        <span class="ea-modern-badge" style="background: #f1f5f9; color: #64748b; padding: 6px 14px; border-radius: 50px;">Sin imagen</span>
+    </div>
 {% endif %}

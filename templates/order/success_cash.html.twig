@@ -91,6 +91,53 @@
         text-align: left;
         border: 1px solid #ffe066;
     }
+
+    /* ── Dark Mode Overrides ── */
+    body.dark-mode {
+        --c-bg: #121212;
+    }
+    body.dark-mode .success-card {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .status-badge {
+        background-color: #2b2100 !important;
+        color: #ffd666 !important;
+    }
+    body.dark-mode .order-ref {
+        background-color: #2a2a2a !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .btn-action {
+        background-color: #444 !important;
+        border: 1px solid #555 !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .btn-action:hover {
+        background-color: #000000 !important;
+        border-color: #ffffff !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+    }
+    body.dark-mode .warning-box {
+        background-color: #2b2100 !important;
+        border-color: #443500 !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .warning-box h6, body.dark-mode .warning-box p, body.dark-mode .warning-box b, body.dark-mode .warning-box i {
+        color: #ffffff !important;
+    }
+    body.dark-mode .text-muted {
+        color: #b0b0b0 !important;
+    }
+    body.dark-mode .text-dark {
+        color: #ffffff !important;
+    }
+    body.dark-mode .fw-bold, body.dark-mode .fw-semibold {
+        color: #ffffff !important;
+    }
 </style>
 
 <div class="container success-container">

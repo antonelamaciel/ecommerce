@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+
 class ProductOptionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -17,6 +19,15 @@ class ProductOptionType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Título de Variantes (Ej: Colores, Talles, Versión)',
+            ])
+            ->add('stock', IntegerType::class, [
+                'label' => 'Stock (opcional)',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => '∞ (Infinito)',
+                    'class' => 'variant-stock-input',
+                    'min' => 0
+                ]
             ])
             ->add('image', TextType::class, [
                 'label' => 'Imagen vinculada (opcional)',

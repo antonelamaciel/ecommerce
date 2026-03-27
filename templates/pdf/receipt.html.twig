@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante de Pedido #{{ order.reference }}</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.5; }
+        .container { padding: 40px; }
+        .header { display: table; width: 100%; border-bottom: 2px solid #eaeaea; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo-box { display: table-cell; width: 50%; vertical-align: top; }
+        .company-info { display: table-cell; text-align: right; width: 50%; vertical-align: top; font-size: 13px; color: #555; }
+        h1 { margin: 0 0 5px 0; font-size: 28px; color: #111; letter-spacing: -1px; }
+        .receipt-number { font-size: 14px; color: #888; font-weight: bold; }
+
+        .info-grid { display: block; width: 100%; text-align: center; margin-bottom: 30px; }
+        .info-box { display: inline-block; width: 42%; padding: 20px; background: #f9f9f9; border-radius: 8px; vertical-align: top; text-align: left; }
+        .info-box.left { margin-right: 2%; }
+
+        .info-box h3 { margin-top: 0; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .info-box p { margin: 0 0 5px 0; font-size: 14px; }
+        table.items { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        table.items th { text-align: left; padding: 12px; font-size: 12px; color: #777; text-transform: uppercase; border-bottom: 2px solid #ddd; }
+        table.items td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        table.items .price { text-align: right; font-weight: bold; }
+        .totals { width: 40%; margin-left: auto; text-align: right; border-top: 2px solid #333; padding-top: 15px; }
+        .totals p { margin: 5px 0; font-size: 14px; display: table; width: 100%; }
+        .totals p span { display: table-cell; }
+        .totals .grand-total { font-size: 20px; font-weight: bold; color: #000; margin-top: 10px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eaeaea; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-box">
+                <h1>COMPROBANTE</h1>
+                <div class="receipt-number">Ref: {{ order.reference }}</div>
+                <div style="margin-top: 5px; font-size: 12px;">Fecha: {{ order.createdAt|date('d/m/Y H:i') }}</div>
+            </div>
+            <div class="company-info">
+                <strong>{{ personalize.companyName|default('Nuestra Empresa') }}</strong><br>
+                {{ personalize.address|default('Calle 123') }}<br>
+                {{ personalize.city|default('Ciudad') }}, {{ personalize.province|default('Provincia') }}<br>
+                {{ personalize.email|default('soporte@tienda.com') }}<br>
+                {% if personalize.whatsapp is defined %}{{ personalize.whatsapp }}{% endif %}
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-box left">
+                <h3>Facturar A / Entrega:</h3>
+                {% set delivery_parts = order.delivery|split('<br>') %}
+                {% for part in delivery_parts %}
+                    <p>{{ part|raw }}</p>
+                {% endfor %}
+            </div>
+            <div class="info-box">
+                <h3>Detalles de Pago:</h3>
+                <p><strong>Método:</strong> {% if order.paymentMethod == 'cash' %}Efectivo (Local){% elseif order.paymentMethod == 'transfer' %}Transferencia Bancaria{% else %}{{ order.paymentMethod }}{% endif %}</p>
+                <p><strong>Estado:</strong> Pagado / Confirmado</p>
+                <p><strong>Envío:</strong> {{ order.carrierName }}</p>
+            </div>
+        </div>
+
+        <table class="items">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align:center;">Cant.</th>
+                    <th class="price">Unitario</th>
+                    <th class="price">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in order.orderDetails %}
+                <tr>
+                    <td>
+                        {{ detail.product }}
+                        {% if detail.variants %}<br><small style="color:#666;">{{ detail.variants }}</small>{% endif %}
+                    </td>
+                    <td style="text-align:center;">{{ detail.quantity }}</td>
+                    <td class="price">${{ (detail.price / 100)|number_format(2, ',', '.') }}</td>
+                    <td class="price">${{ (detail.total / 100)|number_format(2, ',', '.') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <p><span>Subtotal:</span> <span style="text-align:right;">${{ ((order.total - order.carrierPrice) / 100)|number_format(2, ',', '.') }}</span></p>
+            <p><span>Envío ({{ order.carrierName }}):</span> <span style="text-align:right;">${{ (order.carrierPrice / 100)|number_format(2, ',', '.') }}</span></p>
+            <p class="grand-total"><span>Total:</span> <span style="text-align:right;">${{ (order.total / 100)|number_format(2, ',', '.') }}</span></p>
+        </div>
+
+        <div class="footer">
+            Gracias por tu compra. Este documento es un comprobante de pedido no oficial.<br>
+            Generado automáticamente por el subsistema de Facturación el {{ "now"|date("d/m/Y") }}.
+        </div>
+    </div>
+</body>
+</html>

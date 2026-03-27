@@ -118,8 +118,38 @@
   }
 
 
-  /* Grid Fixes */
   .row { --bs-gutter-y: 1.5rem; }
+
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+  }
+  body.dark-mode .address-title { color: #ffffff !important; }
+  body.dark-mode .address-card { 
+    background-color: #1e1e1e !important; 
+    border-color: #333 !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+  }
+  body.dark-mode .form-section-title { border-bottom-color: #333 !important; color: #b0b0b0 !important; }
+  body.dark-mode .form-control {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode .form-control:focus {
+    border-color: #ffffff !important;
+    background-color: #333 !important;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.1) !important;
+  }
+  body.dark-mode .btn-submit-address {
+    background-color: #ffffff !important;
+    color: #121212 !important;
+  }
+  body.dark-mode .btn-back:hover { color: #ffffff !important; }
 </style>
 
 <div class="address-container">

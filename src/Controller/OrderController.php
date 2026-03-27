@@ -188,7 +188,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/order/confirm-efectivo/{reference}', name: 'order_confirm_cash')]
-    public function confirmCash(string $reference, OrderRepository $orderRepository, Cart $cart, EntityManagerInterface $em): Response
+    public function confirmCash(string $reference, OrderRepository $orderRepository, Cart $cart, EntityManagerInterface $em, \App\Service\ReceiptGenerator $receiptGenerator, \App\Service\WhatsAppNotifier $whatsappNotifier): Response
     {
         $order = $orderRepository->findOneByReference($reference);
         if (!$order || $order->getUser() != $this->getUser()) {
@@ -212,7 +212,15 @@ class OrderController extends AbstractController
                 $product->setStock(max(0, $newStock));
             }
         }
+        
+        // 1. Generate Receipt
+        $receiptFilename = $receiptGenerator->generate($order);
+        $order->setReceiptFilename($receiptFilename);
+
         $em->flush();
+
+        // 2. Notify User
+        $whatsappNotifier->sendReceipt($order);
 
         // On vide le panier
         $cart->remove();
@@ -223,7 +231,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/order/confirm-transferencia/{reference}', name: 'order_confirm_transfer')]
-    public function confirmTransfer(string $reference, OrderRepository $orderRepository, Cart $cart, EntityManagerInterface $em): Response
+    public function confirmTransfer(string $reference, OrderRepository $orderRepository, Cart $cart, EntityManagerInterface $em, \App\Service\ReceiptGenerator $receiptGenerator, \App\Service\WhatsAppNotifier $whatsappNotifier): Response
     {
         $order = $orderRepository->findOneByReference($reference);
         if (!$order || $order->getUser() != $this->getUser()) {
@@ -247,7 +255,15 @@ class OrderController extends AbstractController
                 $product->setStock(max(0, $newStock));
             }
         }
+        
+        // 1. Generate Receipt
+        $receiptFilename = $receiptGenerator->generate($order);
+        $order->setReceiptFilename($receiptFilename);
+
         $em->flush();
+
+        // 2. Notify User via WhatsApp (Backend Integration structure ready)
+        $whatsappNotifier->sendReceipt($order);
 
         // On vide le panier
         $cart->remove();

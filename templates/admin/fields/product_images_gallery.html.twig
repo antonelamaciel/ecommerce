@@ -1,26 +1,36 @@
-{# templates/admin/fields/product_images_gallery.html.twig #}
-{% set currentImages = entity.instance.images|default([]) %}
-
-{% if currentImages is not empty %}
-    <div class="row g-2 g-md-3 mt-2">
-        {% for image in currentImages %}
-            <div class="col-6 col-md-3 col-lg-2">
-                <div class="position-relative p-2 border rounded-4 bg-white text-center shadow-sm h-100 overflow-hidden">
-                    <a href="{{ asset('uploads/' ~ image) }}" target="_blank" class="d-block {% if ea.crud.currentAction != 'detail' %}mb-2{% endif %}">
-                        <img src="{{ asset('uploads/' ~ image) }}" 
-                             class="img-fluid"
-                             style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px;">
-                    </a>
-                    {% if ea.crud.currentAction != 'detail' %}
-                    <div class="form-check m-0 d-flex justify-content-center align-items-center py-1">
-                        <input class="form-check-input mt-0 me-2" type="checkbox" name="delete_images[]" value="{{ image }}" id="delete_image_{{ loop.index }}" style="cursor: pointer;">
-                        <label class="form-check-label text-danger small fw-bold" for="delete_image_{{ loop.index }}" style="cursor: pointer;">Eliminar</label>
-                    </div>
-                    {% endif %}
+<div class="row g-2 g-md-3 mt-2">
+    {% set currentImages = entity.instance.images|default([]) %}
+    
+    {% for image in currentImages %}
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="position-relative p-2 border rounded-4 bg-white text-center shadow-sm h-100 overflow-hidden">
+                <a href="{{ asset('uploads/' ~ image) }}" target="_blank" class="d-block {% if ea.crud.currentAction != 'detail' %}mb-2{% endif %}">
+                    <img src="{{ asset('uploads/' ~ image) }}" 
+                         class="img-fluid"
+                         style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px;">
+                </a>
+                {% if ea.crud.currentAction != 'detail' %}
+                <div class="form-check m-0 d-flex justify-content-center align-items-center py-1">
+                    <input class="form-check-input mt-0 me-2" type="checkbox" name="delete_images[]" value="{{ image }}" id="delete_image_{{ loop.index }}" style="cursor: pointer;">
+                    <label class="form-check-label text-danger small fw-bold" for="delete_image_{{ loop.index }}" style="cursor: pointer;">Eliminar</label>
                 </div>
+                {% endif %}
             </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="alert alert-light border p-2 d-inline-block mt-2 mb-0">Sin imagenes cargadas</div>
-{% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+
+
+<style>
+    .ghost-img-card {
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+        filter: grayscale(0.5);
+        border: 2px dashed var(--primary-indigo) !important;
+    }
+    .ghost-img-card:hover {
+        opacity: 0.9;
+        filter: grayscale(0);
+    }
+</style>

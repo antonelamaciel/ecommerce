@@ -62,16 +62,46 @@
     position: relative;
     box-shadow: 0 4px 20px rgba(0,0,0,0.02);
   }
-  .main-img-wrap {
+  .main-img-wrap-scroll {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     aspect-ratio: 1/1.1;
-    overflow: hidden;
     background: #f9f9f9;
+    position: relative;
+  }
+  .main-img-wrap-scroll::-webkit-scrollbar { display: none; }
+  
+  .main-img-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: center;
     position: relative;
   }
   .main-img {
     width: 100%; height: 100%; object-fit: cover;
-    transition: opacity 0.4s ease;
   }
+
+  .gallery-badge {
+    position: absolute; top: 1rem; right: 1rem; z-index: 5;
+    background: #000; color: #fff; font-size: 0.65rem;
+    font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 4px;
+    text-transform: uppercase;
+    animation: pillShake 5s infinite;
+  }
+
+  .gallery-dots {
+    display: flex; justify-content: center; gap: 0.5rem;
+    padding-top: 1rem; padding-bottom: 1.5rem;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #ddd; transition: var(--transition);
+  }
+  .dot.active { background: var(--c-ink); width: 20px; border-radius: 4px; }
+
   .thumb-strip {
     display: flex; gap: 0.5rem; margin-top: 0.75rem; 
     overflow-x: auto; scrollbar-width: none;
@@ -100,7 +130,7 @@
     display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem;
   }
   .price-main { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
-  .price-old { text-decoration: line-through; color: var(--c-muted); font-size: 1.1rem; }
+  .price-old { text-decoration: line-through; color: var(--c-muted); font-size: 1.1rem; margin-left: 0.5rem; }
   .stock-badge { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 4px; }
 
   /* ── Variants ── */
@@ -150,12 +180,12 @@
     width: 38px; height: 38px; border: none; background: transparent; 
     font-size: 1.2rem; color: var(--c-muted); border-radius: 50%;
   }
-  .qty-btn:hover { background: #f5f5f5; color: var(--c-ink); }
+  .qty-btn:hover { background: #000; color: #fff; }
   .qty-input { width: 35px; border: none; text-align: center; font-weight: 700; background: transparent; }
 
   .add-cart-btn {
-    flex-grow: 1; background: var(--tertiary-color); color: var(--primary-color);
-    border: 1.5px solid var(--primary-color); border-radius: 99px; font-weight: 700;
+    flex-grow: 1; background: var(--primary-color); color: var(--tertiary-color);
+    border: 1.5px solid var(--tertiary-color); border-radius: 99px; font-weight: 700;
     transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.75rem;
   }
   .add-cart-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -182,6 +212,8 @@
     font-size: 1.4rem;
   }
   
+  .product-features-container { margin-top: 3rem; padding: 2rem; }
+  
   .btn-added-success {
     background-color: #198754 !important;
     color: #fff !important;
@@ -192,11 +224,29 @@
   @media (max-width: 991px) {
     .product-page { padding-top: 0 !important; }
     .product-info { padding-left: 0; margin-top: 1rem; }
-    .main-img-wrap { aspect-ratio: 1/1; }
-    .product-title { font-size: 1.4rem; margin-bottom: 0.5rem; }
-    .price-main { font-size: 1.5rem; }
-    .price-old { font-size: 0.9rem; }
-    .price-stock-row { margin-bottom: 1rem; }
+    .main-img-wrap-scroll { aspect-ratio: 1/1; }
+    .product-title { font-size: 1.25rem; margin-bottom: 0.4rem; }
+    .product-subtitle { font-size: 0.85rem; margin-bottom: 1rem; }
+    .price-main { font-size: 1.3rem; }
+    .price-old { font-size: 0.8rem; }
+    .price-stock-row { margin-bottom: 1rem; gap: 0.75rem; }
+    
+    .variants-container { margin-bottom: 1rem !important; margin-top: 0.5rem !important; }
+    #parent-options-container { margin-bottom: 0.5rem !important; }
+    .choice-btn { 
+        padding: 0.35rem 0.85rem; 
+        font-size: 0.75rem; 
+        margin-right: 0.35rem; 
+        margin-bottom: 0.35rem; 
+    }
+    
+    .product-features-container { 
+        margin-top: 1.5rem !important; 
+        padding: 1.25rem !important; 
+        gap: 0.5rem !important;
+    }
+    .product-features-container .fs-4 { font-size: 1.1rem !important; }
+    .product-features-container .small { font-size: 0.7rem !important; }
     
     .purchase-grid { 
         flex-direction: row !important; 
@@ -275,6 +325,58 @@
   @media (max-width: 767px) {
   }
 
+  /* ── Dark Mode Overrides for Product Page ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+    color: #f5f5f5;
+  }
+  body.dark-mode .product-title { color: #ffffff; }
+  body.dark-mode .choice-btn {
+    border-color: #444 !important;
+    color: #ffffff !important;
+    background-color: #2a2a2a !important;
+  }
+  body.dark-mode .choice-btn.active {
+    background-color: #ffffff !important;
+    color: #121212 !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+  }
+  body.dark-mode .choice-btn:hover:not(.active) {
+    border-color: #666 !important;
+    background-color: #333 !important;
+  }
+  body.dark-mode .qty-selector { background: #121212; border-color: #333; }
+  body.dark-mode .qty-btn { color: #f5f5f5; }
+  body.dark-mode .qty-input { color: #ffffff; }
+  body.dark-mode .add-cart-btn { background: #6c757d; color: #fff; border-color: #6c757d; }
+  body.dark-mode .description-section { border-top-color: #333; }
+  body.dark-mode .desc-content { color: #d0d0d0; }
+  body.dark-mode .thumb-item { border-color: transparent; }
+  body.dark-mode .thumb-item.active { border-color: #ffffff; }
+  body.dark-mode .price-main:not([style*="color:#dc3545"]) { color: #ffffff; }
+  body.dark-mode .slider-btn { background: #2a2a2a; border-color: #444; color: #fff; }
+  body.dark-mode .slider-btn:hover { background: #fff; color: #000; }
+  body.dark-mode .bg-light { background-color: #2a2a2a !important; }
+  
+  /* Feature items & stock badge tweaks */
+  body.dark-mode .stock-badge { 
+    background-color: #1a1a1a !important; 
+    color: #ffffff !important; 
+    border: 1px solid #444 !important; 
+  }
+  body.dark-mode .product-features-container { 
+    background-color: transparent !important; 
+    border: none !important;
+  }
+  body.dark-mode .product-features-container * { 
+    color: #ffffff !important; 
+  }
+
 </style>
 
 <div class="container product-page">
@@ -290,29 +392,35 @@
         <span style="color:var(--c-ink)">{{ product.name }}</span>
     </nav>
 
+    {% set all_imgs = [product.image] %}
+    {% if product.images is defined and product.images %}
+        {% for img in product.images %}{% set all_imgs = all_imgs|merge([img]) %}{% endfor %}
+    {% endif %}
+
     <div class="row g-lg-5">
         {# Column Left: Gallery #}
         <div class="col-lg-6">
             <div class="gallery-container">
-                <div class="main-img-wrap">
+                <div class="main-img-wrap-scroll" id="main-gallery-scroll">
+                    {% for img in all_imgs %}
+                        <div class="main-img-slide">
+                             <img src="/uploads/{{ img }}" alt="{{ product.name }}" class="main-img">
+                        </div>
+                    {% endfor %}
+                    
+                    {# Badges overlay #}
                     {% for bundle in product.bundles %}
                         {% if bundle.topRightBadge %}
                             {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
-                            <span style="position:absolute; top:1rem; right:1rem; z-index:5; background:#000; color:#fff; font-size:0.65rem; font-weight:700; padding:0.3rem 0.6rem; border-radius:4px; text-transform:uppercase;">{{ badgeText }}</span>
+                            <span class="gallery-badge">{{ badgeText }}</span>
                         {% endif %}
                     {% endfor %}
-                    <img id="main-product-img" src="/uploads/{{ product.image }}" alt="{{ product.name }}" class="main-img">
                 </div>
                 
-                {% set all_imgs = [product.image] %}
-                {% if product.images is defined and product.images %}
-                    {% for img in product.images %}{% set all_imgs = all_imgs|merge([img]) %}{% endfor %}
-                {% endif %}
-
                 {% if all_imgs|length > 1 %}
                 <div class="thumb-strip px-3 pb-3">
                     {% for img in all_imgs %}
-                        <img src="/uploads/{{ img }}" class="thumb-item {{ loop.first ? 'active' : '' }}" data-src="/uploads/{{ img }}">
+                        <img src="/uploads/{{ img }}" class="thumb-item {{ loop.first ? 'active' : '' }}" data-index="{{ loop.index0 }}" data-src="/uploads/{{ img }}">
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -331,31 +439,9 @@
                 <p class="product-subtitle">{{ product.subtitle }}</p>
             {% endif %}
 
-            <div class="price-stock-row">
-                {% set maxDiscount = product.getMaxDiscount() %}
-                {% if maxDiscount > 0 %}
-                    <div class="d-flex flex-column">
-                        <span class="price-old">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
-                        <span class="price-main" style="color:#dc3545">ARS {{ (product.price * (1 - maxDiscount/100) / 100)|number_format(2, ',', '.') }}</span>
-                    </div>
-                {% else %}
-                    <span class="price-main">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
-                {% endif %}
-
-                {% if product.stock is not null %}
-                    <span class="stock-badge" style="background:{{ product.stock <= 0 ? '#fff0f0; color:#dc3545;' : '#f0fff5; color:#198754;' }}">
-                        {{ product.stock <= 0 ? 'Sin stock' : (product.stock <= 5 ? 'Última(s) ' ~ product.stock ~ ' unid.' : 'En stock') }}
-                    </span>
-                {% endif %}
-            </div>
-            
-            <button type="button" class="btn btn-link p-0 mb-4 d-flex align-items-center text-decoration-none fw-600" data-toggle="modal" data-target="#paymentMethodsModal" style="font-size: 0.85rem; color: var(--c-accent);">
-                <i class="bi bi-credit-card mr-2"></i> Ver medios de pago
-            </button>
-
-            {# Variant Selection (Tiered) #}
+            {# Variant Selection (Tiered) - MOVED HERE #}
             {% if product.options|length > 0 %}
-                <div class="variants-container">
+                <div class="variants-container mb-4">
                     {# Parent Options Row #}
                     <div class="d-flex flex-wrap gap-2 mb-3" id="parent-options-container">
                         {% for option in product.options %}
@@ -394,6 +480,30 @@
                 </div>
             {% endif %}
 
+            <div class="price-stock-row">
+                {% set maxDiscount = product.getMaxDiscount() %}
+                {% if maxDiscount > 0 or (product.oldPrice and product.oldPrice != product.price) %}
+                    {% set oldPrice = product.oldPrice ?: product.price %}
+                    {% set finalPrice = maxDiscount > 0 ? (product.price * (1 - maxDiscount/100)) : product.price %}
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="price-main" style="{% if maxDiscount > 0 %}color:#dc3545;{% endif %}">ARS {{ (finalPrice / 100)|number_format(2, ',', '.') }}</span>
+                        <span class="price-old">ARS {{ (oldPrice / 100)|number_format(2, ',', '.') }}</span>
+                    </div>
+                {% else %}
+                    <span class="price-main">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
+                {% endif %}
+
+                {% if product.stock is not null %}
+                    <span class="stock-badge" style="background:{{ product.stock <= 0 ? '#fff0f0; color:#dc3545;' : '#f0fff5; color:#198754;' }}">
+                        {{ product.stock <= 0 ? 'Sin stock' : (product.stock <= 5 ? 'Última(s) ' ~ product.stock ~ ' unid.' : 'En stock') }}
+                    </span>
+                {% endif %}
+            </div>
+            
+            <button type="button" class="btn btn-link p-0 mb-4 d-flex align-items-center text-decoration-none fw-600" data-toggle="modal" data-target="#paymentMethodsModal" style="font-size: 0.85rem; color: var(--c-accent);">
+                <i class="bi bi-credit-card mr-2"></i> Ver medios de pago
+            </button>
+
             {# Purchase actions #}
             <div class="purchase-grid">
                 <div class="qty-selector">
@@ -420,7 +530,7 @@
             </div>
 
             {# Minimal Features #}
-            <div class="d-flex gap-4 mt-5 p-4 rounded-4" style="background:#f8f9fa;">
+            <div class="product-features-container d-flex gap-4 rounded-4" style="background:#f8f9fa;">
                 <div class="text-center flex-grow-1">
                     <i class="bi bi-truck fs-4 d-block mb-1"></i>
                     <span class="small fw-600">Envío rápido</span>
@@ -469,52 +579,148 @@
 </div>
 
 {# Modals and Scripts as before but cleaner #}
-<div class="modal fade" id="paymentMethodsModal" tabindex="-1">
+{# Medios de Pago Modal #}
+<div class="modal fade" id="paymentMethodsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0" style="border-radius:20px;">
-            <div class="modal-header border-0 p-4 pb-0">
-                <h5 class="fw-bold">Medios de Pago</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 overflow-hidden shadow-lg" style="border-radius:24px; background: var(--c-surface);">
+            <div class="modal-header border-0 p-4 pb-2 d-flex align-items-center justify-content-between">
+                <div>
+                   <h5 class="fw-bold mb-0">Medios de Pago</h5>
+                   <p class="text-muted small mb-0">Al final del carrito podrás elegir tu forma de pago preferida</p>
+                </div>
+                <button type="button" class="btn p-0 border-0 shadow-none text-danger" data-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; line-height: 1;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <div class="modal-body p-4">
                 <div class="d-flex flex-column gap-3">
-                    <div class="p-3 rounded-4 bg-light d-flex align-items-center gap-3">
-                        <i class="bi bi-wallet2 fs-4"></i>
-                        <div><h6 class="mb-0 fw-bold">Efectivo</h6><span class="small text-muted">Abonas al recibir</span></div>
+                    {# Cash Option #}
+                    <div class="payment-option-card p-3 d-flex align-items-center gap-3 transition-all">
+                        <div class="payment-icon-wrap" style="background: transparent; color: #4f46e5;">
+                            <i class="bi bi-wallet2 fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-700 payment-title">Efectivo al retirar</h6>
+                            <p class="small text-muted mb-0">¡Pagando en efectivo tienes beneficios!</p>
+                        </div>
                     </div>
-                    <div class="p-3 rounded-4 bg-light d-flex align-items-center gap-3">
-                        <i class="bi bi-lightning-charge fs-4 text-primary"></i>
-                        <div><h6 class="mb-0 fw-bold">Mercado Pago</h6><span class="small text-muted">Tarjetas y saldo</span></div>
+
+                    {# Mercado Pago Option #}
+                    <div class="payment-option-card p-3 d-flex align-items-center gap-3 transition-all">
+                        <div class="payment-icon-wrap" style="background: transparent; color: #d97706;">
+                            <i class="bi bi-lightning-charge-fill fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-700 payment-title">Mercado Pago</h6>
+                            <p class="small text-muted mb-0">Tarjetas de crédito, débito y dinero en cuenta</p>
+                        </div>
                     </div>
+
+                    {# Transfer Option #}
                     {% if personalize and personalize.aliasCbu %}
-                    <div class="p-3 rounded-4 bg-light d-flex align-items-center gap-3">
-                        <i class="bi bi-bank fs-4"></i>
-                        <div><h6 class="mb-0 fw-bold">Transferencia</h6><span class="small text-muted">Alias: {{ personalize.aliasCbu }}</span></div>
+                    <div class="payment-option-card p-3 d-flex align-items-center gap-3 transition-all">
+                        <div class="payment-icon-wrap" style="background: transparent; color: #059669;">
+                            <i class="bi bi-bank2 fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-700 payment-title">Transferencia Bancaria</h6>
+                            <p class="small text-muted mb-0 text-truncate" style="max-width: 200px;">Alias: {{ personalize.aliasCbu }}</p>
+                        </div>
                     </div>
                     {% endif %}
                 </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0 d-block text-center mb-2">
+                <button type="button" class="btn btn-dark w-100 rounded-pill py-2 fw-bold" data-dismiss="modal">Entendido</button>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    .payment-option-card {
+        background: #f8fafc;
+        border: 1px solid var(--c-border);
+        border-radius: 16px;
+        cursor: pointer;
+    }
+    .payment-option-card:hover {
+        background: #fff;
+        border-color: var(--c-ink);
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .payment-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    body.dark-mode .payment-option-card {
+        background: #2a2a2a;
+        border-color: #444;
+    }
+    body.dark-mode .payment-option-card:hover {
+        background: #333;
+        border-color: #fff;
+    }
+    body.dark-mode .payment-icon-wrap { opacity: 0.9; }
+    body.dark-mode .payment-title { color: #ffffff !important; }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const mainImg = document.getElementById('main-product-img');
     const thumbs = document.querySelectorAll('.thumb-item');
     const qtyInput = document.getElementById('pd-qty');
     const selections = {};
 
-    // Gallery Logic
-    thumbs.forEach(thumb => {
+    // Gallery Logic (Scroll Sync)
+    const galleryScroll = document.getElementById('main-gallery-scroll');
+    const dots = document.querySelectorAll('.dot');
+
+    function scrollToImage(index) {
+        if (!galleryScroll) return;
+        const width = galleryScroll.offsetWidth;
+        galleryScroll.scrollTo({
+            left: index * width,
+            behavior: 'smooth'
+        });
+        updateActiveElements(index);
+    }
+
+    function updateActiveElements(index) {
+        thumbs.forEach((t, i) => {
+            t.classList.toggle('active', i === index);
+            if (i === index && window.innerWidth < 992) {
+                // Keep active thumb in view on small containers
+                t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        });
+        dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    }
+
+    if (galleryScroll) {
+        let scrollTimeout;
+        galleryScroll.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const index = Math.round(galleryScroll.scrollLeft / galleryScroll.offsetWidth);
+                updateActiveElements(index);
+            }, 50);
+        });
+    }
+
+    thumbs.forEach((thumb, i) => {
         thumb.addEventListener('click', function() {
-            thumbs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            mainImg.style.opacity = '0.5';
-            setTimeout(() => {
-                mainImg.src = this.dataset.src;
-                mainImg.style.opacity = '1';
-            }, 150);
+            scrollToImage(parseInt(this.dataset.index));
+        });
+    });
+
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', function() {
+            scrollToImage(parseInt(this.dataset.index));
         });
     });
 

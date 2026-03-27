@@ -9,6 +9,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+
 class ProductOptionValueType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -18,6 +20,15 @@ class ProductOptionValueType extends AbstractType
                 'label' => 'Opción (ej: Rojo, XL, V1)',
                 'attr' => ['placeholder' => 'Escribe la opción...']
             ])
+            ->add('stock', IntegerType::class, [
+                'label' => 'Stock (opcional)',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => '∞',
+                    'class' => 'variant-stock-input',
+                    'min' => 0
+                ]
+            ])
             ->add('isAvailable', CheckboxType::class, [
                 'label' => 'Disponible',
                 'required' => false,
@@ -25,7 +36,7 @@ class ProductOptionValueType extends AbstractType
                 'row_attr' => ['class' => 'form-check form-switch'],
             ])
             ->add('image', TextType::class, [
-                'label' => 'Imagen vinculada (ej: color-rojo.jpg)',
+                'label' => 'Imagen vinculada OPCIONAL',
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'Nombre del archivo...',

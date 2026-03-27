@@ -174,7 +174,7 @@
   .price-unit { font-size: 0.75rem; color: var(--c-muted); font-weight: 600; display: block; margin-top: 0.05rem; }
 
   .btn-remove-item {
-    color: #cbd5e1;
+    color: #ef4444;
     background: transparent;
     border: none;
     padding: 0.5rem;
@@ -273,7 +273,7 @@
     .cart-container { padding-top: 0px; padding-bottom: .5rem; }
     .cart-grid { grid-template-columns: 1fr; gap: 1rem; }
     .cart-summary { position: static; max-width: 100%; padding: 1.25rem; }
-    .cart-items-list { padding: 1.25rem; gap: 1rem; }
+    .cart-items-list { padding: 1rem; gap: 0.25rem; }
     .checkout-steps { margin-bottom: 1.5rem; gap: 0.5rem; }
     .step-item { font-size: 0.7rem; gap: 0.4rem; }
     .step-line { width: 20px; }
@@ -281,10 +281,11 @@
   }
 
   @media (max-width: 767px) {
+    .cart-items-list { gap: 0; }
     .cart-item {
       grid-template-columns: 70px 1fr;
-      gap: 1rem;
-      padding: 1.25rem 0;
+      gap: 0 1rem;
+      padding: 0.75rem 0;
     }
     .cart-item__img-wrap { width: 70px; height: 90px; }
     .cart-item__side {
@@ -292,9 +293,9 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      margin-top: 0.25rem;
+      margin-top: 0;
       background: #fdfcfb;
-      padding: 0.5rem 0.75rem;
+      padding: 0 0.75rem 0.5rem 0.75rem;
       border-radius: var(--radius-md);
     }
     .cart-item__name { font-size: 1rem; }
@@ -308,16 +309,66 @@
     .btn-checkout { padding: 0.9rem; margin-top: 1rem; font-size: 0.9rem; }
     .btn-shipping-info { padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.75rem; }
   }
+
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+    color: #f5f5f5;
+  }
+  body.dark-mode .cart-title,
+  body.dark-mode .summary-title { color: #ffffff !important; }
+  body.dark-mode .cart-items-list, 
+  body.dark-mode .cart-summary {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+  }
+  body.dark-mode .cart-item { border-bottom-color: #333 !important; }
+  body.dark-mode .cart-item__name a, body.dark-mode .price-total { color: #ffffff !important; }
+  body.dark-mode .summary-row.total { border-top-color: #333 !important; }
+  body.dark-mode .total-amount { color: #ffffff !important; }
+  body.dark-mode .qty-ctrl { background-color: #2a2a2a !important; }
+  body.dark-mode .qty-btn { background-color: #333 !important; border-color: #444 !important; color: #fff !important; }
+  body.dark-mode .cart-item__variants { background-color: #333 !important; color: #fff !important; }
+  body.dark-mode .step-num { background-color: #333 !important; color: #ffffff !important; }
+  body.dark-mode .step-item { color: #b0b0b0 !important; }
+  body.dark-mode .step-item.active { color: #ffffff !important; }
+  body.dark-mode .step-item.active .step-num { background-color: #ffffff !important; color: #121212 !important; }
+  body.dark-mode .step-line { background-color: #444 !important; }
+  body.dark-mode .cart-item__side { background-color: #1e1e1e !important; }
+  body.dark-mode .btn-checkout { background-color: #2a2a2a !important; color: #ffffff !important; border: 1px solid #444 !important; }
+
+  /* Shipping Popup Dark Mode */
+  body.dark-mode .modal-content { background-color: #1a1a1a !important; color: #fff !important; border: 1px solid #333 !important; }
+  body.dark-mode .modal-header .modal-title { color: #fff !important; }
+  body.dark-mode .modal-header button.close { color: #fff !important; text-shadow: none; opacity: 0.8; }
+  body.dark-mode .modal-header button.close:hover { opacity: 1; }
+  body.dark-mode .selection-card { background-color: #222 !important; border-color: #333 !important; }
+  body.dark-mode .selection-card__name { color: #fff !important; }
+  body.dark-mode .selection-card__icon { background-color: #2d2d2d !important; color: #fff !important; }
+  body.dark-mode .selection-card__desc { color: #aaa !important; }
+  body.dark-mode .modal-footer .btn-dark { background-color: #333 !important; border-color: #444 !important; color: #fff !important; }
+  body.dark-mode .selection-card .text-success { color: #2ecc71 !important; }
+  body.dark-mode .selection-card .text-muted { color: #aaa !important; }
+  
+  /* Shipping Results Dark Mode */
+  body.dark-mode #shipping-results .text-dark { color: #fff !important; }
+  body.dark-mode #shipping-results .border-bottom { border-color: #333 !important; }
+  body.dark-mode #shipping-results .text-muted { color: #aaa !important; }
 </style>
 
 <div class="container cart-container">
     {% if totalQuantity > 0 %}
-        <div class="mb-2 d-flex justify-content-between align-items-center">
-            <button type="button" onclick="window.history.back()" class="btn-back">
+        <div class="mb-2 mt-0 pt-0 d-flex justify-content-between align-items-center">
+            <button type="button" onclick="window.history.back()" class="btn-back d-flex align-items-center gap-1 text-muted fw-bold" style="margin: 0; padding: 0; border: none; background: transparent; font-size: 0.9rem;">
                 <i class="bi bi-arrow-left"></i> Volver
             </button>
-            <a href="{{ path('remove_cart') }}" class="pb-3 text-danger opacity-75 hover-opacity-100 text-decoration-none fw-bold small d-flex align-items-center gap-1" style="transition:0.2s; font-size: 0.9rem;">
-                <i class="bi bi-trash3 mr-1"></i>  <b>Vaciar carrito</b>
+            <a href="{{ path('remove_cart') }}" class="text-danger opacity-75 hover-opacity-100 text-decoration-none fw-bold small d-flex align-items-center gap-1" style="margin: 0; padding: 0; transition:0.2s; font-size: 0.9rem;">
+                <i class="bi bi-trash3"></i> <b class="mx-2">Vaciar carrito</b>
             </a>
         </div>
 
@@ -337,7 +388,7 @@
         </div>
 
         <header class="cart-header">
-            <p class="cart-title">MI CARRITO ({{ totalQuantity }}) </p>
+            <p class="cart-title">MI CARRITO (<span class="js-cart-count">{{ totalQuantity }}</span>) </p>
         </header>
 
         <div class="cart-grid">
@@ -397,7 +448,7 @@
                 
 
                     <div class="summary-row total mb-3">
-                        <span class="total-label">Subtotal  {{ totalQuantity }} producto(s) </span>
+                        <span class="total-label">Subtotal  <span class="js-cart-count">{{ totalQuantity }}</span> producto(s) </span>
                         <span class="total-amount js-cart-total-price" data-raw-price="{{ totalPrice / 100 }}">ARS {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
                     </div>
                     <hr>
@@ -427,7 +478,7 @@
                         <div id="shipping-error" class="text-danger small fw-bold d-none mt-1"></div>
                         <a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" class="small text-decoration-none text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle"></i> No sé mi código postal</a>
                     </div>
-                    <div class="mt-4 pt-4 border-top text-center opacity-75">
+                    <div class="mt-2 pt-2 text-center opacity-75">
                         <small class="text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.75rem; font-weight: 700;">
                             <i class="bi bi-shield-check-fill " style="font-size: 1.1rem; color: #6ed197;"></i>
                             PAGO SEGURO Y PROTEGIDO
@@ -439,12 +490,12 @@
 
     {% else %}
         <div class="cart-empty py-5 text-center">
-            <div class="bg-light d-inline-flex p-4 rounded-circle mb-4">
+            <div class="d-inline-flex mb-4">
                 <i class="bi bi-bag-x" style="font-size: 3rem; color: #cbd5e1;"></i>
             </div>
             <h2 class="order-title mb-3">Tu carrito está vacío</h2>
             <p class="text-muted mb-4">¡No te preocupes! Tenemos productos increíbles esperándote.</p>
-            <a href="{{ path('home') }}" class="btn-checkout d-inline-flex w-auto px-5 rounded-pill">
+            <a href="{{ path('home') }}" class="btn d-inline-flex w-auto px-5 rounded-pill fw-bold" style="background: #6c757d; color: #ffffff; border: none; padding-top: 0.8rem; padding-bottom: 0.8rem;">
                 Ir de compras
             </a>
         </div>

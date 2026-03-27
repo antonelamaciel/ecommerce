@@ -33,7 +33,7 @@
   /* ── SIDEBAR FILTERS - MODERN MINIMAL DESIGN ── */
   .shop-sidebar {
     background: #ffffff;
-    padding: 2rem;
+    padding: 1.25rem;
     border-radius: 16px;
     border: 1px solid #ececec;
     position: sticky;
@@ -68,9 +68,8 @@
 
   /* Filter Sections */
   .filter-section {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #f5f5f5;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
   }
 
   .filter-section:last-of-type {
@@ -116,9 +115,8 @@
 
   /* Filter Buttons */
   .filter-buttons {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #f5f5f5;
+    margin-top: 1rem;
+    padding-top: 0;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -152,9 +150,9 @@
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
-    padding: 0.75rem 0;
+    padding: 0.3rem 0;
     gap: 0.75rem;
-    min-height: 40px;
+    min-height: 36px;
     border-bottom: 1px solid #f8f8f8;
   }
 
@@ -287,9 +285,9 @@
     grid-template-columns: auto 1fr;
     align-items: center;
     gap: 12px;
-    padding: 0.65rem 1rem 0.65rem 1.5rem;
+    padding: 0.25rem 0.75rem 0.25rem 1.25rem;
     cursor: pointer;
-    min-height: 36px;
+    min-height: 28px;
     transition: background 0.2s ease;
   }
 
@@ -298,18 +296,18 @@
   }
 
   .sub-check .form-check-input {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   .sub-check .form-check-label {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     color: #666;
   }
 
   .sub-check .form-check-input:checked ~ .form-check-label {
     color: #000;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   /* ── Header ── */
@@ -416,6 +414,42 @@
       padding: 0.6rem 1rem 0.6rem 1.25rem;
     }
   }
+
+  /* ── Dark Mode Overrides for Product Listing ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+  }
+  body.dark-mode .shop-sidebar {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+  }
+  body.dark-mode .filter-section { border-bottom-color: #333; }
+  body.dark-mode .category-main-row { border-bottom-color: #333; }
+  body.dark-mode .category-main-row:hover { background-color: #2a2a2a; }
+  body.dark-mode .form-check-label { color: #f5f5f5 !important; }
+  body.dark-mode .form-check-input { background-color: #2a2a2a !important; border-color: #444 !important; }
+  body.dark-mode .form-check-input:checked { background-color: #ffffff !important; border-color: #ffffff !important; }
+  body.dark-mode .form-check-input:checked::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='black' d='M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E") !important;
+  }
+  body.dark-mode .sub-list { background-color: #181818; }
+  body.dark-mode .sub-check:hover { background-color: #2a2a2a; }
+  body.dark-mode .sub-toggle-btn:hover { background-color: #333; color: #fff; }
+  body.dark-mode .shop-sidebar input[type="text"],
+  body.dark-mode .shop-sidebar input[type="search"] {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode .mobile-filter-toggle {
+    background-color: #ffffff !important;
+    color: #121212 !important;
+  }
+
 </style>
 
 <div class="container py-5">
@@ -438,7 +472,6 @@
                 {{ form_start(form) }}
                     <!-- Search Input -->
                     <div class="filter-section">
-                        {{ form_label(form.string, 'Buscar') }}
                         {{ form_widget(form.string, {'attr': {'placeholder': 'Buscar productos...'}}) }}
                     </div>
 

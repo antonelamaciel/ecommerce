@@ -20,7 +20,7 @@
         {% if bundle.topRightBadge %}
             {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : 
                                (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
-            <span class="top-badge-right">{{ badgeText }}</span>
+            <span class="top-badge-right top-badge-right--{{ bundle.topRightBadge }}">{{ badgeText }}</span>
         {% endif %}
     {% endfor %}
     
@@ -46,19 +46,6 @@
             {% endif %}
         </a>
 
-        {# MOBILE BUY BUTTON (Inside Image) #}
-        {% if product.stock is not null and product.stock <= 0 %}
-            <div class="pcard__buy-btn pcard__buy-btn-mobile disabled d-md-none" style="background: rgba(255,255,255,0.9); color: #dc3545 !important; cursor: not-allowed;">
-                <span style="margin-right:0.25rem">Sin stock</span> <i class="bi bi-cart-x"></i>
-            </div>
-        {% else %}
-            <a href="{{ path('product_show', {slug: product.slug}) }}" 
-               class="pcard__buy-btn pcard__buy-btn-mobile pcard__buy-btn--p d-md-none" 
-               data-add-cart-url="{{ path('add_to_cart', {id: product.id, variants: firstVariant}) }}"
-               style="{% if personalize is defined and personalize and personalize.tertiaryColor %}background-color: {{ personalize.tertiaryColor }};{% endif %}">
-                <span style="margin-right:0.25rem; font-size: 0.75rem;">Añadir</span> <i class="bi bi-cart-plus"></i>
-            </a>
-        {% endif %}
     </div>
 
     <div class="pcard__body">
@@ -69,7 +56,7 @@
         </h3>
 
         {% if product.bundles|length > 0 %}
-            <div class="pcard__pills-wrap" style="display: flex; gap: 4px; margin-top: 2px;">
+            <div class="pcard__pills-wrap" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center;">
                 {% for bundle in product.bundles %}
                     <span class="bundle-pill" style="font-size: 0.6rem; color: #999; font-weight: 600; text-transform: uppercase;">
                         • {{ bundle.type == 'pocas_unidades' ? 'Pocas unidades' : (bundle.type == 'oferta_sorpresa' ? 'Oferta' : 'Promo') }}
@@ -82,30 +69,37 @@
             <div class="pcard__price-container">
                 {% if maxBundleDiscount > 0 or (product.oldPrice and product.oldPrice != product.price) %}
                     {% set oldPrice = product.oldPrice ?: product.price %}
-                    <span class="pcard__price-old">ARS {{ (oldPrice / 100)|number_format(2, ',', '.') }}</span>
                     <span class="pcard__price-main" style="{% if maxBundleDiscount > 0 %}color: #dc3545;{% elseif personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">
                         ARS {{ (finalPrice / 100)|number_format(2, ',', '.') }}
                         {% if maxBundleDiscount > 0 %}{{ maxBundleDiscount }}%OFF{% endif %}
                     </span>
+                    <span class="pcard__price-old">ARS {{ (oldPrice / 100)|number_format(2, ',', '.') }}</span>
                 {% else %}
                     <span class="pcard__price-main" style="{% if personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
                 {% endif %}
             </div>
         </div>
-
-        {% if product.stock is not null and product.stock <= 0 %}
-            <div class="pcard__buy-btn disabled text-center d-none d-md-block" style="background: #f1f1f1; color: #999 !important; cursor: not-allowed; margin-top: auto;">
-                Sin stock
-            </div>
-        {% else %}
-            <a href="{{ path('product_show', {slug: product.slug}) }}" 
-               class="pcard__buy-btn pcard__buy-btn--p d-none d-md-block" 
-               data-add-cart-url="{{ path('add_to_cart', {id: product.id, variants: firstVariant}) }}"
-               style="margin-top: auto; {% if personalize is defined and personalize and personalize.tertiaryColor %}background-color: {{ personalize.tertiaryColor }};{% endif %}">
-                <span>Agregar al carrito</span>
-            </a>
-        {% endif %}
     </div>
+
+    {% if product.stock is not null and product.stock <= 0 %}
+        <div class="pcard__buy-btn disabled text-center" style="background: #f1f1f1; color: #999 !important; cursor: not-allowed; border-radius: 0;">
+            Sin stock
+        </div>
+    {% else %}
+        <a href="{{ path('product_show', {slug: product.slug}) }}" 
+           class="pcard__buy-btn pcard__buy-btn--p" 
+           data-add-cart-url="{{ path('add_to_cart', {id: product.id, variants: firstVariant}) }}"
+           style="border-radius: 0; background-color: var(--primary-color) !important; color: var(--tertiary-color) !important;">
+            <span>
+                {% if is_related|default(false) %}
+                    <span class="d-md-none">Agregar <i class="bi bi-cart-plus"></i></span>
+                    <span class="d-none d-md-inline">Agregar al carrito</span>
+                {% else %}
+                    Agregar al carrito
+                {% endif %}
+            </span>
+        </a>
+    {% endif %}
 
     {# Hidden store for Quick View #}
     <div class="pcard__options-store d-none">

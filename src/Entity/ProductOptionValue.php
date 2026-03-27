@@ -79,6 +79,21 @@ class ProductOptionValue
         return $this;
     }
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $stock = null;
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?int $stock): static
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
     public function __toString(): string
     {
         return $this->name ?? '';

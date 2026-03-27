@@ -50,16 +50,11 @@ class NotificationCrudController extends AbstractCrudController
             ->createAsGlobalAction()
             ->setCssClass('btn btn-success');
 
-        $modify = Action::new('modify', 'Modificar', 'fa fa-edit')
-            ->linkToCrudAction(Action::EDIT)
-            ->setCssClass('btn btn-secondary');
-
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_INDEX, $markAsSeen)
             ->add(Crud::PAGE_INDEX, $markAllAsSeen)
             ->add(Crud::PAGE_DETAIL, $markAsSeen)
-            ->add(Crud::PAGE_DETAIL, $modify)
             ->remove(Crud::PAGE_INDEX, Action::NEW)
             ->remove(Crud::PAGE_INDEX, Action::DELETE);
     }

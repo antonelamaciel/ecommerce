@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -62,12 +63,14 @@ class ProductCrudController extends AbstractCrudController
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false)
                 ->onlyOnForms()
-                ->setHelp('Portada del producto visible en la tienda'),
+                ->setHelp('Portada del producto visible en la tienda')
+                ->setCssClass('mb-3'),
 
             TextField::new('image_preview', 'Portada actual')
                 ->onlyOnForms()
                 ->setTemplatePath('admin/fields/banner_image.html.twig')
-                ->setFormTypeOption('mapped', false),
+                ->setFormTypeOption('mapped', false)
+                ->setCssClass('mb-3'),
 
             ImageField::new('image', 'Portada')
                 ->setTemplatePath('admin/fields/banner_image.html.twig')
@@ -76,21 +79,24 @@ class ProductCrudController extends AbstractCrudController
             // --- GALERÍA (Colección dinámica de EasyAdmin) ---
             Field::new('imagesUpload', 'Galería de imágenes')
                 ->setFormType(FileType::class)
-                ->setHelp('Galería de imágenes del producto visible en la tienda')
+                ->setHelp('Galería de imágenes del producto visible en la tienda (Máximo 10 fotos)')
                 ->setFormTypeOptions([
                     'multiple' => true,
                     'mapped' => false,
                     'required' => false,
                     'attr' => [
-                        'accept' => 'image/*'
+                        'accept' => 'image/*',
+                        'id' => 'image-upload-input'
                     ]
                 ])
-                ->onlyOnForms(),
+                ->onlyOnForms()
+                ->setCssClass('mb-3'),
 
-            TextField::new('gallery_preview', 'Imágenes cargadas')
+            TextField::new('gallery_preview', 'Imágenes cargadas actualmente')
                 ->onlyOnForms()
                 ->setTemplatePath('admin/fields/product_images_gallery.html.twig')
-                ->setFormTypeOption('mapped', false),
+                ->setFormTypeOption('mapped', false)
+                ->setCssClass('mb-3'),
 
             ArrayField::new('images', 'Imágenes cargadas')
                 ->hideOnForm()
@@ -102,22 +108,15 @@ class ProductCrudController extends AbstractCrudController
             TextareaField::new('description', 'Descripción')->hideOnIndex()->setRequired(false)
             ->setHelp('Descripción del producto visible en la tienda'),
             AssociationField::new('category', 'Categoría')->setRequired(true)
-            ->setHelp('Categoría principal del producto'),
+                ->setHelp('Categoría principal del producto. Ej: INVIERNO, PARTES DE ARRIBA, ACCESORIOS, etc. <br><a href="/admin?crudAction=new&crudControllerFqcn=App\\Controller\\Admin\\CategoryCrudController" class="btn btn-sm btn-primary mt-2 shadow-sm text-white btn-confirm-exit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; padding: 8px 20px; margin-bottom: 12px; border-radius: 10px; text-align:center; min-width: 180px;"><i class="fas fa-plus-circle me-2"></i> Crear Nueva Categoría</a>'),
             AssociationField::new('subcategories', 'Subcategorías')
-            ->setHelp('Categorias mas especificas del producto')
+            ->setHelp('Categorias mas especificas del producto. Ej: BUZOS, COLLARES, TOPS, etc.')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->hideOnIndex(),
-            MoneyField::new('price', 'Precio')->setCurrency('ARS')->setRequired(true)
-            ->setHelp('Precio del producto visible en la tienda'),
-            MoneyField::new('oldPrice', 'Precio Tachado (ARS)')
-            ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).')
-            ->setCurrency('ARS')
-                ->setRequired(false)
-                ->setHelp('Precio anterior que aparecerá tachado.'),
-            IntegerField::new('stock', 'Cantidad de Stock (opcional)')
-            ->setHelp('Unidades disponibles en inventario (no obligatorio).')
-                ->setRequired(false)
-                ->setHelp('Unidades disponibles en inventario.'),
+            NumberField::new('price', 'Precio (ARS)')->setRequired(true)
+            ->setHelp('Precio del producto visible en la tienda (Ej: 1500,50)'),
+            NumberField::new('oldPrice', 'Precio Tachado (ARS)')
+            ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).'),
            
             BooleanField::new('isInHome', 'Producto Destacado')
             ->setHelp('El producto aparecera entre los primeros en la pagina de inicio? si/no.')
@@ -133,15 +132,20 @@ class ProductCrudController extends AbstractCrudController
                 ->hideOnIndex()
                 ->setCssClass('padded-options-collection'),
 
+            IntegerField::new('stock', 'Cantidad de Stock (opcional)')
+            ->setHelp('Unidades disponibles en inventario (no obligatorio).')
+                ->setRequired(false)
+                ->setHelp('Unidades disponibles en inventario.'),
+                
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Administración (Solo Interno)')
                 ->setIcon('fas fa-user-shield')
                 ->addCssClass('padded-internal-panel'),
             AssociationField::new('supplier', 'Proveedor')
                 ->setRequired(false)
                 ->hideOnIndex(),
-            MoneyField::new('purchaseCost', 'Costo de compra')
-                ->setCurrency('ARS')
+            NumberField::new('purchaseCost', 'Costo de compra (ARS)')
                 ->setRequired(false)
+                ->setHelp('Costo aproximado de compra para cálculo de ganancias.')
                 ->hideOnIndex(),
             DateTimeField::new('purchaseDate', 'Fecha de compra')
                 ->setRequired(false)
@@ -220,7 +224,9 @@ class ProductCrudController extends AbstractCrudController
 
     public function configureAssets(Assets $assets): Assets
     {
-        return $assets->addHtmlContentToHead(<<<'HTML'
+        return $assets
+            ->addJsFile('assets/js/image-preview.js')
+            ->addHtmlContentToHead(<<<'HTML'
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const initSubcategories = () => {
@@ -296,7 +302,6 @@ class ProductCrudController extends AbstractCrudController
                         trigger.innerHTML = `
                             <div class="d-flex align-items-center">
                                 <img src="/uploads/${input.value}" class="v-trigger-img">
-                                <span class="v-trigger-text text-truncate">${input.value}</span>
                                 <i class="fas fa-chevron-down ml-auto"></i>
                             </div>
                         `;
@@ -304,7 +309,7 @@ class ProductCrudController extends AbstractCrudController
                         trigger.innerHTML = `
                             <div class="d-flex align-items-center">
                                 <div class="v-trigger-placeholder"><i class="fas fa-image"></i></div>
-                                <span class="v-trigger-text text-muted">Vincular a imagen...</span>
+                                <span class="v-trigger-text text-muted">Vincular imagen...</span>
                                 <i class="fas fa-chevron-down ml-auto"></i>
                             </div>
                         `;
@@ -337,7 +342,6 @@ class ProductCrudController extends AbstractCrudController
                             
                             item.innerHTML = `
                                 <img src="/uploads/${imgName}" class="v-item-img">
-                                <span class="v-item-text text-truncate">${imgName}</span>
                             `;
                             
                             item.onclick = () => {
@@ -393,15 +397,15 @@ class ProductCrudController extends AbstractCrudController
         border-color: #3b82f6;
     }
     .v-trigger-img {
-        width: 32px;
-        height: 32px;
+        width: 50px;
+        height: 50px;
         object-fit: cover;
         border-radius: 4px;
         margin-right: 12px;
     }
     .v-trigger-placeholder {
-        width: 32px;
-        height: 32px;
+        width: 50px;
+        height: 50px;
         background: #f3f4f6;
         border-radius: 4px;
         display: flex;
@@ -419,50 +423,55 @@ class ProductCrudController extends AbstractCrudController
         position: absolute;
         top: 100%;
         left: 0;
-        right: 0;
         z-index: 1000;
         background: #fff;
         border: 1px solid #d1d5db;
         border-radius: 6px;
         margin-top: 4px;
-        max-height: 250px;
+        max-height: 300px;
+        width: auto;
+        min-width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 5px;
+        gap: 5px;
         overflow-y: auto;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
     .v-dropdown-item {
-        padding: 8px 12px;
+        padding: 5px;
         display: flex;
         align-items: center;
+        justify-content: center;
         cursor: pointer;
-        transition: background 0.2s;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    .v-dropdown-item:last-child {
-        border-bottom: none;
+        transition: transform 0.2s, background 0.2s;
+        border-radius: 4px;
+        border: 1px solid transparent;
     }
     .v-dropdown-item:hover {
         background: #eff6ff;
+        transform: scale(1.05);
+        border-color: #3b82f6;
     }
     .v-dropdown-item.active {
         background: #f0f7ff;
-        border-left: 3px solid #3b82f6;
+        border-color: #3b82f6;
     }
     .v-item-img {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
         object-fit: cover;
         border-radius: 4px;
-        margin-right: 12px;
-    }
-    .v-item-text {
-        font-size: 0.85rem;
-        color: #374151;
     }
     .v-clear-opt {
+        width: 100%;
         color: #dc2626;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        padding: 8px !important;
+        justify-content: flex-start !important;
         background: #fff5f5;
+        border-bottom: 1px solid #fee2e2 !important;
     }
     .v-clear-opt:hover {
         background: #fee2e2;

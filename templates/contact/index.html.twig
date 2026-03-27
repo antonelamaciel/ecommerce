@@ -12,7 +12,7 @@
     --c-border: #f0ede8;
     --c-ink: #1a1a1a;
     --c-muted: #696561;
-    --c-brand: var(--secondary-color, #1a1a1a);
+    --c-brand: var(--tertiary-color, #1a1a1a);
     --radius-lg: 24px;
     --radius-md: 16px;
     --radius-sm: 10px;
@@ -90,9 +90,9 @@
 
   form button[type="submit"], .btn-outline-success {
     width: 100%;
-    background: var(--c-brand) !important;
-    color: #fff !important;
-    border: none !important;
+    background: var(--primary-color) !important;
+    color: var(--tertiary-color) !important;
+    border: 1px solid var(--tertiary-color) !important;
     padding: 1rem !important;
     border-radius: var(--radius-sm) !important;
     font-weight: 700 !important;
@@ -211,9 +211,9 @@
 
 .btn-submit {
     width: 100%;
-    background: var(--c-brand) !important;
-    color: var(--primary-color) !important;
-    border: none !important;
+    background: var(--primary-color) !important;
+    color: var(--tertiary-color) !important;
+    border: 1px solid var(--tertiary-color) !important;
     padding: 1.1rem !important;
     border-radius: var(--radius-sm) !important;
     font-weight: 700 !important;
@@ -229,6 +229,41 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 .shadow-xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important; }
+
+  /* ── Dark Mode Overrides for Contact Page ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+    color: #f5f5f5;
+  }
+  body.dark-mode .contact-title { color: #ffffff !important; }
+  body.dark-mode .card-premium {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode label { color: #888 !important; }
+  body.dark-mode form input[type="text"], 
+  body.dark-mode form input[type="email"],
+  body.dark-mode form textarea {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #ffffff !important;
+  }
+  body.dark-mode form input:focus, 
+  body.dark-mode form textarea:focus {
+    border-color: #fff !important;
+    background-color: #333 !important;
+  }
+  body.dark-mode .btn-submit {
+      background-color: var(--primary-color) !important;
+      color: var(--tertiary-color) !important;
+  }
+  body.dark-mode .alert-success { background-color: #163f25 !important; color: #fff !important; }
+  body.dark-mode .alert-danger { background-color: #441a1a !important; color: #fff !important; }
 </style>
 
 <div class="contact-wrap">

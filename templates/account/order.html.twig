@@ -145,6 +145,45 @@
   @media (max-width: 991px) {
     .detail-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+    --c-soft: #2a2a2a;
+    --c-brand: #ffffff;
+  }
+  body.dark-mode .order-title { color: #ffffff !important; }
+  body.dark-mode .order-meta b { color: #ffffff !important; }
+  body.dark-mode .card-premium { 
+    background-color: #1e1e1e !important; 
+    border-color: #333 !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+  }
+  body.dark-mode .section-title { color: #b0b0b0 !important; }
+  body.dark-mode .section-title i { color: #ffffff !important; }
+  body.dark-mode .item-name { color: #ffffff !important; }
+  body.dark-mode .item-price { color: #ffffff !important; }
+  body.dark-mode .items-table td { border-bottom-color: #333 !important; }
+  body.dark-mode .summary-row.total { 
+    border-top-color: #333 !important; 
+    color: #ffffff !important; 
+  }
+  body.dark-mode .order-summary { border-top-color: #333 !important; }
+  body.dark-mode .fw-bold { color: #ffffff !important; }
+  body.dark-mode .item-variants .bg-light { background-color: #2a2a2a !important; color: #b0b0b0 !important; border-color: #444 !important; }
+  
+  /* Status Overrides */
+  body.dark-mode .state-0 { background: #331111 !important; color: #ff8080 !important; }
+  body.dark-mode .state-1 { background: #06331a !important; color: #50e3a6 !important; }
+  body.dark-mode .state-2 { background: #332100 !important; color: #ffda6a !important; }
+  body.dark-mode .state-3 { background: #001a33 !important; color: #80c0ff !important; }
+  body.dark-mode .state-4 { background: #332100 !important; color: #ffb84d !important; }
+  body.dark-mode .state-5 { background: #2a2a2a !important; color: #666 !important; }
+  body.dark-mode .btn-back:hover { color: #ffffff !important; }
 </style>
 
 <div class="order-detail-wrap">

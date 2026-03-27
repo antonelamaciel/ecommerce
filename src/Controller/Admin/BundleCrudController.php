@@ -85,16 +85,94 @@ class BundleCrudController extends AbstractCrudController
                     
             </style>
             
+            <style>
+                .select2-results__option { padding: 0 !important; }
+                .hover-surface:hover { background-color: #f8fafc !important; }
+                .bg-soft-primary { background-color: rgba(99, 102, 241, 0.1); }
+            </style>
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    // Forzar que Select2 se adjunte al body de la página en lugar del panel interno
-                    if (typeof $ !== "undefined" && $.fn.select2) {
-                        setTimeout(function() {
-                            $("select[data-widget=\"select2\"], .select2").each(function() {
-                                $(this).select2({ dropdownParent: $(document.body) });
+                    function initUniversalProductPicker() {
+                        var select = document.querySelector(".bundle-products-selector select");
+                        if (!select) return false;
+
+                        // 1. Mapa Universal Constante: Asegurar que extraemos todas las rutas de imagen del DOM
+                        var imageMap = {};
+                        var options = Array.from(select.options);
+                        options.forEach(function(opt) {
+                            if (opt.value) {
+                                imageMap[opt.value] = opt.dataset.image || "/assets/images/default-product.png";
+                            }
+                        });
+
+                        // 2. Soporte para TomSelect (Motor Nativo EasyAdmin 4)
+                        if (select.tomselect && !select.dataset.visualTs) {
+                            select.dataset.visualTs = "true";
+                            var ts = select.tomselect;
+                            
+                            // Reinyectar IDs en el objeto interno
+                            Object.keys(imageMap).forEach(function(key) {
+                                if (ts.options[key]) {
+                                    ts.updateOption(key, Object.assign({}, ts.options[key], { src: imageMap[key] }));
+                                } else {
+                                    ts.addOption({ value: key, text: "Producto " + key, src: imageMap[key] });
+                                }
                             });
-                        }, 500);
+
+                            ts.settings.render.option = function(data, escape) {
+                                var src = data.src || imageMap[data.value] || "/assets/images/default-product.png";
+                                return \'<div class="d-flex align-items-center p-3 border-bottom hover-surface">\' +
+                                    \'<img src="\' + src + \'" class="rounded-3 shadow-sm border border-black-10 me-3" style="width: 50px; height: 50px; object-fit: cover;">\' +
+                                    \'<div class="d-flex flex-column"><span class="fw-bolder text-dark h6 mb-1">\' + escape(data.text) + \'</span></div></div>\';};
+                            ts.settings.render.item = function(data, escape) {
+                                var src = data.src || imageMap[data.value] || "/assets/images/default-product.png";
+                                return \'<div class="d-flex align-items-center gap-2">\' +
+                                    \'<img src="\' + src + \'" class="rounded-1" style="width: 24px; height: 24px; object-fit: cover;">\' +
+                                    \'<span class="small fw-semibold text-dark">\' + escape(data.text) + \'</span></div>\';
+                            };
+                            ts.refreshOptions(false);
+                            ts.refreshItems();
+                            return true;
+                        }
+
+                        // 3. Soporte para Select2 (Motor Clásico)
+                        if (typeof $ !== "undefined" && $.fn && $.fn.select2 && !select.dataset.visualS2) {
+                            select.dataset.visualS2 = "true";
+                            var $s = $(select);
+                            if ($s.hasClass("select2-hidden-accessible")) $s.select2("destroy");
+                            
+                            $s.select2({
+                                width: "100%",
+                                dropdownParent: $(document.body),
+                                templateResult: function(product) {
+                                    if (!product.id) return product.text;
+                                    var src = imageMap[product.id] || "/assets/images/default-product.png";
+                                    return $(
+                                        \'<div class="d-flex align-items-center p-3 border-bottom hover-surface">\' +
+                                        \'<img src="\' + src + \'" class="rounded-3 shadow-sm border border-black-10 me-3" style="width: 50px; height: 50px; object-fit: cover;">\' +
+                                        \'<div class="d-flex flex-column"><span class="fw-bolder h6 mb-1 text-dark">\' + product.text + \'</span>\' +
+                                        \'<span class="badge bg-soft-primary text-primary px-2 py-1 rounded-pill" style="font-size:0.75rem;"><i class="fas fa-check-circle me-1"></i>Catálogo Completo</span></div></div>\'
+                                    );
+                                },
+                                templateSelection: function(product) {
+                                    if (!product.id) return product.text;
+                                    var src = imageMap[product.id] || "/assets/images/default-product.png";
+                                    return $(\'<div class="d-flex align-items-center gap-2"><img src="\' + src + \'" class="rounded-1" style="width: 24px; height: 24px; object-fit: cover;"><span class="small fw-semibold text-dark">\' + product.text + \'</span></div>\');
+                                }
+                            });
+                            return true;
+                        }
+
+                        return false;
                     }
+
+                    // Forzar escaneo constante durante los primeros 10 segundos
+                    var attempts = 0;
+                    var interv = setInterval(function() {
+                        var success = initUniversalProductPicker();
+                        if (success || attempts > 40) clearInterval(interv);
+                        attempts++;
+                    }, 250);
                 });
             </script>
         ');
@@ -153,6 +231,8 @@ class BundleCrudController extends AbstractCrudController
                 ->setRequired(false),
             
             AssociationField::new('products', 'Productos seleccionados (afectados)')
+                ->autocomplete(false)
+                ->setCssClass('bundle-products-selector')
                 ->setFormTypeOptions([
                     'by_reference' => false,
                     'choice_attr' => function($choice, $key, $value) {

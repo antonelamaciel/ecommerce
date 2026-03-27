@@ -33,6 +33,77 @@
         
         body {
             background-color: var(--bg-body) !important;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* ── Dark Mode Theme Protocol ── */
+        body.dark-mode {
+            --bg-body: #121212 !important;
+            --primary-color: #1a1a1a !important;
+            --secondary-color: #222222 !important;
+            --tertiary-color: #ffffff !important;
+            background-color: #121212 !important;
+            color: #f5f5f5 !important;
+        }
+        body.dark-mode .navbar, body.dark-mode .footer-custom {
+            background-color: #1a1a1a !important;
+            border-bottom: 1px solid #333 !important;
+        }
+        body.dark-mode .navbar-custom *, body.dark-mode .nav-link, body.dark-mode .navbar-brand {
+            color: #ffffff !important;
+        }
+        body.dark-mode .card, body.dark-mode .pcard, body.dark-mode .dropdown-menu, body.dark-mode .offcanvas {
+            background-color: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .pcard__name a { color: #fff !important; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode p, body.dark-mode span:not(.badge):not(.bundle-pill), body.dark-mode a:not(.btn):not(.top-badge-right):not(.bundle-pill) {
+            color: #f5f5f5 !important;
+        }
+        body.dark-mode .pcard__img-wrap, body.dark-mode .bg-light {
+            background-color: #2a2a2a !important;
+        }
+        body.dark-mode .form-control, body.dark-mode .form-select {
+            background-color: #2a2a2a !important;
+            border-color: #444 !important;
+            color: #fff !important;
+            max-width: 100%;
+        }
+        body.dark-mode input::placeholder { color: #888 !important; }
+        body.dark-mode .btn-outline-dark, body.dark-mode .btn-light {
+            border-color: #555 !important;
+            background-color: #333 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .table, body.dark-mode .list-group-item {
+            background-color: transparent !important;
+            color: #f5f5f5 !important;
+            border-color: #333 !important;
+        }
+        body.dark-mode .accordion-item, body.dark-mode .accordion-button {
+            background-color: #1e1e1e !important;
+            color: #f5f5f5 !important;
+            border-color: #333 !important;
+        }
+        body.dark-mode .text-dark, body.dark-mode .text-muted {
+            color: #b0b0b0 !important;
+        }
+        body.dark-mode .drawer-header { border-bottom: 1px solid #333; }
+        body.dark-mode .pcard__badge {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444 !important;
+        }
+        body.dark-mode .top-badge-right {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444 !important;
+        }
+        body.dark-mode #themeToggleBtn {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border-color: #ffffff !important;
         }
 
         {% if personalize %}
@@ -74,7 +145,14 @@
 
             .navbar-custom .cart-badge {
                 color: var(--primary-color) !important;
+                background-color: var(--tertiary-color) !important;
                 border-color: var(--primary-color) !important;
+            }
+            
+            body.dark-mode .navbar-custom .cart-badge {
+                color: #ffffff !important;
+                background-color: #000000 !important;
+                border-color: #ffffff !important;
             }
 
             .navbar-custom .search-box input, 
@@ -83,6 +161,12 @@
             .search-overlay-form input,
             .btn-outline-light {
                 border-color: var(--tertiary-color) !important;
+                color: var(--tertiary-color) !important;
+            }
+
+            /* Global Icon Color (Excluding WhatsApp, Theme Toggle, and Assistant) */
+            i[class^="bi-"]:not(.bi-whatsapp):not(.bi-sun-fill):not(.bi-moon-fill):not(.bi-robot), 
+            i[class*=" bi-"]:not(.bi-whatsapp):not(.bi-sun-fill):not(.bi-moon-fill):not(.bi-robot) {
                 color: var(--tertiary-color) !important;
             }
             
@@ -101,8 +185,20 @@
                 opacity: 0.8;
             }
 
-            /* Secondary Color */
-            .btn-modern, .btn-primary, .card-action-btn:hover {
+            /* Global Button Theme */
+            .btn:not(.btn-back):not(#whatsappBtn):not(#theme-toggle), 
+            button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.btn-back) {
+                background-color: var(--primary-color) !important;
+                color: var(--tertiary-color) !important;
+                border: 1px solid var(--tertiary-color) !important;
+            }
+
+            .btn:not(.btn-back):hover, button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.btn-back):hover {
+                filter: brightness(0.95);
+            }
+
+            /* Secondary Color (Overridden by global if needed, but keeping for specific classes) */
+            .btn-modern, .btn-primary-custom, .card-action-btn:hover {
                 background-color: var(--secondary-color) !important;
                 color: white !important;
                 border-color: var(--secondary-color) !important;
@@ -132,8 +228,8 @@
 
         @media (max-width: 991px) {
             .main-content-wrap {
-                margin-top: 1.5rem !important;
-                padding-top: 2rem !important;
+                margin-top: 0.5rem !important;
+                padding-top: 0.5rem !important;
             }
         }
         
@@ -178,6 +274,7 @@
             border-radius: 4px;
             color: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: pillShake 5s infinite;
         }
         @media (max-width: 767px) {
             .top-badge-right {
@@ -308,22 +405,25 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            padding: 0.85rem;
-            border-radius: 5px;
+            padding: 1rem;
+            border-radius: 0px;
             text-align: center;
             text-decoration: none !important;
             transition: all .3s ease;
             z-index: 5;
-            margin-top: 0.75rem;
+            margin: 0px;
             display: block;
+            width: 100%;
         }
         .pcard__buy-btn:hover { background: #333; transform: scale(1.02); }
         .pcard__body {
-            padding: 0 0.5rem 1rem;
+            padding: 0 0.5rem 0.75rem;
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
             flex-grow: 1;
+            align-items: center;
+            text-align: center;
         }
         .pcard__name {
             font-size: 0.95rem;
@@ -338,7 +438,7 @@
             font-weight: 700;
             margin-top: 2px;
         }
-        .pcard__price-container { display: flex; align-items: baseline; gap: 0.5rem; }
+        .pcard__price-container { display: flex; align-items: baseline; gap: 0.5rem; justify-content: center; }
         .pcard__price-old { text-decoration: line-through; color: #999; font-size: 0.8rem; }
         .pcard__price-main { color: var(--tertiary-color, #1a1a1a); }
         .pcard__badge, .top-badge-right {
@@ -385,7 +485,7 @@
                 line-height: 1.2;
             }
             .pcard__price { font-size: clamp(0.9rem, 4vw, 1rem) !important; }
-            .pcard__price-container { flex-direction: column; align-items: flex-start; gap: 0; }
+            .pcard__price-container { flex-direction: column; align-items: center; gap: 0; }
             .pcard__badge { 
                 left: auto !important; 
                 right: 0.75rem !important; 
@@ -439,6 +539,12 @@
     </style>
 </head>
 <body>
+    <script>
+        // Apply dark mode immediately to prevent CSS-flashes on reload
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
     <header>
         {% include "_nav.html.twig" %}
     </header>
@@ -476,28 +582,33 @@
         </button>
     {% endif %}
 
-    {# Right Side: WhatsApp Button #}
-    {% if personalize.whatsapp %}
-        <div id="whatsappFloatingContainer" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: row; align-items: flex-end; transition: opacity 0.3s ease;">
-            
-            <div id="whatsappBotBubble" style="position: relative; background-color: #fff; color: #333; padding: 12px 16px; border-radius: 12px 12px 0 12px; margin-right: 14px; margin-bottom: 6px; max-width: 260px; font-size: 0.9rem; font-weight: 500; line-height: 1.3; opacity: 1; transform: translateX(0) scale(1); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: center right; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));">
+    {# Right Side: Floating Buttons (WhatsApp & Theme Toggle) #}
+    <div id="floatingButtonsContainer" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: row; align-items: flex-end; transition: opacity 0.3s ease;">
+        
+        {# Theme Toggle Button #}
+        <button id="themeToggleBtn" class="btn shadow-lg d-flex align-items-center justify-content-center" style="font-size: 1.3rem; width: 50px; height: 50px; transition: all 0.3s ease; background-color: #222; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: white; margin-right: 15px; margin-bottom: 5px;">
+            <i class="bi bi-moon-fill" id="themeIcon"></i>
+        </button>
+
+        {% if personalize.whatsapp %}
+            <div id="whatsappBotBubble" style="position: relative; background-color: #ffffff; color: #1a1a1a; padding: 12px 16px; border-radius: 12px 12px 0 12px; margin-right: 14px; margin-bottom: 6px; max-width: 260px; font-size: 0.9rem; font-weight: 500; line-height: 1.3; opacity: 1; transform: translateX(0) scale(1); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: center right; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));">
                 <span onclick="var b=document.getElementById('whatsappBotBubble'); if(b){ b.style.opacity='0'; b.style.transform='translateX(20px) scale(0.8)'; b.style.pointerEvents='none'; setTimeout(()=>b.remove(), 600); }" style="position: absolute; top: 4px; right: 6px; cursor: pointer; color: #999; font-size: 1.2rem; line-height: 1; z-index: 10;"><i class="bi bi-x"></i></span>
                 <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" style="text-decoration: none; color: inherit; display: block; padding-right: 12px;">
                     <div style="display: flex; align-items: center; margin-bottom: 6px;">
                         <div style="background-color: #25d366; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin-right: 8px;">
                             <i class="bi bi-robot"></i>
                         </div>
-                        <span style="font-weight: 700; font-size: 0.9rem; color: #25d366;">Asistente</span>
+                        <span style="font-weight: 700; font-size: 0.9rem; color: #169c46;">Asistente</span>
                     </div>
-                    <span style="color: #444; display: block; line-height: 1.4;">¿En qué podemos ayudarte? ¡No dudes en consultarnos!</span>
+                    <span style="color: inherit; display: block; line-height: 1.4;">¿En qué podemos ayudarte? ¡No dudes en consultarnos!</span>
                 </a>
             </div>
 
             <a href="https://wa.me/{{ personalize.whatsapp|replace({'+': '', ' ': '', '-': ''}) }}" target="_blank" id="whatsappBtn" class="btn btn-success shadow-lg d-flex align-items-center justify-content-center" style="font-size: 1.8rem; width: 60px; height: 60px; transition: all 0.3s ease; background-color: #25d366; border: none; border-radius: 50%; color: white;">
                 <i class="bi bi-whatsapp"></i>
             </a>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 
     <style>
         #whatsappBotBubble::after {
@@ -507,8 +618,16 @@
             right: -10px;
             width: 0;
             height: 0;
-            border-bottom: 12px solid #fff;
+            border-bottom: 12px solid #ffffff;
             border-right: 12px solid transparent;
+        }
+
+        body.dark-mode #whatsappBotBubble {
+            background-color: #2a2a2a !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode #whatsappBotBubble::after {
+            border-bottom-color: #2a2a2a !important;
         }
 
         #whatsappBtn:hover, #scrollToTop:hover, #whatsappBotBubble:hover {
@@ -732,6 +851,38 @@
             adjustBodyPadding();
             window.addEventListener('resize', adjustBodyPadding);
             setTimeout(adjustBodyPadding, 500);
+
+            // Theme Toggle Logic
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            const icon = document.getElementById('themeIcon');
+            const body = document.body;
+
+            if (toggleBtn && icon) {
+                // Initialize icon state
+                if (body.classList.contains('dark-mode')) {
+                    icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                }
+                
+                toggleBtn.addEventListener('click', () => {
+                    body.classList.toggle('dark-mode');
+                    if (body.classList.contains('dark-mode')) {
+                        localStorage.setItem('theme', 'dark');
+                        icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                        icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+                    }
+                });
+
+                // Scroll behavior: Fade out theme toggle when scrolling
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 80) {
+                        toggleBtn.style.opacity = '0.5';
+                    } else {
+                        toggleBtn.style.opacity = '1';
+                    }
+                });
+            }
         });
     </script>
 </body>

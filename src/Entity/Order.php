@@ -276,6 +276,21 @@ class Order
         return implode(", ", $summary);
     }
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $receiptFilename = null;
+
+    public function getReceiptFilename(): ?string
+    {
+        return $this->receiptFilename;
+    }
+
+    public function setReceiptFilename(?string $receiptFilename): self
+    {
+        $this->receiptFilename = $receiptFilename;
+
+        return $this;
+    }
+
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
     public function updateGrossProfit(): void

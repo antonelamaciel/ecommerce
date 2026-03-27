@@ -19,8 +19,8 @@
                             </a>
                         </div>
                     {% endif %}
-                    <h1 class="display-5 fw-bold text-dark mb-3">Crea tu cuenta</h1>
-                    <p class="text-muted lead px-md-5">Registrate en {{ personalize.companyName ?? 'MONKAI' }}.</p>
+                    <h1 class="display-5 fw-bold text-dark-mode-adapt mb-3">Crea tu cuenta</h1>
+                    <p class="text-muted-mode-adapt lead px-md-5">Registrate en {{ personalize.companyName ?? 'MONKAI' }}.</p>
                 </div>
 
                 {# Form Section #}
@@ -90,7 +90,7 @@
                     {{ form_end(form) }}
 
                     <div class="text-center mt-4">
-                        <p class="text-muted">¿Ya tienes una cuenta? <a href="{{ path('app_login') }}" class="fw-bold text-decoration-none" style="color: black;">Inicia Sesión aquí</a></p>
+                        <p class="text-muted-mode-adapt">¿Ya tienes una cuenta? <a href="{{ path('app_login') }}" class="fw-bold text-decoration-none highlight-link-mode-adapt">Inicia Sesión aquí</a></p>
                     </div>
                 </div>
             </div>
@@ -216,6 +216,46 @@
             margin-bottom: 0.4rem !important;
         }
     }
+
+    /* ── Dark Mode Overrides ── */
+    body.dark-mode .register-page-modern {
+        background-color: #121212 !important;
+    }
+    body.dark-mode .text-dark-mode-adapt {
+        color: #ffffff !important;
+    }
+    body.dark-mode .text-muted-mode-adapt {
+        color: #b0b0b0 !important;
+    }
+    body.dark-mode .form-control-lux {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .btn-primary-lux {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    body.dark-mode .btn-primary-lux:hover {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .form-control-lux:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode .btn-toggle-lux,
+    body.dark-mode .input-wrapper-lux i:not(.bi-eye) {
+        color: #64748b !important;
+    }
+
+    .highlight-link-mode-adapt {
+        color: black; 
+    }
+
+    .text-dark-mode-adapt { color: #212529; }
+    .text-muted-mode-adapt { color: #6c757d; }
 </style>
 
 {% block javascripts %}

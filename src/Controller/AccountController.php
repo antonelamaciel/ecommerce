@@ -74,6 +74,19 @@ class AccountController extends AbstractController
     }
 
     /**
+     * Affiche la section des comprobantes (facturas/recibos en PDF)
+     */
+    #[Route('/account/comprobantes', name: 'account_receipts')]
+    public function showReceipts(OrderRepository $repository): Response
+    {
+        // Usamos el mismo query que trae los pedidos válidos
+        $orders = $repository->findPaidOrdersByUser($this->getUser());
+        return $this->render('account/receipts.html.twig', [
+            'orders' => $orders
+        ]);
+    }
+
+    /**
      * Affiche une commande
      */
     #[Route('/account/orders/{reference}', name: 'account_order')]

@@ -1,0 +1,209 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mis Comprobantes - {{ personalize.companyName ?? 'Mi Empresa' }}{% endblock %}
+
+{% block body %}
+<style>
+    /* ── Tokens ── */
+    :root {
+        --c-bg: #fdfcfb;
+        --c-surface: #ffffff;
+        --c-border: #f0ede8;
+        --c-ink: #1a1a1a;
+        --c-muted: #696561;
+        --radius-lg: 24px;
+        --radius-md: 16px;
+        --radius-sm: 8px;
+        --shadow-soft: 0 10px 40px rgba(0,0,0,.03);
+        --transition: .3s cubic-bezier(.4, 0, .2, 1);
+        --font-main: 'Outfit', sans-serif;
+    }
+
+    body {
+        background: var(--c-bg);
+        font-family: var(--font-main);
+        color: var(--c-ink);
+    }
+
+    .account-container { padding-top: 3rem; padding-bottom: 5rem; max-width: 1000px; margin: 0 auto; }
+    
+    .account-header { margin-bottom: 2rem; }
+    .account-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; margin: 0; color: var(--c-ink); }
+    .account-subtitle { color: var(--c-muted); margin-top: 0.5rem; font-size: 0.95rem; }
+
+    .receipt-card {
+        background: var(--c-surface);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-soft);
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: var(--transition);
+        border: 1px solid transparent;
+        animation: fadeInUp 0.5s ease backwards;
+    }
+    .receipt-card:hover {
+        border-color: var(--c-border);
+        transform: translateY(-2px);
+        box-shadow: 0 15px 50px rgba(0,0,0,.05);
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .receipt-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .receipt-date {
+        font-size: 0.85rem;
+        color: var(--c-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .receipt-ref {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--c-ink);
+    }
+
+    .receipt-total {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--tertiary-color, var(--c-ink));
+    }
+
+    .btn-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f8f9fa;
+        color: var(--c-ink);
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: 1px solid var(--c-border);
+    }
+    .btn-download:hover {
+        background: var(--tertiary-color, var(--c-ink));
+        color: #fff;
+        border-color: var(--tertiary-color, var(--c-ink));
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--c-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+    }
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--c-border);
+        margin-bottom: 1rem;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--c-muted);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: var(--transition);
+    }
+    .btn-back:hover { color: var(--c-ink); }
+
+    @media (max-width: 767px) {
+        .account-container { padding: 1.5rem; }
+        .receipt-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+        .btn-download { width: 100%; justify-content: center; }
+    }
+
+    /* ── Dark Mode Overrides ── */
+    body.dark-mode {
+        --c-bg: #121212;
+        --c-surface: #1e1e1e;
+        --c-border: #333;
+        --c-ink: #f5f5f5;
+        --c-muted: #b0b0b0;
+    }
+    body.dark-mode .account-title { color: #ffffff !important; }
+    body.dark-mode .receipt-card, body.dark-mode .empty-state {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+    }
+    body.dark-mode .receipt-card:hover { border-color: #444 !important; background-color: #252525 !important; }
+    body.dark-mode .receipt-ref { color: #ffffff !important; }
+    body.dark-mode .btn-download { 
+        background-color: #444 !important; 
+        border-color: #555 !important; 
+        color: #ffffff !important; 
+    }
+    body.dark-mode .btn-download:hover { 
+        background-color: #000000 !important; 
+        border-color: #ffffff !important; 
+        color: #ffffff !important; 
+    }
+    body.dark-mode .btn-back:hover { color: #ffffff !important; }
+</style>
+
+<div class="container account-container">
+    <a href="{{ path('account') }}" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Volver a mi cuenta
+    </a>
+
+    <header class="account-header">
+        <h1 class="account-title">Mis Comprobantes</h1>
+        <p class="account-subtitle">Visualiza y descarga el PDF de tus pedidos finalizados.</p>
+    </header>
+
+    {% set hasReceipts = false %}
+
+    {% for order in orders|reverse %}
+        {% if order.receiptFilename %}
+            {% set hasReceipts = true %}
+            <div class="receipt-card">
+                <div class="receipt-info">
+                    <span class="receipt-date">{{ order.createdAt|date('d F Y') }}</span>
+                    <span class="receipt-ref">Pedido #{{ order.reference }}</span>
+                    <span class="receipt-total">Total: ${{ (order.total / 100)|number_format(2, ',', '.') }}</span>
+                </div>
+                <div class="receipt-action">
+                    <a href="{{ path('download_receipt', {'reference': order.reference}) }}" target="_blank" class="btn-download">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> Descargar PDF
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if not hasReceipts %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-receipt"></i></div>
+            <h3 class="fw-bold fs-5 mb-2">Sin comprobantes</h3>
+            <p class="text-muted mb-4">Aún no tienes pedidos finalizados con comprobantes generados.</p>
+            <a href="{{ path('product') }}" class="btn btn-dark px-4 py-2" style="border-radius: var(--radius-sm); font-weight: 700;">Ir a la tienda</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

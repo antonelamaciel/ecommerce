@@ -288,6 +288,61 @@
     .success-logo-circle { width: 100px; height: 100px; padding: 0.75rem; }
     .success-check-big { font-size: 4.5rem !important; }
   }
+
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+  }
+  body.dark-mode .order-title { color: #ffffff !important; }
+  body.dark-mode .info-card, 
+  body.dark-mode .summary-sidebar, 
+  body.dark-mode .modal-content { 
+    background-color: #1e1e1e !important; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+  }
+  body.dark-mode .info-card__title, body.dark-mode .summary-title, body.dark-mode .modal-title { color: #ffffff !important; }
+  body.dark-mode .selection-card { border-color: #333 !important; background-color: transparent !important; }
+  body.dark-mode .selection-card:hover { border-color: #ffffff !important; background: #2a2a2a !important; }
+  body.dark-mode .selection-card.active, body.dark-mode .selection-card:has(input:checked) {
+    border-color: #ffffff !important;
+    background-color: #2a2a2a !important;
+  }
+  body.dark-mode .selection-card__name, body.dark-mode .selection-card__price { color: #ffffff !important; }
+  body.dark-mode .selection-card__icon { background-color: #2a2a2a !important; }
+  body.dark-mode .selection-card.active .selection-card__icon, 
+  body.dark-mode .selection-card:has(input:checked) .selection-card__icon { 
+    background: #ffffff !important; color: #121212 !important; 
+  }
+  body.dark-mode .summary-item { border-bottom-color: #333 !important; }
+  body.dark-mode .summary-item__name { color: #ffffff !important; }
+  body.dark-mode .summary-item__img { background: #2a2a2a !important; border-color: #333 !important; }
+  body.dark-mode .summary-breakdown, body.dark-mode .breakdown-row.final-total { border-top-color: #333 !important; }
+  body.dark-mode .final-total { color: #ffffff !important; }
+  body.dark-mode .btn-pay, body.dark-mode #btn-confirm-order { background-color: #2a2a2a !important; color: #ffffff !important; border: 1px solid #444 !important; }
+  body.dark-mode .modal-header .close { color: #ffffff !important; }
+  body.dark-mode .bg-light { background-color: #2a2a2a !important; }
+  body.dark-mode .text-dark { color: #ffffff !important; }
+  body.dark-mode .text-muted { color: #b0b0b0 !important; }
+
+  body.dark-mode .step-num { background-color: #333 !important; color: #ffffff !important; }
+  body.dark-mode .step-item { color: #b0b0b0 !important; }
+  body.dark-mode .step-item.active { color: #ffffff !important; }
+  body.dark-mode .step-item.active .step-num { background-color: #ffffff !important; color: #121212 !important; }
+  body.dark-mode .step-line { background-color: #444 !important; }
+  body.dark-mode .bg-warning-subtle { 
+    background-color: #2b2100 !important; 
+    color: #ffd666 !important; 
+    border-color: #443500 !important; 
+  }
+  body.dark-mode .btn-back:hover { color: #ffffff !important; }
+  body.dark-mode #order-success-overlay { 
+    background-color: #000000 !important; 
+    background: #000000 !important;
+  }
 </style>
 
 <div id="order-success-overlay" style="color: #fff !important;">

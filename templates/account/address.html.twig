@@ -44,8 +44,9 @@
     margin: 0;
   }
   .btn-add-address {
-    background: var(--tertiary-color, var(--c-ink));
-    color: #fff;
+    background: var(--primary-color) !important;
+    color: var(--tertiary-color) !important;
+    border: 1px solid var(--tertiary-color) !important;
     padding: 0.75rem 1.5rem;
     border-radius: 99px;
     font-weight: 600;
@@ -150,6 +151,37 @@
   .empty-state i { font-size: 3.5rem; color: var(--c-border); margin-bottom: 1.5rem; display: block; }
   .empty-state p { color: var(--c-muted); font-size: 1.1rem; }
 
+  /* ── Dark Mode Overrides ── */
+  body.dark-mode {
+    --c-bg: #121212;
+    --c-surface: #1e1e1e;
+    --c-border: #333;
+    --c-ink: #f5f5f5;
+    --c-muted: #b0b0b0;
+  }
+  body.dark-mode .page-title { color: #ffffff !important; }
+  body.dark-mode .address-card, body.dark-mode .empty-state {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+  }
+  body.dark-mode .address-card:hover { border-color: #ffffff !important; background-color: #252525 !important; }
+  body.dark-mode .address-card__title { color: #ffffff !important; }
+  body.dark-mode .action-link { color: #ffffff !important; }
+  body.dark-mode .action-link:hover { color: #ffffff !important; opacity: 0.8; }
+  body.dark-mode .action-link.delete { color: #ef4444 !important; }
+  body.dark-mode .address-card__actions { border-top-color: #333 !important; }
+  body.dark-mode .btn-add-address { 
+      background-color: var(--primary-color) !important; 
+      color: var(--tertiary-color) !important; 
+      border: 1px solid var(--tertiary-color) !important;
+  }
+  body.dark-mode .btn-add-address:hover { 
+      background-color: #000000 !important; 
+      border-color: #ffffff !important; 
+      color: #ffffff !important; 
+  }
+  body.dark-mode .btn-back:hover { color: #ffffff !important; }
 </style>
 
 <div class="container mt-page">
