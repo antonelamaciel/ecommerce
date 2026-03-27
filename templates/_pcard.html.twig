@@ -89,7 +89,7 @@
         <a href="{{ path('product_show', {slug: product.slug}) }}" 
            class="pcard__buy-btn pcard__buy-btn--p" 
            data-add-cart-url="{{ path('add_to_cart', {id: product.id, variants: firstVariant}) }}"
-           style="border-radius: 0; background-color: var(--primary-color) !important; color: var(--tertiary-color) !important;">
+           style="border-radius: 0; background-color: #000000 !important; color: #ffffff !important;">
             <span>
                 {% if is_related|default(false) %}
                     <span class="d-md-none">Agregar <i class="bi bi-cart-plus"></i></span>

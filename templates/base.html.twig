@@ -39,7 +39,7 @@
         /* ── Dark Mode Theme Protocol ── */
         body.dark-mode {
             --bg-body: #121212 !important;
-            --primary-color: #1a1a1a !important;
+            --primary-color: #000000 !important;
             --secondary-color: #222222 !important;
             --tertiary-color: #ffffff !important;
             background-color: #121212 !important;
@@ -164,10 +164,21 @@
                 color: var(--tertiary-color) !important;
             }
 
-            /* Global Icon Color (Excluding WhatsApp, Theme Toggle, and Assistant) */
-            i[class^="bi-"]:not(.bi-whatsapp):not(.bi-sun-fill):not(.bi-moon-fill):not(.bi-robot), 
-            i[class*=" bi-"]:not(.bi-whatsapp):not(.bi-sun-fill):not(.bi-moon-fill):not(.bi-robot) {
-                color: var(--tertiary-color) !important;
+            /* Global Icon Color (Excluding WhatsApp, Theme Toggle, and icons inside Inverse-themed elements) */
+            i[class^="bi-"]:not(.bi-whatsapp):not(.bi-sun-fill):not(.bi-moon-fill):not(.bi-robot):not(.add-cart-btn i):not(.pcard__buy-btn i):not([data-bs-dismiss] i):not(.btn-close i):not(.choice-btn.active i):not(.qv-value-btn.active i), 
+            i[class*=" bi-"]:not(.bi-whatsapp):not(.bi-sun-fill):not(.bi-moon-fill):not(.bi-robot):not(.add-cart-btn i):not(.pcard__buy-btn i):not([data-bs-dismiss] i):not(.btn-close i):not(.choice-btn.active i):not(.qv-value-btn.active i) {
+                color: inherit !important; /* Allow inheritance if inside a themed button */
+            }
+            
+            /* The above didn't work as expected if we want a global default, let's refine: */
+            i[class^="bi-"], i[class*=" bi-"] {
+                color: var(--tertiary-color); /* Default to tertiary */
+            }
+            
+            /* But if it's one of the exclusions, keep original or inherit */
+            i.bi-whatsapp, i.bi-sun-fill, i.bi-moon-fill, i.bi-robot,
+            .add-cart-btn i, .pcard__buy-btn i, [data-bs-dismiss] i, .btn-close i, .choice-btn.active i, .qv-value-btn.active i, .cart-rolling-qv i {
+                color: inherit !important;
             }
             
             .search-close-btn {
@@ -185,16 +196,28 @@
                 opacity: 0.8;
             }
 
-            /* Global Button Theme */
-            .btn:not(.btn-back):not(#whatsappBtn):not(#theme-toggle), 
-            button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.btn-back) {
+            /* Global Button Theme (Default: Primary BG, Tertiary Text) */
+            .btn:not(.btn-back):not(#whatsappBtn):not(#theme-toggle):not(.add-cart-btn):not(.pcard__buy-btn):not(.choice-btn), 
+            button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.qv-parent-btn):not(.btn-back):not(.add-cart-btn):not(.choice-btn):not(.slider-btn) {
                 background-color: var(--primary-color) !important;
                 color: var(--tertiary-color) !important;
                 border: 1px solid var(--tertiary-color) !important;
             }
 
-            .btn:not(.btn-back):hover, button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.btn-back):hover {
+            .btn:hover, button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.qv-parent-btn):not(.btn-back):not(.choice-btn):not(.slider-btn):hover {
                 filter: brightness(0.95);
+            }
+
+            /* Inverse Action Theme (Tertiary BG, Primary Text) for Purchase, Close & Selection */
+            .add-cart-btn, 
+            [data-bs-dismiss="modal"], 
+            [data-bs-dismiss="alert"],
+            .btn-close,
+            .choice-btn.active,
+            .qv-value-btn.active {
+                background-color: var(--tertiary-color) !important;
+                color: var(--primary-color) !important;
+                border: 1px solid var(--primary-color) !important;
             }
 
             /* Secondary Color (Overridden by global if needed, but keeping for specific classes) */
