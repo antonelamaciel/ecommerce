@@ -17,4 +17,14 @@
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/
-###< symfony/asset-mapper ###
+
+###> ecommerce-custom ###
+/public/uploads/
+/public/uploads/receipts/
+/public/uploads/logo/
+/*.sql*
+/*.gz
+/.env.test
+/tests/_output/
+/tests/_support/_generated/
+###< ecommerce-custom ###
