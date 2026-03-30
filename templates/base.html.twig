@@ -93,17 +93,17 @@
         body.dark-mode .pcard__badge {
             background-color: #333333 !important;
             color: #ffffff !important;
-            border: 1px solid #444 !important;
+            border: none !important;
         }
         body.dark-mode .top-badge-right {
             background-color: #333333 !important;
             color: #ffffff !important;
-            border: 1px solid #444 !important;
+            border: none !important;
         }
         body.dark-mode #themeToggleBtn {
             background-color: #ffffff !important;
             color: #000000 !important;
-            border-color: #ffffff !important;
+            border: none !important;
         }
 
         {% if personalize %}
@@ -146,13 +146,13 @@
             .navbar-custom .cart-badge {
                 color: var(--primary-color) !important;
                 background-color: var(--tertiary-color) !important;
-                border-color: var(--primary-color) !important;
+                border: none !important;
             }
             
             body.dark-mode .navbar-custom .cart-badge {
                 color: #ffffff !important;
                 background-color: #000000 !important;
-                border-color: #ffffff !important;
+                border: none !important;
             }
 
             .navbar-custom .search-box input, 
@@ -160,7 +160,7 @@
             .navbar-custom .btn-login,
             .search-overlay-form input,
             .btn-outline-light {
-                border-color: var(--tertiary-color) !important;
+                border: none !important;
                 color: var(--tertiary-color) !important;
             }
 
@@ -197,14 +197,14 @@
             }
 
             /* Global Button Theme (Default: Primary BG, Tertiary Text) */
-            .btn:not(.btn-back):not(#whatsappBtn):not(#theme-toggle):not(.add-cart-btn):not(.pcard__buy-btn):not(.choice-btn), 
-            button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.qv-parent-btn):not(.btn-back):not(.add-cart-btn):not(.choice-btn):not(.slider-btn) {
+            .btn:not(.btn-back):not(#whatsappBtn):not(#theme-toggle):not(.add-cart-btn):not(.pcard__buy-btn):not(.choice-btn):not(.btn-toggle-lux), 
+            button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.qv-parent-btn):not(.btn-back):not(.add-cart-btn):not(.choice-btn):not(.slider-btn):not(.btn-toggle-lux) {
                 background-color: var(--primary-color) !important;
                 color: var(--tertiary-color) !important;
-                border: 1px solid var(--tertiary-color) !important;
+                border: none !important;
             }
 
-            .btn:hover, button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.qv-parent-btn):not(.btn-back):not(.choice-btn):not(.slider-btn):hover {
+            .btn:hover:not(.btn-toggle-lux), button:not(.navbar-toggler):not(.btn-close):not(#theme-toggle):not(.qv-value-btn):not(.qv-parent-btn):not(.btn-back):not(.choice-btn):not(.slider-btn):not(.btn-toggle-lux):hover {
                 filter: brightness(0.95);
             }
 
@@ -217,7 +217,13 @@
             .qv-value-btn.active {
                 background-color: var(--tertiary-color) !important;
                 color: var(--primary-color) !important;
-                border: 1px solid var(--primary-color) !important;
+                border: none !important;
+            }
+
+            body.dark-mode .add-cart-btn,
+            body.dark-mode .pcard__buy-btn {
+                background-color: #000000 !important;
+                color: #ffffff !important;
             }
 
             /* Secondary Color (Overridden by global if needed, but keeping for specific classes) */
@@ -422,8 +428,8 @@
         .pcard:hover .pcard__img { transform: scale(1.1); }
         .pcard__buy-btn {
             position: relative;
-            background: #000;
-            color: #fff !important;
+            background-color: var(--tertiary-color) !important;
+            color: var(--primary-color) !important;
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -437,8 +443,9 @@
             margin: 0px;
             display: block;
             width: 100%;
+            border: none;
         }
-        .pcard__buy-btn:hover { background: #333; transform: scale(1.02); }
+        .pcard__buy-btn:hover { filter: brightness(0.9); transform: scale(1.02); }
         .pcard__body {
             padding: 0 0.5rem 0.75rem;
             display: flex;
@@ -600,7 +607,7 @@
     {# Floating Buttons #}
     {# Left Side: Scroll to Top (Only Home) #}
     {% if app.request.attributes.get('_route') == 'home' %}
-        <button id="scrollToTop" class="btn shadow-lg d-none align-items-center justify-content-center" style="font-size: 1.5rem; position: fixed; bottom: 30px; left: 30px; z-index: 9999; width: 60px; height: 60px; transition: all 0.3s ease; opacity: 1; background-color: #ffffffff; color: black; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+        <button id="scrollToTop" class="btn shadow-lg d-none align-items-center justify-content-center" style="font-size: 1.5rem; position: fixed; bottom: 30px; left: 30px; z-index: 9999; width: 60px; height: 60px; transition: all 0.3s ease; opacity: 1; background-color: #ffffffff; color: black; border: none; border-radius: 8px;">
             <i class="bi bi-chevron-up text-dark"></i>
         </button>
     {% endif %}
@@ -609,7 +616,7 @@
     <div id="floatingButtonsContainer" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: row; align-items: flex-end; transition: opacity 0.3s ease;">
         
         {# Theme Toggle Button #}
-        <button id="themeToggleBtn" class="btn shadow-lg d-flex align-items-center justify-content-center" style="font-size: 1.3rem; width: 50px; height: 50px; transition: all 0.3s ease; background-color: #222; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: white; margin-right: 15px; margin-bottom: 5px;">
+        <button id="themeToggleBtn" class="btn shadow-lg d-flex align-items-center justify-content-center" style="font-size: 1.3rem; width: 50px; height: 50px; transition: all 0.3s ease; background-color: #222; border: none; border-radius: 50%; color: white; margin-right: 15px; margin-bottom: 5px;">
             <i class="bi bi-moon-fill" id="themeIcon"></i>
         </button>
 

@@ -1,7 +1,7 @@
 <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
-      <button type="button" id="qv-close-btn" class="btn btn-sm" aria-label="Close" style="position: absolute; top: 15px; right: 15px; z-index: 10; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: 1px solid var(--primary-color) !important; transition: all 0.2s;"><i class="bi bi-x"></i></button>
+      <button type="button" id="qv-close-btn" class="btn btn-sm" aria-label="Close" style="position: absolute; top: 15px; right: 15px; z-index: 10; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: none !important; transition: all 0.2s;"><i class="bi bi-x"></i></button>
       
       <div class="modal-body p-0">
         <div class="row g-0">
@@ -36,12 +36,12 @@
               <div class="d-flex flex-column gap-3 w-100">
                 <div class="d-flex align-items-center gap-2 gap-sm-3">
                   <div class="d-flex justify-content-center align-items-center flex-shrink-0 bg-light" id="qv-qty-controls" style="border-radius: 99px; padding: 0.25rem;">
-                    <button type="button" class="btn rounded-circle fw-bold border-0 d-flex justify-content-center align-items-center qv-qty-btn" id="qv-minus" style="background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: 1px solid var(--primary-color) !important;">-</button>
+                    <button type="button" class="btn rounded-circle fw-bold border-0 d-flex justify-content-center align-items-center qv-qty-btn" id="qv-minus" style="background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: none !important;">-</button>
                     <input type="number" id="qv-qty" name="qty" value="1" min="1" class="form-control text-center mx-1 border-0 fw-bold bg-transparent p-0" style="width: 35px; pointer-events: none; font-size: 1.1rem; box-shadow: none;" readonly>
-                    <button type="button" class="btn rounded-circle fw-bold border-0 d-flex justify-content-center align-items-center qv-qty-btn" id="qv-plus" style="background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: 1px solid var(--primary-color) !important;">+</button>
+                    <button type="button" class="btn rounded-circle fw-bold border-0 d-flex justify-content-center align-items-center qv-qty-btn" id="qv-plus" style="background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: none !important;">+</button>
                   </div>
 
-                  <button type="submit" id="qv-submit" class="btn rounded-pill fw-bold py-3 px-3 px-sm-4 d-flex align-items-center justify-content-center flex-grow-1" style="background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: 1.5px solid var(--primary-color) !important; font-size: 1.05rem; letter-spacing: 0.02em; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                  <button type="submit" id="qv-submit" class="btn rounded-pill fw-bold py-3 px-3 px-sm-4 d-flex align-items-center justify-content-center flex-grow-1" style="background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: none !important; font-size: 1.05rem; letter-spacing: 0.02em; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
                     <i class="bi bi-cart-plus mr-2 fs-5"></i>
                     <span>Añadir al carrito</span>
                   </button>
