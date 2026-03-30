@@ -83,7 +83,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Transportistas', 'fas fa-truck', Carrier::class);
 
         yield MenuItem::subMenu('Ventas', 'fas fa-shopping-basket')->setSubItems([
-            MenuItem::linkToCrud('Pedidos', 'fas fa-clipboard-list', Order::class),
+            MenuItem::linkToCrud('Pedidos', 'fas fa-clipboard-list', Order::class)
+                ->setController(OrderCrudController::class),
             MenuItem::linkToCrud('Comprobantes PDF', 'fas fa-file-invoice', Order::class)
                 ->setController(\App\Controller\Admin\ReceiptCrudController::class),
             MenuItem::linkToCrud('Clientes', 'fas fa-users', User::class),

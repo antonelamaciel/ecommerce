@@ -186,22 +186,26 @@ class OrderCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm()->hideOnIndex()->hideOnDetail(),
-            TextField::new('reference', 'ID del pedido'),
-            DateTimeField::new('createdAt', 'Fecha del pedido')->onlyOnDetail(),
+            IdField::new('id')->hideOnForm()->hideOnDetail(), 
+            TextField::new('reference', 'ID del Pedido'),
+            DateTimeField::new('createdAt', 'Fecha')->setFormat('short', 'short'),
             AssociationField::new('user', 'Cliente'),
+            
+            // Administrative fields (Form/Detail mostly)
             CollectionField::new('orderDetails', 'Productos del Pedido')
                 ->allowAdd()
                 ->allowDelete()
                 ->setEntryType(OrderDetailType::class)
                 ->setFormTypeOption('by_reference', false)
                 ->setTemplatePath('admin/field/order_details.html.twig')
-                ->hideOnDetail(),
+                ->hideOnIndex(),
+            
+            // This is for the index list summary
+            TextField::new('productSummary', 'Productos')->onlyOnIndex(),
+            
             MoneyField::new('total', 'Total')->setCurrency('ARS')->hideOnForm(),
-            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->hideOnDetail(),
-            MoneyField::new('carrierPrice', 'Costos de envío')->setCurrency('ARS'),
-            TextField::new('carrierName', 'Empresa de Transporte'),
-            TextField::new('delivery', 'Detalle de entrega / Dirección')->hideOnIndex()->renderAsHtml(),
+            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->onlyOnDetail(),
+            
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,
                 'Pagado' => 1,
@@ -209,12 +213,19 @@ class OrderCrudController extends AbstractCrudController
                 'Enviado/Retirado' => 3,
                 'Pendiente de pago' => 4,
                 'Cancelado' => 5,
-            ]
-            ),
-            TextField::new('paymentMethod', 'Método de pago')->onlyOnDetail(),
-            CollectionField::new('orderDetails', 'Resumen de Productos')
-                ->setTemplatePath('admin/field/order_details.html.twig')
-                ->onlyOnDetail()
+            ])->renderAsBadges([
+                0 => 'warning',
+                1 => 'success',
+                2 => 'primary',
+                3 => 'secondary',
+                4 => 'info',
+                5 => 'danger',
+            ]),
+            
+            TextField::new('paymentMethod', 'Método de Pago')->onlyOnDetail(),
+            TextField::new('carrierName', 'Transporte'),
+            MoneyField::new('carrierPrice', 'Costo Envío')->setCurrency('ARS'),
+            TextField::new('delivery', 'Detalle de Entrega / Dirección')->hideOnIndex()->renderAsHtml(),
         ];
     }
 
