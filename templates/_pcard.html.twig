@@ -91,12 +91,8 @@
            data-add-cart-url="{{ path('add_to_cart', {id: product.id, variants: firstVariant}) }}"
            style="border-radius: 0;">
             <span>
-                {% if is_related|default(false) %}
-                    <span class="d-md-none">Agregar <i class="bi bi-cart-plus"></i></span>
-                    <span class="d-none d-md-inline">Agregar al carrito</span>
-                {% else %}
-                    Agregar al carrito
-                {% endif %}
+                <span class="d-md-none">Agregar <i class="bi bi-cart-plus"></i></span>
+                <span class="d-none d-md-inline">Agregar al carrito</span>
             </span>
         </a>
     {% endif %}

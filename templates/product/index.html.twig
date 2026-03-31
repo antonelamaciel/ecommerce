@@ -150,10 +150,10 @@
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
-    padding: 0.3rem 0;
+    padding: 0;
     gap: 0.75rem;
-    min-height: 36px;
-    border-bottom: 1px solid #f8f8f8;
+    min-height: 28px;
+    border-bottom: 1px solid rgba(0,0,0,0.02);
   }
 
   .category-main-row:hover {
@@ -273,11 +273,11 @@
   }
 
   .sub-list.show {
-    max-height: 600px;
+    max-height: 800px;
     opacity: 1;
-    padding: 0.5rem 0;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .sub-check {
@@ -285,9 +285,9 @@
     grid-template-columns: auto 1fr;
     align-items: center;
     gap: 12px;
-    padding: 0.25rem 0.75rem 0.25rem 1.25rem;
+    padding: 0 0.75rem 0 1.25rem;
     cursor: pointer;
-    min-height: 28px;
+    min-height: 22px;
     transition: background 0.2s ease;
   }
 
@@ -400,18 +400,19 @@
 
   @media (max-width: 767px) {
     .shop-sidebar {
-      padding: 1.5rem;
+      padding: 1rem;
     }
     .filter-section {
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
     }
     .category-main-row {
-      padding: 0.65rem 0;
-      min-height: 36px;
+      padding: 0.1rem 0;
+      min-height: 30px;
     }
     .sub-check {
-      padding: 0.6rem 1rem 0.6rem 1.25rem;
+      padding: 0.1rem 1rem 0.1rem 1.25rem;
+      min-height: 24px;
     }
   }
 
