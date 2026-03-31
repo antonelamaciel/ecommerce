@@ -26,7 +26,7 @@ class MercadoPagoService
             $items[] = [
                 'title' => $detail->getProduct(),
                 'quantity' => $detail->getQuantity(),
-                'unit_price' => (float) ($detail->getPrice() / 100),
+                'unit_price' => (float) ($detail->getPrice()),
                 'currency_id' => 'ARS'
             ];
         }
@@ -35,7 +35,7 @@ class MercadoPagoService
         $items[] = [
             'title' => 'Envío: ' . $order->getCarrierName(),
             'quantity' => 1,
-            'unit_price' => (float) ($order->getCarrierPrice() / 100),
+            'unit_price' => (float) ($order->getCarrierPrice()),
             'currency_id' => 'ARS'
         ];
 

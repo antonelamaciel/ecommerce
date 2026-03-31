@@ -79,17 +79,17 @@
                         {% if detail.variants %}<br><small style="color:#666;">{{ detail.variants }}</small>{% endif %}
                     </td>
                     <td style="text-align:center;">{{ detail.quantity }}</td>
-                    <td class="price">${{ (detail.price / 100)|number_format(2, ',', '.') }}</td>
-                    <td class="price">${{ (detail.total / 100)|number_format(2, ',', '.') }}</td>
+                    <td class="price">${{ detail.price|number_format(2, ',', '.') }}</td>
+                    <td class="price">${{ detail.total|number_format(2, ',', '.') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
         <div class="totals">
-            <p><span>Subtotal:</span> <span style="text-align:right;">${{ ((order.total - order.carrierPrice) / 100)|number_format(2, ',', '.') }}</span></p>
-            <p><span>Envío ({{ order.carrierName }}):</span> <span style="text-align:right;">${{ (order.carrierPrice / 100)|number_format(2, ',', '.') }}</span></p>
-            <p class="grand-total"><span>Total:</span> <span style="text-align:right;">${{ (order.total / 100)|number_format(2, ',', '.') }}</span></p>
+            <p><span>Subtotal:</span> <span style="text-align:right;">${{ (order.total - order.carrierPrice)|number_format(2, ',', '.') }}</span></p>
+            <p><span>Envío ({{ order.carrierName }}):</span> <span style="text-align:right;">${{ order.carrierPrice|number_format(2, ',', '.') }}</span></p>
+            <p class="grand-total"><span>Total:</span> <span style="text-align:right;">${{ order.total|number_format(2, ',', '.') }}</span></p>
         </div>
 
         <div class="footer">

@@ -70,12 +70,12 @@
                 {% if maxBundleDiscount > 0 or (product.oldPrice and product.oldPrice != product.price) %}
                     {% set oldPrice = product.oldPrice ?: product.price %}
                     <span class="pcard__price-main" style="{% if maxBundleDiscount > 0 %}color: #dc3545;{% elseif personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">
-                        ARS {{ (finalPrice / 100)|number_format(2, ',', '.') }}
+                        ARS {{ finalPrice|number_format(2, ',', '.') }}
                         {% if maxBundleDiscount > 0 %}{{ maxBundleDiscount }}%OFF{% endif %}
                     </span>
-                    <span class="pcard__price-old">ARS {{ (oldPrice / 100)|number_format(2, ',', '.') }}</span>
+                    <span class="pcard__price-old">ARS {{ oldPrice|number_format(2, ',', '.') }}</span>
                 {% else %}
-                    <span class="pcard__price-main" style="{% if personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
+                    <span class="pcard__price-main" style="{% if personalize is defined and personalize and personalize.tertiaryColor %}color: {{ personalize.tertiaryColor }};{% endif %}">ARS {{ product.price|number_format(2, ',', '.') }}</span>
                 {% endif %}
             </div>
         </div>

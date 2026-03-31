@@ -131,7 +131,7 @@ class CartController extends AbstractController
         $cartDetails = $cart->getDetails();
 
         try {
-            $options = $calculator->calculateShipping($cp, $cartDetails['totals']['price'] / 100);
+            $options = $calculator->calculateShipping($cp, $cartDetails['totals']['price']);
             
             // Simplificar para mostrar solo lo solicitado por el usuario
             $shippingPrice = 0;

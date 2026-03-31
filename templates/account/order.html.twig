@@ -224,10 +224,10 @@
                       </span>
                     </div>
                   {% endif %}
-                  <div class="small text-muted mt-1">ARS {{ (detail.price / 100)|number_format(2, ',', '.') }} / ud.</div>
+                  <div class="small text-muted mt-1">ARS {{ detail.price|number_format(2, ',', '.') }} / ud.</div>
                 </td>
                 <td class="item-qty">x{{ detail.quantity }}</td>
-                <td class="item-price">ARS {{ (detail.total / 100)|number_format(2, ',', '.') }}</td>
+                <td class="item-price">ARS {{ detail.total|number_format(2, ',', '.') }}</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -279,15 +279,15 @@
         <div class="order-summary mt-4 pt-4 border-top" style="border-top-style: dashed !important;">
           <div class="summary-row">
             <span>Subtotal</span>
-            <span>ARS {{ (order.total / 100)|number_format(2, ',', '.') }}</span>
+            <span>ARS {{ order.total|number_format(2, ',', '.') }}</span>
           </div>
           <div class="summary-row">
             <span>Envío</span>
-            <span>ARS {{ (order.carrierPrice / 100)|number_format(2, ',', '.') }}</span>
+            <span>ARS {{ order.carrierPrice|number_format(2, ',', '.') }}</span>
           </div>
           <div class="summary-row total">
             <span>Total</span>
-            <span>ARS {{ ((order.carrierPrice + order.total) / 100)|number_format(2, ',', '.') }}</span>
+            <span>ARS {{ (order.carrierPrice + order.total)|number_format(2, ',', '.') }}</span>
           </div>
         </div>
       </div>

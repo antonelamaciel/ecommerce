@@ -502,11 +502,11 @@
                     {% set oldPrice = product.oldPrice ?: product.price %}
                     {% set finalPrice = maxDiscount > 0 ? (product.price * (1 - maxDiscount/100)) : product.price %}
                     <div class="d-flex align-items-baseline gap-2">
-                        <span class="price-main" style="{% if maxDiscount > 0 %}color:#dc3545;{% endif %}">ARS {{ (finalPrice / 100)|number_format(2, ',', '.') }}</span>
-                        <span class="price-old">ARS {{ (oldPrice / 100)|number_format(2, ',', '.') }}</span>
+                        <span class="price-main" style="{% if maxDiscount > 0 %}color:#dc3545;{% endif %}">ARS {{ finalPrice|number_format(2, ',', '.') }}</span>
+                        <span class="price-old">ARS {{ oldPrice|number_format(2, ',', '.') }}</span>
                     </div>
                 {% else %}
-                    <span class="price-main">ARS {{ (product.price / 100)|number_format(2, ',', '.') }}</span>
+                    <span class="price-main">ARS {{ product.price|number_format(2, ',', '.') }}</span>
                 {% endif %}
 
                 {% if product.stock is not null %}

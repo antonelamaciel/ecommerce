@@ -131,7 +131,7 @@ class OrderController extends AbstractController
 
             $cartProducts = $cart->getDetails();
             $destCp = $address->getPostal();
-            $shippingOptions = $shippingCalc->calculateShipping($destCp, $cartProducts['totals']['price'] / 100);
+            $shippingOptions = $shippingCalc->calculateShipping($destCp, $cartProducts['totals']['price']);
 
             // Affichage récap
             return $this->renderForm('order/add.html.twig', [
@@ -160,7 +160,7 @@ class OrderController extends AbstractController
         $destCp = trim($deliveryParts[4] ?? '1000');
 
         $cartProducts = $cart->getDetails();
-        $options = $shippingCalc->calculateShipping($destCp, $order->getTotal() / 100);
+        $options = $shippingCalc->calculateShipping($destCp, $order->getTotal());
         
         $selectedOption = null;
         foreach ($options as $opt) {
@@ -174,16 +174,15 @@ class OrderController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Opción de envío no válida'], 400);
         }
 
-        $priceInCents = (int)($selectedOption['price'] * 100);
-
+        $price = (float)$selectedOption['price'];
         $order->setCarrierName($selectedOption['name']);
-        $order->setCarrierPrice($priceInCents);
+        $order->setCarrierPrice($price);
         $em->flush();
 
         return $this->json([
             'success' => true,
-            'carrierPrice' => $priceInCents,
-            'totalPrice' => $order->getTotal() + $priceInCents
+            'carrierPrice' => $price,
+            'totalPrice' => $order->getTotal() + $price
         ]);
     }
 
