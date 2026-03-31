@@ -1,0 +1,220 @@
+:root {
+    --admin-bg: #f8fafc;
+    --admin-surface: #ffffff;
+    --admin-primary: #111827;
+    --admin-accent: #2563eb;
+    --admin-text: #1e293b;
+    --admin-text-muted: #64748b;
+    --admin-border: #e2e8f0;
+    --admin-radius: 12px;
+    --admin-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background-color: var(--admin-bg) !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    color: var(--admin-text) !important;
+}
+
+/* Restoring Standard Vertical Layout */
+.wrapper {
+    display: flex !important;
+}
+
+aside.sidebar-wrapper {
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    background: #ffffff !important;
+    border-right: 1px solid var(--admin-border) !important;
+    z-index: 1000 !important;
+    box-shadow: none !important;
+}
+
+.sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    padding: 1.5rem 1rem !important;
+    background-color: transparent !important;
+}
+
+.logo {
+    padding: 0 0.5rem 2rem 0.5rem !important;
+    border-bottom: none !important;
+}
+
+.logo a {
+    color: var(--admin-primary) !important;
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+}
+
+.btn-back-admin {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    background: #111827 !important;
+    color: #fff !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 0.8rem !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+    margin-bottom: 1rem !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+
+.btn-back-admin:hover {
+    background: #374151 !important;
+    color: #fff !important;
+}
+
+/* Sidebar Menu */
+#main-menu {
+    flex-grow: 1 !important;
+}
+
+.sidebar .menu {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.sidebar .menu-item {
+    margin-bottom: 0.25rem !important;
+}
+
+.sidebar .menu-item>a {
+    padding: 0.75rem 1rem !important;
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    color: #4b5563 !important;
+    transition: var(--transition) !important;
+    display: flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+}
+
+.sidebar .menu-item:hover>a {
+    background-color: #f1f5f9 !important;
+    color: var(--admin-primary) !important;
+}
+
+.sidebar .menu-item.active>a {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+.sidebar .menu-item i {
+    font-size: 1.1rem !important;
+    margin-right: 0.75rem !important;
+    width: 20px !important;
+    text-align: center !important;
+}
+
+/* Submenu (Dropdowns) */
+.sidebar .submenu {
+    list-style: none !important;
+    padding: 0.25rem 0 0.25rem 1rem !important;
+    margin: 0.25rem 0 0.5rem 0 !important;
+    border-left: 1px solid var(--admin-border) !important;
+}
+
+.sidebar .submenu .menu-item>a {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem !important;
+}
+
+/* Main Content Area */
+.main-content {
+    flex-grow: 1 !important;
+    width: 100% !important;
+    padding: 2rem !important;
+}
+
+.content-header {
+    margin-bottom: 2rem !important;
+}
+
+.content-header .title {
+    font-size: 1.875rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.04em !important;
+    color: var(--admin-primary) !important;
+}
+
+.content-panel {
+    border: none !important;
+    box-shadow: var(--admin-shadow) !important;
+    border-radius: var(--admin-radius) !important;
+    background: white !important;
+    padding: 2rem !important;
+}
+
+.datagrid {
+    border: 1px solid var(--admin-border) !important;
+    border-radius: var(--admin-radius) !important;
+    overflow: hidden !important;
+}
+
+.table thead th {
+    background-color: #f9fafb !important;
+    border-bottom: 1px solid var(--admin-border) !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 1rem 1.25rem !important;
+}
+
+.table tbody td {
+    padding: 1rem 1.25rem !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px !important;
+    padding: 0.6rem 1.2rem !important;
+    font-weight: 600 !important;
+    transition: var(--transition) !important;
+}
+
+.btn-primary {
+    background-color: var(--admin-primary) !important;
+    border: none !important;
+}
+
+/* Top bar (User / Search) */
+.content-top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding: 1rem 2rem !important;
+    background: white !important;
+    border-bottom: 1px solid var(--admin-border) !important;
+    margin: -2rem -2rem 2rem -2rem !important;
+}
+
+.content-search {
+    margin-right: 1.5rem !important;
+}
+
+.user-menu {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.modal-backdrop.fade.show {
+    display: none;
+}
