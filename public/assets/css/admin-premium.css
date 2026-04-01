@@ -657,7 +657,7 @@ input[type="color"].form-control,
     .main-sidebar {
         z-index: 1045 !important;
         top: 0 !important;
-        height: 100vh !important;
+        height: 100dvh !important;
         background-color: #ffffff !important;
     }
 

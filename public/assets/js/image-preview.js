@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const fileInput = e.target.closest('input[type="file"]');
         if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
 
-        // Use 10MB for Admin as it's typically more permissive than guest uploads
-        const MAX_SIZE_MB = 10;
+        // Limit to 5MiB as requested
+        const MAX_SIZE_MB = 5;
         const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
         for (let i = 0; i < fileInput.files.length; i++) {

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Una tienda genial, con muchos artículos genios y hermosos y todo...">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
@@ -957,7 +957,7 @@
             const fileInput = e.target.closest('input[type="file"]');
             if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
             
-            const MAX_SIZE_MB = 8; // 8MB is typical safe ceiling
+            const MAX_SIZE_MB = 5; // 5MB limit
             const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
             
             for (let i = 0; i < fileInput.files.length; i++) {
@@ -969,7 +969,7 @@
                     fileInput.value = '';
                     
                     // Alert
-                    const alertMsg = `¡Archivo demasiado pesado!\n\nEl archivo "${file.name}" pesa ${fileSizeMB}MB y el máximo permitido es de ${MAX_SIZE_MB}MB.\n\nPor favor, reduce el peso o sube un archivo diferente para evitar el error 413.`;
+                    const alertMsg = `¡Archivo muy pesado!\n\n"${file.name}" (${fileSizeMB}MB) excede el máximo permitido de ${MAX_SIZE_MB}MB.\n\nPor favor, reduce el peso de la imagen antes de subirla o usa una diferente.`;
                     
                     if (window.Swal) {
                         Swal.fire({

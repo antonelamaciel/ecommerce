@@ -12,7 +12,6 @@
             {# Background image + dual overlay #}
             <div class="hc-slide__bg"
                  style="background-image: url(/uploads/{{ header.image }});"></div>
-            <div class="hc-slide__overlay"></div>
 
             {# Main content removed (only image and link per user request) #}
 
@@ -39,7 +38,7 @@
 .hc-carousel {
     position: relative;
     width: 100%;
-    height: 65vh; /* Reduced height as requested */
+    height: 65dvh; /* Reduced height as requested */
     min-height: 450px;
     max-height: 700px;
     overflow: hidden;
@@ -49,7 +48,7 @@
 
 /* ── Slide ── */
 .hc-slide {
-    height: 65vh;
+    height: 65dvh;
     min-height: 450px;
     max-height: 700px;
     overflow: hidden;
@@ -80,15 +79,6 @@
     transform: scale(1);
 }
 
-/* Layered overlay: dark bottom + directional gradient */
-.hc-slide__overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background:
-        linear-gradient(to top,  rgba(0,0,0,0.6) 0%, transparent 55%),
-        linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 70%);
-}
 
 /* ── Content ── */
 .hc-slide__body {
@@ -219,7 +209,7 @@
 @media (max-width: 768px) {
     .hc-carousel,
     .hc-slide {
-        height: 35vh;
+        height: 35dvh;
         min-height: 250px;
     }
     .hc-content {

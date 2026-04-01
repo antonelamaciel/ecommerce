@@ -25,7 +25,7 @@ body {
 aside.sidebar-wrapper {
     position: sticky !important;
     top: 0 !important;
-    height: 100vh !important;
+    height: 100dvh !important;
     width: 260px !important;
     min-width: 260px !important;
     background: #ffffff !important;

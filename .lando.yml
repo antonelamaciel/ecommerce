@@ -3,3 +3,8 @@ recipe: lamp
 config:
   webroot: public
   php: 8.4
+  conf:
+    php:
+      upload_max_filesize: 5M
+      post_max_size: 8M
+      memory_limit: 256M
