@@ -450,6 +450,19 @@
 
         {# Column Right: Info & Purchase #}
         <div class="col-lg-6 product-info">
+            {% if product.bundles|length > 0 %}
+                <div class="mb-3" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    {% for bundle in product.bundles %}
+                        {% if bundle.type %}
+                            <span class="bundle-pill">
+                                {{ bundle.type == 'pocas_unidades' ? '¡Apurate, quedan pocas unidades!' : 
+                                   (bundle.type == 'oferta_sorpresa' ? '¡Oferta sorpresa!' : 
+                                   (bundle.type == 'ultimos_stock' ? '¡Últimos en stock!' : bundle.type)) }}
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
             <h1 class="product-title">{{ product.name }}</h1>
             {% if product.subtitle %}
                 <p class="product-subtitle">{{ product.subtitle }}</p>
@@ -524,7 +537,7 @@
             <div class="purchase-grid">
                 <div class="qty-selector">
                     <button class="qty-btn" id="pd-minus">-</button>
-                    <input type="number" id="pd-qty" value="1" min="1" class="qty-input" readonly>
+                    <input type="number" id="pd-qty" value="1" min="1" max="{{ product.stock ?? 9999 }}" data-max-stock="{{ product.stock ?? 9999 }}" class="qty-input" readonly>
                     <button class="qty-btn" id="pd-plus" {{ product.stock is not null and product.stock <= 0 ? 'disabled' : '' }}>+</button>
                 </div>
                 
@@ -747,7 +760,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.getElementById('pd-plus').addEventListener('click', () => {
         let val = parseInt(qtyInput.value);
-        qtyInput.value = val + 1;
+        let max = parseInt(qtyInput.dataset.maxStock);
+        if (val < max) {
+            qtyInput.value = val + 1;
+        }
     });
 
     // Variant Selection Logic (Tiered)

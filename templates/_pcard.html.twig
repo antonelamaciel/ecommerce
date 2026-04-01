@@ -48,22 +48,26 @@
 
     </div>
 
-    <div class="pcard__body">
+    <div class="pcard__body" style="padding: 12px; text-align: center;">
+        {% if product.bundles|length > 0 %}
+            <div class="pcard__pills-wrap mb-2" style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                {% for bundle in product.bundles %}
+                    {% if bundle.type %}
+                        <span class="bundle-pill">
+                            {{ bundle.type == 'pocas_unidades' ? '¡Apurate, quedan pocas unidades!' : 
+                               (bundle.type == 'oferta_sorpresa' ? '¡Oferta sorpresa!' : 
+                               (bundle.type == 'ultimos_stock' ? '¡Últimos en stock!' : bundle.type)) }}
+                        </span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <h3 class="pcard__name">
             <a href="{{ path('product_show', {slug: product.slug}) }}">
                 <span class="pcard__name-text"><b>{{ product.name }}</b></span>
             </a>
         </h3>
-
-        {% if product.bundles|length > 0 %}
-            <div class="pcard__pills-wrap" style="display: flex; gap: 4px; margin-top: 2px; justify-content: center;">
-                {% for bundle in product.bundles %}
-                    <span class="bundle-pill" style="font-size: 0.6rem; color: #999; font-weight: 600; text-transform: uppercase;">
-                        • {{ bundle.type == 'pocas_unidades' ? 'Pocas unidades' : (bundle.type == 'oferta_sorpresa' ? 'Oferta' : 'Promo') }}
-                    </span>
-                {% endfor %}
-            </div>
-        {% endif %}
         
         <div class="pcard__price" style="margin-top: 4px;">
             <div class="pcard__price-container">

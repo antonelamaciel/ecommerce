@@ -276,23 +276,21 @@
             align-items: center;
             justify-content: center;
             vertical-align: middle;
-            padding: 0.3rem 0.6rem;
+            padding: 0.35rem 0.75rem;
             font-size: 0.65rem;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             border-radius: 4px;
-            margin-left: 0.4rem;
             margin-top: 0.25rem;
             margin-bottom: 0.25rem;
-            color: #fff;
+            background-color: #FFD700 !important;
+            color: #000000 !important;
             text-align: center;
             line-height: 1.2;
+            letter-spacing: 0.02em;
             animation: pillShake 5s infinite;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .bundle-pill--oferta_sorpresa { background-color: #198754; }
-        .bundle-pill--ultimos_stock { background-color: #dc3545; }
-        .bundle-pill--pocas_unidades { background-color: #ffc107; color: #000; }
-        
         /* ── Top Right Badges (Envío, Recomendado, etc) ── */
         .top-badge-right {
             position: absolute;
@@ -703,6 +701,20 @@
         <button id="acceptCookies" class="btn btn-dark px-4 fw-bold" style="border-radius: 4px;">Entendido</button>
     </div>
 
+    {# Session Expired Overlay #}
+    <div id="sessionExpiredOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(10px); align-items: center; justify-content: center; text-align: center; color: #fff; padding: 2rem; opacity: 0; transition: opacity 0.5s ease;">
+        <div style="max-width: 500px; padding: 3rem; background: #fff; color: #000; border-radius: 2rem; box-shadow: 0 30px 60px rgba(0,0,0,0.3); border: 2px solid var(--tertiary-color);">
+            <div style="background: #fff0f0; color: #dc3545; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; font-size: 2.5rem;">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <h2 style="font-weight: 800; font-size: 1.8rem; margin-bottom: 1rem; color: #1e293b;">¡La sesión expiró!</h2>
+            <p style="color: #64748b; font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.5;">Por favor ingrese de nuevo para continuar con su pedido.</p>
+            <a href="{{ path('app_login') }}" class="btn btn-dark w-100 py-3 fw-bold shadow-lg" style="border-radius: 1rem; font-size: 1.1rem; text-transform: uppercase; background: var(--tertiary-color) !important; color: var(--primary-color) !important; border: none !important;">
+                Iniciar Sesión <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="{{asset('assets/js/bootstrap.bundle.js')}}"></script>
     <script>
@@ -916,6 +928,62 @@
                         toggleBtn.style.opacity = '1';
                     }
                 });
+            }
+        });
+
+        // Session Expiration Heartbeat
+        {% if app.user %}
+            const checkSession = () => {
+                fetch('{{ path('api_session_check') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        const overlay = document.getElementById('sessionExpiredOverlay');
+                        if (overlay) {
+                            overlay.style.display = 'flex';
+                            setTimeout(() => overlay.style.opacity = '1', 50);
+                            document.body.style.overflow = 'hidden';
+                        }
+                    }
+                })
+                .catch(err => { console.log('Session check error:', err); });
+            };
+            setInterval(checkSession, 120000); 
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkSession(); });
+        {% endif %}
+
+        // File Size Validation (Pre-upload 413 prevention)
+        document.addEventListener('change', function(e) {
+            const fileInput = e.target.closest('input[type="file"]');
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
+            
+            const MAX_SIZE_MB = 8; // 8MB is typical safe ceiling
+            const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+            
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                if (file.size > MAX_SIZE_BYTES) {
+                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                    
+                    // Clear input
+                    fileInput.value = '';
+                    
+                    // Alert
+                    const alertMsg = `¡Archivo demasiado pesado!\n\nEl archivo "${file.name}" pesa ${fileSizeMB}MB y el máximo permitido es de ${MAX_SIZE_MB}MB.\n\nPor favor, reduce el peso o sube un archivo diferente para evitar el error 413.`;
+                    
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: '¡Peso Excedido!',
+                            text: alertMsg,
+                            confirmButtonColor: 'var(--tertiary-color, #000)',
+                            confirmButtonText: 'Entendido'
+                        });
+                    } else {
+                        alert(alertMsg);
+                    }
+                    return;
+                }
             }
         });
     </script>

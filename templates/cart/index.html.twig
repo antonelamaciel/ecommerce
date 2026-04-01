@@ -408,6 +408,21 @@
                                             {{ item.product.name }}
                                         </a>
                                     </h3>
+                                    
+                                    {% if item.product.bundles|length > 0 %}
+                                        <div class="mb-1" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                            {% for bundle in item.product.bundles %}
+                                                {% if bundle.type %}
+                                                    <span class="bundle-pill" style="font-size: 0.55rem; padding: 2px 6px;">
+                                                        {{ bundle.type == 'pocas_unidades' ? '¡Apurate, quedan pocas unidades!' : 
+                                                           (bundle.type == 'oferta_sorpresa' ? '¡Oferta sorpresa!' : 
+                                                           (bundle.type == 'ultimos_stock' ? '¡Últimos en stock!' : bundle.type)) }}
+                                                    </span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
                                     {% if item.variants %}
                                         <div class="cart-item__variants">
                                             {{ item.variants }}
@@ -421,7 +436,8 @@
                                             <i class="bi bi-dash"></i>
                                         </a>
                                         <span class="qty-val js-qty-val">{{ item.quantity }}</span>
-                                        <a href="{{ path('add_to_cart', {id: item.product.id, qty: 1, variants: item.variants}) }}" class="qty-btn js-qty-btn" data-action="increase" title="Más">
+                                        <a href="{{ path('add_to_cart', {id: item.product.id, qty: 1, variants: item.variants}) }}" class="qty-btn js-qty-btn" data-action="increase" data-max-stock="{{ item.product.stock ?? 9999 }}"
+                                           title="Más">
                                             <i class="bi bi-plus"></i>
                                         </a>
                                     </div>
@@ -533,7 +549,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const action = this.dataset.action;
             
             let currentQty = parseInt(qtyVal.textContent);
-            if (action === 'decrease' && currentQty === 1) return; 
+            if (action === 'decrease' && currentQty === 1) return;
+            if (action === 'increase' && currentQty >= parseInt(this.dataset.maxStock || 9999)) return;
 
             const url = new URL(this.href, window.location.origin);
             url.searchParams.set('ajax', '1');

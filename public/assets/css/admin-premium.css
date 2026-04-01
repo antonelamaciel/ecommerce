@@ -62,6 +62,12 @@ h1.title {
     transition: all 0.3s ease;
 }
 
+.ts-dropdown-content,
+.ts-wrapper.form-select.single.plugin-dropdown_input.plugin-clear_button.full.has-items.focus.input-active.dropdown-active,
+.ts-wrapper.form-select.single.plugin-dropdown_input.plugin-clear_button.focus.input-active.dropdown-active {
+    z-index: 1050 !important;
+}
+
 .btn-back-admin:hover {
     background: #eef2ff;
     color: var(--primary-indigo) !important;

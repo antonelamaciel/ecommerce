@@ -139,4 +139,26 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     initStockSync();
+
+    // ── FILE SIZE VALIDATION (413 PREVENTION) ──
+    document.addEventListener('change', function (e) {
+        const fileInput = e.target.closest('input[type="file"]');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
+
+        // Use 10MB for Admin as it's typically more permissive than guest uploads
+        const MAX_SIZE_MB = 10;
+        const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const file = fileInput.files[i];
+            if (file.size > MAX_SIZE_BYTES) {
+                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                fileInput.value = '';
+
+                // For admin, we use a standard alert for better compatibility with EasyAdmin lifecycle
+                alert(`¡Archivo muy pesado!\n\n"${file.name}" (${fileSizeMB}MB) excede el máximo permitido de ${MAX_SIZE_MB}MB.\n\nPor favor, reduce el peso de la imagen antes de subirla.`);
+                return;
+            }
+        }
+    });
 });

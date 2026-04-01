@@ -207,29 +207,8 @@ class BundleCrudController extends AbstractCrudController
             ->setHelp('Esto te ayudara a identificar la promo en el panel de administración.'),
 
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('1. Productos')->setCssClass('padded-internal-panel')->hideOnDetail(),
-            ChoiceField::new('type', 'Etiqueta Lateral')
-                ->setChoices([
-                    'Ninguna' => '',
-                    'Oferta sorpresa!' => 'oferta_sorpresa',
-                    'Últimos en stock!' => 'ultimos_stock',
-                    'Apurate, quedan pocas unidades!' => 'pocas_unidades',
-                ])
-                ->setHelp('Aparecera del alado del nombre de cada "producto seleccionado".')
-                ->setRequired(false),
 
-            \EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField::new('discountPercentage', 'descuento (%)')
-                ->setHelp('Aplica un descuento automático a todos los "productos seleccionados". Dejar vacío si no quieres hacer un descuento.')
-                ->setRequired(false),
-            ChoiceField::new('topRightBadge', 'Etiqueta Superior Derecha')
-                ->setChoices([
-                    'Ninguna' => '',
-                    'Envío gratis' => 'envio_gratis',
-                    'Recomendado' => 'recomendado',
-                    'Más vendido' => 'mas_vendido',
-                ])
-                ->setHelp('Aparecera en la esquina superior derecha de cada producto seleccionado.')
-                ->setRequired(false),
-            
+
             AssociationField::new('products', 'Productos seleccionados (afectados)')
                 ->autocomplete(false)
                 ->setCssClass('bundle-products-selector')
@@ -242,6 +221,32 @@ class BundleCrudController extends AbstractCrudController
                 ])
                 ->setHelp('Busca los productos a los que deseas aplicar estas etiquetas y descuento.'),
 
+            \EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField::new('discountPercentage', 'descuento (%)')
+                ->setHelp('Aplica un descuento automático a todos los "productos seleccionados". Dejar vacío si no quieres hacer un descuento.')
+                ->setRequired(false),
+                
+            ChoiceField::new('type', 'Etiqueta Lateral')
+                ->setChoices([
+                    'Ninguna' => '',
+                    'Oferta sorpresa!' => 'oferta_sorpresa',
+                    'Últimos en stock!' => 'ultimos_stock',
+                    'Apurate, quedan pocas unidades!' => 'pocas_unidades',
+                ])
+                ->setHelp('Aparecerá al lado del nombre de cada "producto seleccionado".')
+                ->setRequired(false)
+                ->setColumns(6),
+
+            ChoiceField::new('topRightBadge', 'Etiqueta Superior Derecha')
+                ->setChoices([
+                    'Ninguna' => '',
+                    'Envío gratis' => 'envio_gratis',
+                    'Recomendado' => 'recomendado',
+                    'Más vendido' => 'mas_vendido',
+                ])
+                ->setHelp('Aparecerá en la esquina superior derecha de cada producto seleccionado.')
+                ->setRequired(false)
+                ->setColumns(6),
+            
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('2. Cuenta Regresiva')->setCssClass('padded-internal-panel')->hideOnDetail(),
             TextField::new('countdownTitle', 'Ocasión cuenta regresiva')
                 ->setHelp('Ej: Black Friday, Cyber Monday, Promoción Especial. Aparecerá primero en el inicio.')
