@@ -570,7 +570,7 @@
                                 </div>
                             </div>
                             <div class="small fw-700">
-                                ARS {{ ((item.quantity * item.product.price) / 100)|number_format(2,',','.') }}
+                                ARS {{ (item.quantity * item.product.price)|number_format(2,',','.') }}
                             </div>
                         </div>
                     {% endfor %}
@@ -579,16 +579,16 @@
                 <div class="summary-breakdown">
                     <div class="breakdown-row">
                         <span class="text-muted">Subtotal</span>
-                        <span class="fw-600">ARS {{ (totalPrice / 100)|number_format(2,',','.') }}</span>
+                        <span class="fw-600">ARS {{ totalPrice|number_format(2,',','.') }}</span>
                     </div>
                     <div class="breakdown-row">
                         <span class="text-muted">Envío</span>
-                        <span class="fw-600">ARS {{ (order.carrierPrice/100)|number_format(2,',','.') }}</span>
+                        <span class="fw-600">ARS {{ order.carrierPrice|number_format(2,',','.') }}</span>
                     </div>
 
                     <div class="breakdown-row final-total">
                         <span>Total Final</span>
-                        <span>ARS {{ ((totalPrice / 100) + order.carrierPrice / 100)|number_format(2,',','.') }}</span>
+                        <span>ARS {{ (totalPrice + order.carrierPrice)|number_format(2,',','.') }}</span>
                     </div>
 
                     <div class="payment-opts" id="payment-buttons-container" style="opacity: 0.5; pointer-events: none;">
@@ -759,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Reset price UI
         if (shippingRow) shippingRow.textContent = 'ARS 0,00';
-        const subtotal = {{ totalPrice / 100 }};
+        const subtotal = {{ totalPrice }};
         if (finalRow) finalRow.textContent = `ARS ${subtotal.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
         checkConfirmation();
     };
@@ -798,8 +798,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    if (shippingRow) shippingRow.textContent = `ARS ${(data.carrierPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
-                    if (finalRow) finalRow.textContent = `ARS ${(data.totalPrice / 100).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    if (shippingRow) shippingRow.textContent = `ARS ${(data.carrierPrice).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    if (finalRow) finalRow.textContent = `ARS ${(data.totalPrice).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
                     checkConfirmation();
                     
                     // Smooth scroll to confirmation button for better UX
