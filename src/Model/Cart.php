@@ -3,39 +3,71 @@ namespace App\Model;
 
 use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Security;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Permet de gérer un panier en session plutot que de tout implémenter dans le controller
- * Modifié pour supporter les variantes (opciones e hijas)
+ * Modifié pour conserver le panier dans la BDD pour un utilisateur connecté
  */
 class Cart 
 {
     private SessionInterface $session;
     private ProductRepository $repository;
+    private Security $security;
+    private EntityManagerInterface $em;
 
-    public function __construct(SessionInterface $session, ProductRepository $repository)
+    public function __construct(SessionInterface $session, ProductRepository $repository, Security $security, EntityManagerInterface $em)
     {
         $this->session = $session;
         $this->repository = $repository;
+        $this->security = $security;
+        $this->em = $em;
     }
 
-    /**
-     * Ajoute un produit au panier avec ses variantes
-     *
-     * @param int $id
-     * @param int $qty
-     * @param string|null $variants
-     * @return void
-     */
+    private function getCartArray(): array
+    {
+        $sessionCart = $this->session->get('cart_v2', []);
+        $user = $this->security->getUser();
+        
+        if ($user && method_exists($user, 'getCartData')) {
+            $dbCart = $user->getCartData() ?? [];
+            if (!empty($sessionCart) && !$this->session->get('cart_db_merged')) {
+                foreach ($sessionCart as $key => $item) {
+                    if (isset($dbCart[$key])) {
+                        $dbCart[$key]['qty'] += $item['qty'];
+                    } else {
+                        $dbCart[$key] = $item;
+                    }
+                }
+                $user->setCartData($dbCart);
+                $this->em->flush();
+                $this->session->set('cart_db_merged', true);
+            }
+            $this->session->set('cart_v2', $dbCart);
+            return $dbCart;
+        }
+        
+        return $sessionCart;
+    }
+
+    private function saveCartArray(array $cart): void
+    {
+        $this->session->set('cart_v2', $cart);
+        $user = $this->security->getUser();
+        if ($user && method_exists($user, 'setCartData')) {
+            $user->setCartData($cart);
+            $this->em->flush();
+        }
+    }
+
     public function add(int $id, int $qty = 1, ?string $variants = null): void
     {
-        $cart = $this->session->get('cart_v2', []);
+        $cart = $this->getCartArray();
         
-        // Trim and normalize variants string
         $variants = $variants ? trim($variants) : null;
         if ($variants === '') $variants = null;
         
-        // Créer une clé unique basée sur l'ID du produit et ses variantes
         $compositeId = $variants ? $id . '-' . md5($variants) : (string)$id;
 
         if (empty($cart[$compositeId])) {
@@ -48,47 +80,29 @@ class Cart
             $cart[$compositeId]['qty'] += $qty;
         }
 
-        $this->session->set('cart_v2', $cart);
+        $this->saveCartArray($cart);
     }
 
-    /**
-     * Récupère le panier
-     */
     public function get(): array
     {
-        return $this->session->get('cart_v2', []);
+        return $this->getCartArray();
     }
 
-    /**
-     * Supprime entièrement le panier
-     */
     public function remove(): void
     {
-        $this->session->remove('cart_v2');
+        $this->saveCartArray([]);
     }
 
-    /**
-     * Supprime un item du panier via sa clé composite
-     *
-     * @param string $compositeId
-     * @return void
-     */
     public function removeItem(string $compositeId): void
     {
-        $cart = $this->session->get('cart_v2', []);
+        $cart = $this->getCartArray();
         unset($cart[$compositeId]);
-        $this->session->set('cart_v2', $cart);
+        $this->saveCartArray($cart);
     }
 
-    /**
-     * Diminue la quantité d'un item
-     *
-     * @param string $compositeId
-     * @return void
-     */
     public function decreaseItem(string $compositeId): void
     {
-        $cart = $this->session->get('cart_v2', []);
+        $cart = $this->getCartArray();
         if (isset($cart[$compositeId])) {
             if ($cart[$compositeId]['qty'] < 2) {
                 unset($cart[$compositeId]);
@@ -96,15 +110,12 @@ class Cart
                 $cart[$compositeId]['qty']--;
             }
         }
-        $this->session->set('cart_v2', $cart);
+        $this->saveCartArray($cart);
     }
 
-    /**
-     * Quantité totale d'articles
-     */
     public function getFullQuantity(): int
     {
-        $cart = $this->session->get('cart_v2', []);
+        $cart = $this->getCartArray();
         $quantity = 0;
 
         foreach ($cart as $item) {
@@ -114,9 +125,6 @@ class Cart
         return $quantity;
     }
 
-    /**
-     * Détails complets du panier pour affichage
-     */
     public function getDetails(): array
     {
         $cartProducts = [
@@ -127,7 +135,7 @@ class Cart
             ],
         ];
 
-        $cart = $this->session->get('cart_v2', []);
+        $cart = $this->getCartArray();
         if ($cart) {
             foreach ($cart as $compositeId => $item) {
                 $currentProduct = $this->repository->find($item['id']);

@@ -66,6 +66,10 @@ class PersonalizeCrudController extends AbstractCrudController
         return [
             Field\FormField::addPanel('Información General')->setCssClass('padded-internal-panel')->hideOnDetail(),
             Field\TextField::new('companyName', 'Nombre de la empresa')->setRequired(true),
+            Field\TextareaField::new('description', 'Descripción corta de la empresa')
+                ->setHelp('Aparecerá en los buscadores de Google (SEO) al compartir la página web.')
+                ->setMaxLength(160)
+                ->hideOnIndex(),
             Field\ImageField::new('logo', "Logo de la empresa")
                 ->setBasePath('uploads/logo/')
                 ->setUploadDir('public/uploads/logo/')

@@ -31,6 +31,9 @@ class Personalize
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
+
     #[ORM\Column(length: 50)]
     private ?string $whatsapp = null;
 
@@ -270,6 +273,18 @@ class Personalize
     public function setPostal(?string $postal): static
     {
         $this->postal = $postal;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[UniqueEntity('email', "Cet email est déja pris")]
+#[UniqueEntity('email', "Esta dirección de correo electrónico ya está ocupada.")]
 #[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class)]
     private Collection $orders;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $cartData = null;
 
     public function __construct()
     {
@@ -232,4 +235,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getFullName() ?? $this->getEmail() ?? 'Usuario';
     }
 
+    public function getCartData(): ?array
+    {
+        return $this->cartData;
+    }
+
+    public function setCartData(?array $cartData): self
+    {
+        $this->cartData = $cartData;
+
+        return $this;
+    }
 }

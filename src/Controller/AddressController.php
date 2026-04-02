@@ -25,6 +25,13 @@ class AddressController extends AbstractController
     public function add(Request $request, EntityManagerInterface $em, SessionInterface $session): Response
     {
         $address = new Address();
+        $user = $this->getUser();
+        
+        if ($user) {
+            $address->setFirstname($user->getFirstname());
+            $address->setLastname($user->getLastname());
+        }
+
         $form = $this->createForm(AddressType::class, $address);
 
         $form->handleRequest($request);

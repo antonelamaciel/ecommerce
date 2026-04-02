@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Una tienda genial, con muchos artículos genios y hermosos y todo...">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v4.1.1">
+    <meta name="description" content="{{ personalize.description ?? 'Una tienda genial, con muchos artículos genios y hermosos y todo...' }}">
+    <meta name="author" content="{{ personalize.companyName ?? 'Empresa' }}">
+    <meta name="generator" content="{{ personalize.companyName ?? 'Empresa' }}">
     <title>{% block title %}{{ personalize.companyName ?? 'Empresa' }}{% endblock %}</title>
 
     <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
