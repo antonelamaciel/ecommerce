@@ -900,12 +900,33 @@ input[type="color"].form-control,
     /* Detail view usually spans full width, let it wrap instead of hiding */
 }
 
+/* 16. Specific Field Truncation (Banners Index) */
+.ea-truncate-index,
+.ea-truncate-index span,
+.ea-truncate-index div,
+.ea-truncate-index a {
+    max-width: 450px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block !important;
+    vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+
+    .ea-truncate-index,
+    .ea-truncate-index span,
+    .ea-truncate-index div,
+    .ea-truncate-index a {
+        max-width: 140px !important;
+    }
+}
+
 @media (max-width: 991px) {
     .datagrid td:not(.actions) {
         max-width: 150px !important;
     }
-
-
 
     /* Stack form actions on mobile */
     .page-actions,
@@ -990,18 +1011,55 @@ aside.sidebar {
 }
 
 /* --- ETIQUETAS DE CAMPOS OBLIGATORIOS (EasyAdmin) --- */
-.ea-edit-form label.required::after,
-.ea-new-form label.required::after,
-.field-group label.required::after,
-label.required::after,
-.form-group label.required::after {
-    content: " (obligatorio)" !important;
+label.required:not(.custom-file-label),
+legend.required,
+.form-label.required,
+.col-form-label.required,
+.form-control-label.required:not(.custom-file-label) {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    position: relative !important;
+}
+
+.field-text label.required::before,
+.field-textarea label.required::before,
+.field-integer label.required::before,
+.field-number label.required::before,
+.field-money label.required::before,
+.field-association label.required::before,
+.field-image legend.required::before,
+.ea-edit-form label.required:not(.custom-file-label)::before,
+.ea-new-form label.required:not(.custom-file-label)::before,
+label.required:not(.custom-file-label)::before,
+legend.required::before,
+.col-form-label.required::before,
+.form-control-label.required:not(.custom-file-label)::before {
+    content: "(obligatorio)" !important;
+    display: block !important;
+    width: fit-content !important;
+    /* Asegura que ocupe solo su espacio */
     color: #ef4444 !important;
     /* Rojo vibrante */
-    font-size: 0.8em;
-    font-weight: 700;
-    margin-left: 6px;
-    letter-spacing: 0.02em;
+    font-size: 0.65rem !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 4px !important;
+    line-height: 1 !important;
+}
+
+/* Evitar que aparezca dentro de inputs de archivos de Bootstrap */
+.custom-file-label.required::before,
+.custom-file-label.required::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Ocultar contenido residual en ::after */
+label.required::after {
+    content: "" !important;
+    display: none !important;
 }
 
 

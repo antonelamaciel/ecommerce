@@ -42,7 +42,8 @@ class HeadersCrudController extends AbstractCrudController
             // TextareaField::new('content', 'Contenido'),
             // TextField::new('btnTitle', 'Texto del botón'),
             TextField::new('btnUrl', 'Enlace del banner')
-            ->setHelp('Por ej: Enlace a Whatsapp, a un producto de la tienda, a una publicacion de instagram, etc. Al hacer click en el banner se redirigira a ese enlace'),
+                ->setCssClass('ea-truncate-index')
+                ->setHelp('Por ej: Enlace a Whatsapp, a un producto de la tienda, a una publicacion de instagram, etc. Al hacer click en el banner se redirigira a ese enlace'),
             
             ImageField::new('image', 'Subir/Cambiar Banner')
                 ->setBasePath('uploads/')

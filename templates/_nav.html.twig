@@ -123,7 +123,7 @@
                         <li><a class="nav-dropdown-item" href="{{ path('account_orders') }}"><i class="bi bi-bag-check mr-2"></i>Mis Pedidos</a></li>
                         {% if is_granted('ROLE_ADMIN') %}
                             <li><div class="dropdown-divider"></div></li>
-                            <li><a class="nav-dropdown-item" href="/admin"><i class="bi bi-speedometer2 mr-2"></i>Administración</a></li>
+                            <li><a class="nav-dropdown-item btn-nav-admin" href="/admin"><i class="bi bi-speedometer2 mr-2"></i>Administración</a></li>
                         {% endif %}
                         <li><div class="dropdown-divider"></div></li>
                         <li><a class="nav-dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right mr-2"></i>Cerrar Sesión</a></li>
@@ -174,13 +174,7 @@
 <div class="mobile-drawer-overlay" id="drawerOverlay"></div>
 <div class="mobile-drawer" id="mobileDrawer">
     <div class="drawer-header-modern">
-        <div class="d-flex align-items-center gap-3">
-             {% if personalize and personalize.logo %}
-                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" class="mini-drawer-logo">
-            {% else %}
-                <span class="mini-brand-text">{{ personalize.companyName ?? 'Empresa' }}</span>
-            {% endif %}
-        </div>
+        <div></div>
         <button class="drawer-close-btn-modern" id="drawerCloseModern" aria-label="Cerrar menú">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -261,7 +255,7 @@
                     <span>Mis Pedidos</span>
                 </a>
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a class="drawer-link animate-item text-danger" style="--delay: 8" href="/admin">
+                    <a class="drawer-link animate-item btn-nav-admin" style="--delay: 8" href="/admin">
                         <i class="bi bi-speedometer2"></i>
                         <span class="fw-bold">Administración</span>
                     </a>
@@ -532,7 +526,7 @@ body.dark-mode .cart-added-toast {
 }
 @media (max-width: 991px) {
     .cart-added-toast {
-        right: -65px;
+        right: -10px;
         padding: 6px 12px;
         gap: 6px;
     }
@@ -932,30 +926,36 @@ body.dark-mode .drawer-avatar { background-color: #2a2a2a !important; color: #ff
 @media (max-width: 991px) {
     .navbar-inner {
         padding: .5rem 1rem;
-        gap: .5rem;
+        gap: .25rem;
         display: flex;
         align-items: center;
+        position: relative;
     }
 
     .hamburger-btn { display: flex; order: 1; }
 
-    /* Logo solo a la derecha */
+    /* Logo centrado absolutamente */
     .navbar-brand-custom {
-        margin-left: auto;
-        order: 10;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        z-index: 10;
     }
     .navbar-logo { height: 60px; }
 
-    /* Centro: icono búsqueda pegado a hamburguesa */
+    /* Buscador movido a la derecha */
     .navbar-center {
         order: 3;
+        margin-left: auto; /* Empuja el contenedor y el carrito a la derecha */
         flex: 0 0 auto;
         gap: 0;
     }
 
-    /* Carrito junto al grupo izquierdo */
+    /* Carrito a la derecha del buscador */
     .navbar-right {
-        order: 2;
+        order: 4;
         gap: 0;
     }
 
