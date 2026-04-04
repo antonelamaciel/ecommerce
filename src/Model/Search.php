@@ -6,6 +6,10 @@ class Search
     private $string = '';
     private $categories = [];
     private $subcategories = [];
+    private $sort = 'default';
+
+    public function getSort() { return $this->sort; }
+    public function setSort($sort) { $this->sort = $sort; return $this; }
 
     public function getString() { return $this->string; }
     public function setString($string) { $this->string = $string; return $this; }

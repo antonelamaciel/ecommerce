@@ -48,6 +48,19 @@ class SearchType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
             ])
+            ->add('sort', \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
+                'choices' => [
+                    'Seleccionar orden' => 'default',
+                    'Precio: Menor a Mayor' => 'price-asc',
+                    'Precio: Mayor a Menor' => 'price-desc',
+                    'Más nuevo a más viejo' => 'date-desc',
+                    'Más viejo a más nuevo' => 'date-asc',
+                ],
+                'required' => false,
+                'expanded' => false,
+                'multiple' => false,
+                'placeholder' => false,
+            ])
         ;
     }
 
