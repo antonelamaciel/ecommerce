@@ -39,7 +39,7 @@
             </div>
             <div class="company-info">
                 <strong>{{ personalize.companyName|default('Nuestra Empresa') }}</strong><br>
-                {{ personalize.address|default('Calle 123') }}<br>
+                {{ personalize.address|default('Calle 123') }} ({{ personalize.postal|default('') }})<br>
                 {{ personalize.city|default('Ciudad') }}, {{ personalize.province|default('Provincia') }}<br>
                 {{ personalize.email|default('soporte@tienda.com') }}<br>
                 {% if personalize.whatsapp is defined %}{{ personalize.whatsapp }}{% endif %}
@@ -57,7 +57,14 @@
             <div class="info-box">
                 <h3>Detalles de Pago:</h3>
                 <p><strong>Método:</strong> {% if order.paymentMethod == 'cash' %}Efectivo (Local){% elseif order.paymentMethod == 'transfer' %}Transferencia Bancaria{% else %}{{ order.paymentMethod }}{% endif %}</p>
-                <p><strong>Estado:</strong> Pagado / Confirmado</p>
+                <p><strong>Estado:</strong> 
+                    {{ order.state == 0 ? 'No pagado' :
+                       order.state == 1 ? 'Pago aceptado' :
+                       order.state == 2 ? 'En preparación' :
+                       order.state == 3 ? 'Enviado/Retirado' :
+                       order.state == 4 ? 'Pendiente' :
+                       order.state == 5 ? 'Cancelado' : 'Estado ' ~ order.state }}
+                </p>
                 <p><strong>Envío:</strong> {{ order.carrierName }}</p>
             </div>
         </div>
@@ -87,9 +94,9 @@
         </table>
 
         <div class="totals">
-            <p><span>Subtotal:</span> <span style="text-align:right;">${{ (order.total - order.carrierPrice)|number_format(2, ',', '.') }}</span></p>
+            <p><span>Subtotal:</span> <span style="text-align:right;">${{ order.total|number_format(2, ',', '.') }}</span></p>
             <p><span>Envío ({{ order.carrierName }}):</span> <span style="text-align:right;">${{ order.carrierPrice|number_format(2, ',', '.') }}</span></p>
-            <p class="grand-total"><span>Total:</span> <span style="text-align:right;">${{ order.total|number_format(2, ',', '.') }}</span></p>
+            <p class="grand-total"><span>Total:</span> <span style="text-align:right;">${{ (order.total + order.carrierPrice)|number_format(2, ',', '.') }}</span></p>
         </div>
 
         <div class="footer">

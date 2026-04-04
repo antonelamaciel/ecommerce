@@ -13,6 +13,7 @@
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/modern-theme.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     {% if personalize and personalize.logo %}
         <link rel="icon" type="image/x-icon" href="{{ asset('uploads/logo/' ~ personalize.logo) }}">
@@ -34,6 +35,7 @@
         body {
             background-color: var(--bg-body) !important;
             transition: background-color 0.4s ease, color 0.4s ease;
+            font-family: 'Outfit', sans-serif !important;
         }
 
         /* ── Dark Mode Theme Protocol ── */
@@ -45,12 +47,9 @@
             background-color: #121212 !important;
             color: #f5f5f5 !important;
         }
-        body.dark-mode .navbar, body.dark-mode .footer-custom {
+        body.dark-mode .footer-custom {
             background-color: #1a1a1a !important;
             border-bottom: 1px solid #333 !important;
-        }
-        body.dark-mode .navbar-custom *, body.dark-mode .nav-link, body.dark-mode .navbar-brand {
-            color: #ffffff !important;
         }
         body.dark-mode .card, body.dark-mode .pcard, body.dark-mode .dropdown-menu, body.dark-mode .offcanvas {
             background-color: #1e1e1e !important;
@@ -190,12 +189,6 @@
                 color: var(--tertiary-color) !important;
             }
 
-            .navbar-custom .search-box input::placeholder,
-            .search-overlay-form input::placeholder {
-                color: var(--tertiary-color) !important;
-                opacity: 0.6;
-            }
-            
             .nav-link:hover, .navbar .dropdown-toggle:hover {
                 opacity: 0.8;
             }

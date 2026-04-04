@@ -91,7 +91,8 @@ class NotificationCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Notificación de Pedido')
             ->setEntityLabelInPlural('Notificaciones')
-            ->setDefaultSort(['id' => 'DESC']);
+            ->setDefaultSort(['id' => 'DESC'])
+            ->setSearchFields(['id', 'reference', 'user.firstname', 'user.lastname']);
     }
 
     public function configureFields(string $pageName): iterable
@@ -99,10 +100,10 @@ class NotificationCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm()->hideOnIndex()->hideOnDetail(),
             TextField::new('reference', 'ID del pedido'),
-            DateTimeField::new('createdAt', 'Fecha')->setFormat('short', 'short'),
+            DateTimeField::new('createdAt', 'Fecha')->setFormat('short', 'short')->setSortable(true),
             TextField::new('user.fullName', 'Cliente'),
             TextField::new('productSummary', 'Resumen de Productos'),
-            MoneyField::new('total', 'Total')->setCurrency('ARS'),
+            MoneyField::new('total', 'Total')->setCurrency('ARS')->setSortable(false),
             MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->hideOnDetail(),
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,

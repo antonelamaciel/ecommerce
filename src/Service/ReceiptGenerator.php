@@ -12,11 +12,13 @@ class ReceiptGenerator
 {
     private $twig;
     private $projectDir;
+    private $personalizeRepository;
 
-    public function __construct(Environment $twig, KernelInterface $kernel)
+    public function __construct(Environment $twig, KernelInterface $kernel, \App\Repository\PersonalizeRepository $personalizeRepository)
     {
         $this->twig = $twig;
         $this->projectDir = $kernel->getProjectDir();
+        $this->personalizeRepository = $personalizeRepository;
     }
 
     public function generate(Order $order): string
@@ -31,6 +33,7 @@ class ReceiptGenerator
         // Render HTML
         $html = $this->twig->render('pdf/receipt.html.twig', [
             'order' => $order,
+            'personalize' => $this->personalizeRepository->findOneBy([])
         ]);
 
         $dompdf->loadHtml($html);

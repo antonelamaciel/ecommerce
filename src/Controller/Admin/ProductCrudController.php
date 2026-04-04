@@ -74,7 +74,8 @@ class ProductCrudController extends AbstractCrudController
 
             ImageField::new('image', 'Portada')
                 ->setTemplatePath('admin/fields/banner_image.html.twig')
-                ->hideOnForm(),
+                ->hideOnForm()
+                ->setSortable(false),
 
             // --- GALERÍA (Colección dinámica de EasyAdmin) ---
             Field::new('imagesUpload', 'Galería de imágenes')
@@ -116,11 +117,13 @@ class ProductCrudController extends AbstractCrudController
             NumberField::new('price', 'Precio (ARS)')->setRequired(true)
             ->setHelp('Precio del producto visible en la tienda (Ej: 1500,50)'),
             NumberField::new('oldPrice', 'Precio Tachado (ARS)')
-            ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).'),
+            ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).')
+            ->setSortable(false),
            
             BooleanField::new('isInHome', 'Producto Destacado')
             ->setHelp('El producto aparecera entre los primeros en la pagina de inicio? si/no.')
-                ->setFormTypeOption('disabled', $pageName === Crud::PAGE_INDEX),
+                ->setFormTypeOption('disabled', $pageName === Crud::PAGE_INDEX)
+                ->setSortable(false),
 
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Opciones del Producto'),
             CollectionField::new('options', 'Talles, Colores o Variantes')
@@ -160,9 +163,9 @@ class ProductCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Producto')
             ->setEntityLabelInPlural('Productos')
+            ->setSearchFields(['id', 'name', 'subtitle', 'description', 'price', 'category.name', 'stock'])
             ->overrideTemplate('crud/index', 'admin/sales/products.html.twig')
-            ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
-        ;
+            ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig']);
     }
 
     private function handleImages($request, Product $product): void

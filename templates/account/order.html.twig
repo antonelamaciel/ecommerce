@@ -4,7 +4,6 @@
 
 {% block body %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
   :root {
     --c-bg: #fcfbf9;
@@ -19,11 +18,9 @@
     --radius-sm: 10px;
     --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
-    --font-main: 'Outfit', sans-serif;
   }
 
-  .order-detail-wrap {
-    font-family: var(--font-main);
+  .order-detail-wrap { 
     color: var(--c-ink);
     padding: 1rem 0 5rem;
     animation: fadeUp .6s var(--transition) both;
@@ -146,6 +143,45 @@
     .detail-grid { grid-template-columns: 1fr; }
   }
 
+  @media (max-width: 575px) {
+    .order-detail-header { margin-bottom: 2rem; }
+    .card-premium { padding: 1.25rem; }
+    
+    .items-table thead { display: none; }
+    .items-table tr {
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--c-border);
+      gap: 0.75rem;
+    }
+    .items-table td {
+      padding: 0 !important;
+      border: none !important;
+      width: 100%;
+    }
+    
+    .item-qty { 
+      order: 2; 
+      display: inline-flex;
+      background: var(--c-soft);
+      padding: 0.3rem 0.75rem !important;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      width: fit-content !important;
+    }
+    
+    .item-price { 
+      order: 3; 
+      text-align: left !important; 
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--c-ink);
+    }
+
+    body.dark-mode .item-qty { background-color: #2a2a2a !important; color: #fff; }
+  }
+
   /* ── Dark Mode Overrides ── */
   body.dark-mode {
     --c-bg: #121212;
@@ -209,7 +245,7 @@
             <tr>
               <th>Producto</th>
               <th>Cantidad</th>
-              <th class="text-end">Precio Total</th>
+              <th class="text-end">Precio</th>
             </tr>
           </thead>
           <tbody>

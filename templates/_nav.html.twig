@@ -24,7 +24,7 @@
             <form action="{{ path('product') }}" method="GET" class="search-wrapper position-relative" id="desktopSearchForm">
                 <div class="search-box">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="search" name="string" id="desktopSearchInput" placeholder="Buscar…" autocomplete="off">
+                    <input type="search" name="string" id="desktopSearchInput" placeholder="Buscar productos …" autocomplete="off">
                 </div>
                 <!-- Desktop Live Search Dropdown -->
                 <div id="desktopSearchDropdown" class="dropdown-menu w-100 shadow-lg border-0" style="display:none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; max-height: 400px; overflow-y: auto; z-index: 1050; border-radius: 14px;">
@@ -40,7 +40,7 @@
             <div class="search-overlay position-relative" id="searchOverlay">
                 <form action="{{ path('product') }}" method="GET" class="search-overlay-form position-relative" id="mobileSearchForm">
                     <i class="bi bi-search search-overlay-icon"></i>
-                    <input type="search" name="string" id="searchOverlayInput" placeholder="Buscar…" autocomplete="off">
+                    <input type="search" name="string" id="searchOverlayInput" placeholder="Buscar productos …" autocomplete="off">
                     <button type="button" class="search-close-btn" id="searchClose">
                         <i class="bi bi-x-lg"></i>
                     </button>
@@ -302,6 +302,15 @@
     box-shadow: 0 4px 24px rgba(0,0,0,.15);
     z-index: 1030;
 }
+body.dark-mode .navbar-custom {
+    background-color: #1a1a1a !important;
+    border-bottom: 1px solid #333 !important;
+}
+body.dark-mode .navbar-custom *,
+body.dark-mode .nav-link,
+body.dark-mode .navbar-brand {
+    color: #ffffff !important;
+}
 .navbar-inner {
     display: flex;
     align-items: center;
@@ -385,7 +394,10 @@
     outline: none;
     transition: background .2s, border-color .2s;
 }
-.search-box input::placeholder { color: rgba(255,255,255,.5); }
+.search-box input::placeholder { 
+    color: var(--tertiary-color) !important;
+    opacity: 0.6;
+}
 .search-box input:focus {
     background: rgba(255,255,255,.22);
     border-color: transparent !important;
@@ -655,7 +667,10 @@ body.dark-mode .nav-dropdown-item.text-danger:hover { background: #3c1414 !impor
     color: #fff; font-size: .95rem;
     outline: none;
 }
-.search-overlay-form input::placeholder { color: rgba(255,255,255,.5); }
+.search-overlay-form input::placeholder { 
+    color: var(--tertiary-color) !important;
+    opacity: 0.6; 
+}
 .search-close-btn {
     background: rgba(255, 255, 255, 0.15);
     border: none !important;

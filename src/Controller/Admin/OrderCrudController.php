@@ -70,8 +70,8 @@ class OrderCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Pedido')
             ->setEntityLabelInPlural('Pedidos')
             ->setDefaultSort(['id' => 'DESC'])
-            ->overrideTemplate('crud/index', 'admin/sales/orders.html.twig')
-            ;
+            ->setSearchFields(['id', 'reference', 'user.firstname', 'user.lastname', 'user.email', 'total', 'state', 'paymentMethod', 'carrierName', 'delivery'])
+            ->overrideTemplate('crud/index', 'admin/sales/orders.html.twig');
     }
 
     public function configureAssets(Assets $assets): Assets
@@ -186,7 +186,7 @@ class OrderCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm()->hideOnDetail(), 
+            IdField::new('id')->hideOnForm()->hideOnDetail()->hideOnIndex(), 
             TextField::new('reference', 'ID del Pedido'),
             DateTimeField::new('createdAt', 'Fecha')->setFormat('short', 'short'),
             AssociationField::new('user', 'Cliente'),
@@ -203,7 +203,7 @@ class OrderCrudController extends AbstractCrudController
             // This is for the index list summary
             TextField::new('productSummary', 'Productos')->onlyOnIndex(),
             
-            MoneyField::new('total', 'Total')->setCurrency('ARS')->hideOnForm(),
+            MoneyField::new('total', 'Total')->setCurrency('ARS')->hideOnForm()->setSortable(true),
             MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->onlyOnDetail(),
             
             ChoiceField::new('state', 'Estado')->setChoices([
@@ -220,10 +220,10 @@ class OrderCrudController extends AbstractCrudController
                 3 => 'secondary',
                 4 => 'info',
                 5 => 'danger',
-            ]),
+            ])->setSortable(false),
             
             TextField::new('paymentMethod', 'Método de Pago')->onlyOnDetail(),
-            TextField::new('carrierName', 'Transporte'),
+            TextField::new('carrierName', 'Transporte')->setSortable(false),
             MoneyField::new('carrierPrice', 'Costo Envío')->setCurrency('ARS'),
             TextField::new('delivery', 'Detalle de Entrega / Dirección')->hideOnIndex()->renderAsHtml(),
         ];

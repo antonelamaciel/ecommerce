@@ -2,6 +2,190 @@
 
 {% block title %}Mis pedidos{% endblock %}
 
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('orderSearch');
+        const sortSelect = document.getElementById('orderSort');
+        const listBody = document.querySelector('.orders-table tbody');
+        
+        const thTotal = document.getElementById('thTotal');
+        const totalIcon = document.getElementById('totalSortIcon');
+        const thDate = document.getElementById('thDate');
+        const dateIcon = document.getElementById('dateSortIcon');
+        
+        const stateTrigger = document.getElementById('thStateTrigger');
+        const stateMenu = document.getElementById('stateFilterMenu');
+        const stateOptions = document.querySelectorAll('.state-option');
+        const stateTextDisp = document.getElementById('currentStateText');
+        
+        if (!searchInput || !sortSelect || !listBody) return;
+
+        let totalSortDir = 'none'; 
+        let dateSortDir = 'desc'; 
+        let activeStateFilter = 'all';
+        let visibleLimit = 10;
+
+        // Toggle dropdown
+        if (stateTrigger && stateMenu) {
+            stateTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                stateMenu.classList.toggle('active');
+            });
+            document.addEventListener('click', () => stateMenu.classList.remove('active'));
+        }
+
+        // Handle selection
+        stateOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                stateOptions.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                activeStateFilter = opt.dataset.state;
+                
+                // Update header text
+                if (activeStateFilter === 'all') {
+                    stateTextDisp.textContent = 'Estado';
+                } else {
+                    stateTextDisp.textContent = opt.textContent;
+                }
+                
+                visibleLimit = 10;
+                filterAndSort();
+            });
+        });
+
+        function resetIcons() {
+            if (totalIcon) {
+                totalIcon.className = 'bi bi-chevron-down mx-2';
+                totalIcon.style.color = 'inherit';
+            }
+            if (dateIcon) {
+                dateIcon.className = 'bi bi-chevron-down mx-2';
+                dateIcon.style.color = 'inherit';
+            }
+        }
+
+        function filterAndSort() {
+            const rows = Array.from(listBody.querySelectorAll('.order-row'));
+            const query = searchInput.value.toLowerCase().trim();
+            const sortVal = sortSelect.value;
+            
+            rows.forEach(row => {
+                const id = row.dataset.id.toLowerCase();
+                const state = row.dataset.state.toLowerCase();
+                const rawState = row.dataset.rawState;
+                const total = row.dataset.total.toLowerCase();
+                const date = row.dataset.date.toLowerCase();
+                
+                const searchableText = `${id} ${state} ${total} ${date}`;
+                const searchMatch = searchableText.includes(query);
+                const stateMatch = (activeStateFilter === 'all' || rawState === activeStateFilter);
+                
+                row.style.display = (searchMatch && stateMatch) ? 'table-row' : 'none';
+            });
+            
+            const matchingRows = rows.filter(r => r.style.display !== 'none');
+            
+            matchingRows.sort((a, b) => {
+                const timeA = parseInt(a.dataset.timestamp);
+                const timeB = parseInt(b.dataset.timestamp);
+                const priceA = parseFloat(a.dataset.total);
+                const priceB = parseFloat(b.dataset.total);
+
+                if (sortVal === 'newest') return timeB - timeA;
+                if (sortVal === 'oldest') return timeA - timeB;
+                if (sortVal === 'price-desc') return priceB - priceA;
+                if (sortVal === 'price-asc') return priceA - priceB;
+                return 0;
+            });
+            
+            matchingRows.forEach((row, index) => {
+                if (index < visibleLimit) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+                listBody.appendChild(row);
+            });
+
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            if (loadMoreContainer) {
+                loadMoreContainer.style.display = (matchingRows.length > visibleLimit) ? 'block' : 'none';
+            }
+        }
+
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                visibleLimit += 10;
+                filterAndSort();
+            });
+        }
+
+        if (thTotal && totalIcon) {
+            thTotal.addEventListener('click', () => {
+                resetIcons();
+                if (totalSortDir === 'desc') {
+                    totalSortDir = 'asc';
+                    sortSelect.value = 'price-asc';
+                    totalIcon.className = 'bi bi-chevron-up mx-2';
+                } else {
+                    totalSortDir = 'desc';
+                    sortSelect.value = 'price-desc';
+                    totalIcon.className = 'bi bi-chevron-down mx-2';
+                }
+                totalIcon.style.color = 'var(--c-brand)';
+                dateSortDir = 'none';
+                filterAndSort();
+            });
+        }
+
+        if (thDate && dateIcon) {
+            thDate.addEventListener('click', () => {
+                resetIcons();
+                if (dateSortDir === 'desc') {
+                    dateSortDir = 'asc';
+                    sortSelect.value = 'oldest';
+                    dateIcon.className = 'bi bi-chevron-up mx-2';
+                } else {
+                    dateSortDir = 'desc';
+                    sortSelect.value = 'newest';
+                    dateIcon.className = 'bi bi-chevron-down mx-2';
+                }
+                dateIcon.style.color = 'var(--c-brand)';
+                totalSortDir = 'none';
+                filterAndSort();
+            });
+        }
+        
+        searchInput.addEventListener('input', () => {
+            visibleLimit = 10;
+            filterAndSort();
+        });
+        sortSelect.addEventListener('change', () => {
+            resetIcons();
+            visibleLimit = 10;
+            const val = sortSelect.value;
+            if (val.startsWith('price')) {
+                totalSortDir = (val === 'price-desc') ? 'desc' : 'asc';
+                totalIcon.className = (totalSortDir === 'desc') ? 'bi bi-chevron-down mx-2' : 'bi bi-chevron-up mx-2';
+                totalIcon.style.color = 'var(--c-brand)';
+                dateSortDir = 'none';
+            } else {
+                dateSortDir = (val === 'newest') ? 'desc' : 'asc';
+                dateIcon.className = (dateSortDir === 'desc') ? 'bi bi-chevron-down mx-2' : 'bi bi-chevron-up mx-2';
+                dateIcon.style.color = 'var(--c-brand)';
+                totalSortDir = 'none';
+            }
+            filterAndSort();
+        });
+
+        // Initial call to set limit and sorting on load
+        filterAndSort();
+    });
+</script>
+{% endblock %}
+
 {% block body %}
 
 <style>
@@ -61,13 +245,20 @@
     border-radius: var(--radius-md);
     border: 1px solid var(--c-border);
     box-shadow: var(--shadow-soft);
-    overflow: hidden;
+    overflow: visible; /* Changed to allow dropdowns to show */
   }
 
   .orders-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate; /* Required for border-radius on table */
+    border-spacing: 0;
   }
+
+  /* Round table corners since wrapper is now overflow:visible */
+  .orders-table thead tr:first-child th:first-child { border-top-left-radius: var(--radius-md); }
+  .orders-table thead tr:first-child th:last-child { border-top-right-radius: var(--radius-md); }
+  .orders-table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--radius-md); }
+  .orders-table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius-md); }
 
   .orders-table th {
     background: var(--c-soft);
@@ -79,6 +270,7 @@
     letter-spacing: 0.05em;
     color: var(--c-muted);
     border-bottom: 1px solid var(--c-border);
+    position: relative;
   }
 
   .orders-table td {
@@ -122,7 +314,129 @@
   .state-2 { background: #fffbe6; color: #d97706; } /* Prep */
   .state-3 { background: #eff6ff; color: #2563eb; } /* Sent */
   .state-4 { background: #fffbeb; color: #b45309; }
-  .state-5 { background: #f1f5f9; color: #475569; text-decoration: line-through; }
+  .state-5 { background: #f1f5f9; color: #475569; text-decoration: none; }
+
+  /* Load More */
+  .load-more-container {
+    text-align: center;
+    margin-top: 3rem;
+  }
+  .load-more-btn {
+    background: transparent;
+    border: 2px solid var(--c-brand);
+    color: var(--c-brand);
+    font-weight: 700;
+    padding: 0.8rem 2.5rem;
+    border-radius: 50px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .load-more-btn:hover {
+    background: var(--c-brand);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  .load-more-btn:active { transform: translateY(0); }
+  
+  body.dark-mode .load-more-btn { border-color: var(--c-brand); color: #fff; }
+  body.dark-mode .load-more-btn:hover { background: var(--c-brand); color: #000; }
+
+  .dot-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+  .dot-status.state-0 { background-color: #991b1b; }
+  .dot-status.state-1 { background-color: #10b981; }
+  .dot-status.state-2 { background-color: #d97706; }
+  .dot-status.state-3 { background-color: #2563eb; }
+  .dot-status.state-4 { background-color: #b45309; }
+  .dot-status.state-5 { background-color: #475569; }
+
+  .ref-badge-small {
+    font-size: 0.65rem;
+    color: var(--c-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .mobile-price-ellipsis {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--c-brand);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 90px;
+  }
+
+  @media (max-width: 767px) {
+    .mobile-info-stack {
+       display: flex;
+       flex-direction: column;
+       gap: 0.25rem;
+    }
+  }
+
+  /* Custom State Filter Dropdown */
+  .state-filter-container { position: relative; }
+  .state-filter-trigger { 
+      cursor: pointer; 
+      user-select: none; 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem;
+      transition: var(--transition);
+  }
+  .state-filter-trigger:hover { color: var(--c-brand); }
+  
+  .state-filter-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    background: white;
+    min-width: 200px;
+    z-index: 9999;
+    border: 1px solid var(--c-border);
+    padding: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-transform: none; /* Reset uppercase from th */
+    letter-spacing: normal;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .state-filter-dropdown.active { display: block; animation: slideBottom 0.2s ease-out; }
+  
+  @keyframes slideBottom {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .state-option { 
+    padding: 0.6rem 1rem; 
+    cursor: pointer; 
+    border-radius: 6px; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.75rem;
+    color: var(--c-ink);
+    transition: var(--transition);
+  }
+  .state-option:hover { background: var(--c-soft); color: var(--c-brand); }
+  .state-option.selected { background: var(--c-soft); color: var(--c-brand); font-weight: 700; }
+  
+  body.dark-mode .state-filter-dropdown { background: #1e1e1e; border-color: #333; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+  body.dark-mode .state-option { color: #eee; }
+  body.dark-mode .state-option:hover { background: #2a2a2a; }
+  body.dark-mode .state-option.selected { background: #2a2a2a; }
 
   .order-price {
     font-weight: 700;
@@ -224,38 +538,201 @@
   body.dark-mode .state-4 { background: #332100 !important; color: #ffb84d !important; }
   body.dark-mode .state-5 { background: #2a2a2a !important; color: #666 !important; }
   body.dark-mode .btn-back:hover { color: #ffffff !important; }
+
+  /* ── Controls ── */
+  .orders-search-wrapper { 
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fdfcfb;
+    padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--c-border);
+    transition: var(--transition);
+    width: 100%; 
+    max-width: 450px; 
+  }
+  @media (max-width: 767px) {
+    .orders-search-wrapper { max-width: 100%; }
+  }
+  .orders-search-wrapper:focus-within {
+    border-color: var(--c-ink);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+  }
+  .orders-search-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--c-muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .orders-search-wrapper .form-control { 
+    border: none !important;
+    background: transparent !important;
+    padding-left: 0 !important;
+    height: 2.4rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+  }
+  
+  /* ── Sort Selector ── */
+  .orders-sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fdfcfb;
+    padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--c-border);
+    transition: var(--transition);
+  }
+  .orders-sort-wrapper:focus-within {
+    border-color: var(--c-ink);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+  }
+  .orders-sort-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--c-muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .orders-sort-select {
+    width: auto;
+    min-width: 180px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    background-color: transparent;
+    color: var(--c-ink);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a1a1a' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 10px;
+  }
+  .orders-sort-select:focus {
+    box-shadow: none;
+    outline: none;
+  }
+
+  @media (max-width: 767px) {
+    .orders-sort-wrapper {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    .orders-sort-select {
+        flex: 1;
+        min-width: 0;
+    }
+  }
+  
+  body.dark-mode .orders-search-wrapper { background-color: #2a2a2a !important; border-color: #444 !important; }
+  body.dark-mode .orders-sort-wrapper { background-color: #2a2a2a !important; border-color: #444 !important; }
+  body.dark-mode .orders-sort-select { 
+      color: #fff !important; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffffff' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !important;
+  }
+  body.dark-mode .orders-sort-select option { background-color: #1e1e1e !important; color: #fff !important; }
 </style>
 
 <div class="orders-wrap">
 
   <!-- ── Header ── -->
+  <button type="button" onclick="window.history.back()" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Volver
+    </button>
   <div class="orders-header">
     <div>
       <h1 class="orders-title">Mis pedidos</h1>
       <p class="orders-subtitle">Gestiona y revisa el historial de tus compras</p>
     </div>
-    <button type="button" onclick="window.history.back()" class="btn-back">
-      <i class="bi bi-arrow-left"></i> Volver
-    </button>
   </div>
-
   {% if orders %}
+
+    <!-- ── Controls ── -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-5">
+        <div class="orders-search-wrapper">
+            <label for="orderSearch" class="orders-search-label mt-1">
+                <i class="bi bi-search"></i> Buscar
+            </label>
+            <input type="text" id="orderSearch" class="form-control" placeholder="Estado, Total, Fecha, ID...">
+        </div>
+        
+        <div class="orders-sort-wrapper">
+            <label for="orderSort" class="orders-sort-label mt-1">
+                <i class="bi bi-sliders"></i> Ordenar por
+            </label>
+            <select id="orderSort" class="orders-sort-select">
+                <option value="newest">Más nuevo a más viejo</option>
+                <option value="oldest">Más viejo a más nuevo</option>
+                <option value="price-desc">Precio mayor a menor</option>
+                <option value="price-asc">Precio menor a mayor</option>
+            </select>
+        </div>
+    </div>
 
     <div class="orders-card">
       <table class="orders-table">
         <thead>
           <tr>
             <th class="d-none d-md-table-cell">Artículos</th>
-            <th class="d-none d-md-table-cell">Estado</th>
-            <th class="d-none d-md-table-cell">Total</th>
-            <th>Fecha</th>
+            <th class="d-none d-md-table-cell">
+              <div class="state-filter-container">
+                <div class="state-filter-trigger" id="thStateTrigger">
+                  <span id="currentStateText">Estado</span> <i class="bi bi-chevron-down small"></i>
+                </div>
+                <div class="state-filter-dropdown" id="stateFilterMenu">
+                  <div class="state-option selected" data-state="all">Todos los estados</div>
+                  <div class="state-option" data-state="0"><span class="dot-status state-0"></span> No pagado</div>
+                  <div class="state-option" data-state="1"><span class="dot-status state-1"></span> Pago aceptado</div>
+                  <div class="state-option" data-state="2"><span class="dot-status state-2"></span> En preparación</div>
+                  <div class="state-option" data-state="3"><span class="dot-status state-3"></span> Enviado/Retirado</div>
+                  <div class="state-option" data-state="4"><span class="dot-status state-4"></span> Pendiente</div>
+                  <div class="state-option" data-state="5"><span class="dot-status state-5"></span> Cancelado</div>
+                </div>
+              </div>
+            </th>
+            <th class="d-none d-md-table-cell">
+              <div class="d-flex align-items-center gap-2" id="thTotal" style="cursor: pointer; user-select: none;">
+                Total <i class="bi bi-chevron-down mx-2" id="totalSortIcon"></i>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex align-items-center gap-2" id="thDate" style="cursor: pointer; user-select: none;">
+                <span class="d-none d-md-inline">Fecha</span>
+                <span class="d-md-none">Info</span>
+                <i class="bi bi-chevron-down mx-2" id="dateSortIcon" style="color: var(--c-brand);"></i>
+              </div>
+            </th>
             <th class="d-none d-md-table-cell">ID del pedido</th>
             <th class="text-end">Acción</th>
           </tr>
         </thead>
         <tbody>
           {% for order in orders %}
-            <tr>
+            {% set orderStateText = order.state == 0 ? 'No pagado' :
+                                   order.state == 1 ? 'Pago aceptado' :
+                                   order.state == 2 ? 'En preparación' :
+                                   order.state == 3 ? 'Enviado/Retirado' :
+                                   order.state == 4 ? 'Pendiente' :
+                                   order.state == 5 ? 'Cancelado' : 'Estado ' ~ order.state %}
+            <tr class="order-row" 
+                data-id="{{ order.reference }}"
+                data-state="{{ orderStateText }}"
+                data-raw-state="{{ order.state }}"
+                data-total="{{ (order.carrierPrice + order.total) }}"
+                data-date="{{ order.createdAt|date('d/m/Y') }}"
+                data-timestamp="{{ order.createdAt|date('U') }}">
               <td class="d-none d-md-table-cell">
                 <span class="qty-pill">{{ order.totalQuantity }} unidades</span>
               </td>
@@ -278,11 +755,17 @@
               </td>
               <td class="d-none d-md-table-cell">
                 <span class="order-price">
-                  ARS {{ ((order.carrierPrice + order.total) / 100)|number_format(2, ',', '.') }}
+                  ARS {{ (order.carrierPrice + order.total)|number_format(2, ',', '.') }}
                 </span>
               </td>
               <td>
-                <span class="order-date">{{ order.createdAt|date('d/m/Y') }}</span>
+                <div class="mobile-info-stack">
+                  <span class="order-date">{{ order.createdAt|date('d/m/Y') }}</span>
+                  <div class="d-md-none d-flex flex-column gap-1">
+                    <span class="ref-badge-small">{{ order.reference }}</span>
+                    <span class="mobile-price-ellipsis">ARS {{ (order.carrierPrice + order.total)|number_format(2, ',', '.') }}</span>
+                  </div>
+                </div>
               </td>
               <td class="d-none d-md-table-cell">
                 <span class="ref-badge">{{ order.reference }}</span>
@@ -296,6 +779,12 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
+
+    <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+      <button id="loadMoreBtn" class="load-more-btn">
+        Ver más pedidos <i class="bi bi-plus-lg"></i>
+      </button>
     </div>
 
   {% else %}

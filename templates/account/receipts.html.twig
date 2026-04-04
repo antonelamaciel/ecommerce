@@ -16,12 +16,10 @@
         --radius-sm: 8px;
         --shadow-soft: 0 10px 40px rgba(0,0,0,.03);
         --transition: .3s cubic-bezier(.4, 0, .2, 1);
-        --font-main: 'Outfit', sans-serif;
     }
 
     body {
         background: var(--c-bg);
-        font-family: var(--font-main);
         color: var(--c-ink);
     }
 
@@ -164,11 +162,117 @@
         color: #ffffff !important; 
     }
     body.dark-mode .btn-back:hover { color: #ffffff !important; }
+
+    /* ── Controls ── */
+    /* ── Controls ── */
+    .receipts-search-wrapper { 
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: #fdfcfb;
+        padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+        border-radius: 8px;
+        border: 1px solid var(--c-border);
+        transition: var(--transition);
+        width: 100%; 
+        max-width: 450px; 
+    }
+    @media (max-width: 767px) {
+        .receipts-search-wrapper { max-width: 100%; }
+    }
+    .receipts-search-wrapper:focus-within {
+        border-color: var(--c-ink);
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+    }
+    .receipts-search-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--c-muted);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .receipts-search-wrapper .form-control { 
+        border: none !important;
+        background: transparent !important;
+        padding-left: 0 !important;
+        height: 2.4rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        box-shadow: none !important;
+    }
+    
+    /* ── Sort Selector ── */
+    .receipts-sort-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: #fdfcfb;
+        padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+        border-radius: 8px;
+        border: 1px solid var(--c-border);
+        transition: var(--transition);
+    }
+    .receipts-sort-wrapper:focus-within {
+        border-color: var(--c-ink);
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+    }
+    .receipts-sort-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--c-muted);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .receipts-sort-select {
+        width: auto;
+        min-width: 180px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.5rem 2.5rem 0.5rem 1rem;
+        background-color: transparent;
+        color: var(--c-ink);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a1a1a' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 10px;
+    }
+    .receipts-sort-select:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    @media (max-width: 767px) {
+        .receipts-sort-wrapper {
+            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .receipts-sort-select {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+    
+    body.dark-mode .receipts-search-wrapper { background-color: #2a2a2a !important; border-color: #444 !important; }
+    body.dark-mode .receipts-sort-wrapper { background-color: #2a2a2a !important; border-color: #444 !important; }
+    body.dark-mode .receipts-sort-select { 
+        color: #fff !important; 
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffffff' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !important;
+    }
+    body.dark-mode .receipts-sort-select option { background-color: #1e1e1e !important; color: #fff !important; }
 </style>
 
 <div class="container account-container">
     <a href="{{ path('account') }}" class="btn-back">
-        <i class="bi bi-arrow-left"></i> Volver a mi cuenta
+        <i class="bi bi-arrow-left"></i> Volver
     </a>
 
     <header class="account-header">
@@ -176,25 +280,53 @@
         <p class="account-subtitle">Visualiza y descarga el PDF de tus pedidos finalizados.</p>
     </header>
 
-    {% set hasReceipts = false %}
-
-    {% for order in orders|reverse %}
-        {% if order.receiptFilename %}
-            {% set hasReceipts = true %}
-            <div class="receipt-card">
-                <div class="receipt-info">
-                    <span class="receipt-date">{{ order.createdAt|date('d F Y') }}</span>
-                    <span class="receipt-ref">Pedido #{{ order.reference }}</span>
-                    <span class="receipt-total">Total: ${{ (order.total / 100)|number_format(2, ',', '.') }}</span>
-                </div>
-                <div class="receipt-action">
-                    <a href="{{ path('download_receipt', {'reference': order.reference}) }}" target="_blank" class="btn-download">
-                        <i class="bi bi-file-earmark-pdf-fill"></i> Descargar PDF
-                    </a>
-                </div>
+    {% if orders|length > 0 %}
+        <!-- ── Controls ── -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-5">
+            <div class="receipts-search-wrapper">
+                <label for="receiptSearch" class="receipts-search-label mt-1">
+                    <i class="bi bi-search"></i> Buscar
+                </label>
+                <input type="text" id="receiptSearch" class="form-control" placeholder="N° de pedido...">
             </div>
-        {% endif %}
-    {% endfor %}
+            
+            <div class="receipts-sort-wrapper">
+                <label for="receiptSort" class="receipts-sort-label mt-1">
+                    <i class="bi bi-sliders"></i> Ordenar por
+                </label>
+                <select id="receiptSort" class="receipts-sort-select">
+                    <option value="newest">Más nuevo a más viejo</option>
+                    <option value="oldest">Más viejo a más nuevo</option>
+                    <option value="price-desc">Precio mayor a menor</option>
+                    <option value="price-asc">Precio menor a mayor</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="receiptsContainer">
+            {% set hasReceipts = false %}
+            {% for order in orders %}
+                {% if order.receiptFilename %}
+                    {% set hasReceipts = true %}
+                    <div class="receipt-card" 
+                         data-ref="{{ order.reference }}" 
+                         data-timestamp="{{ order.createdAt|date('U') }}" 
+                         data-price="{{ (order.carrierPrice + order.total) }}">
+                        <div class="receipt-info">
+                            <span class="receipt-date">{{ order.createdAt|date('d F Y') }}</span>
+                            <span class="receipt-ref">Pedido #{{ order.reference }}</span>
+                            <span class="receipt-total">Total: ${{ (order.carrierPrice + order.total)|number_format(2, ',', '.') }}</span>
+                        </div>
+                        <div class="receipt-action">
+                            <a href="{{ path('download_receipt', {'reference': order.reference}) }}" target="_blank" class="btn-download">
+                                <i class="bi bi-file-earmark-pdf-fill"></i> Descargar PDF
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% if not hasReceipts %}
         <div class="empty-state">
@@ -204,6 +336,52 @@
             <a href="{{ path('product') }}" class="btn btn-dark px-4 py-2" style="border-radius: var(--radius-sm); font-weight: 700;">Ir a la tienda</a>
         </div>
     {% endif %}
-
 </div>
+{% endblock %}
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('receiptSearch');
+        const sortSelect = document.getElementById('receiptSort');
+        const container = document.getElementById('receiptsContainer');
+        
+        if (!searchInput || !sortSelect || !container) return;
+
+        function filterAndSort() {
+            const cards = Array.from(container.querySelectorAll('.receipt-card'));
+            const query = searchInput.value.toLowerCase().trim();
+            const sortVal = sortSelect.value;
+            
+            cards.forEach(card => {
+                const ref = card.dataset.ref.toLowerCase();
+                if (ref.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            const visibleCards = cards.filter(c => c.style.display !== 'none');
+            
+            visibleCards.sort((a, b) => {
+                const timeA = parseInt(a.dataset.timestamp);
+                const timeB = parseInt(b.dataset.timestamp);
+                const priceA = parseFloat(a.dataset.price);
+                const priceB = parseFloat(b.dataset.price);
+
+                if (sortVal === 'newest') return timeB - timeA;
+                if (sortVal === 'oldest') return timeA - timeB;
+                if (sortVal === 'price-desc') return priceB - priceA;
+                if (sortVal === 'price-asc') return priceA - priceB;
+                return 0;
+            });
+            
+            // Append cards back in sorted order
+            visibleCards.forEach(card => container.appendChild(card));
+        }
+        
+        searchInput.addEventListener('input', filterAndSort);
+        sortSelect.addEventListener('change', filterAndSort);
+    });
+</script>
 {% endblock %}

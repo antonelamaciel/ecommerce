@@ -41,7 +41,21 @@
             {% if entities|length > 0 %}
                 <div class="ea-list-header d-none d-lg-grid" style="grid-template-columns: repeat({{ entities|first.fields|length }}, 1fr) 100px; gap: 1.5rem;">
                     {% for field in entities|first.fields %}
-                        <div>{{ field.label|raw }}</div>
+                        <div>
+                            {% if field.isSortable %}
+                                {% set sortDirection = ea.search.isSortingField(field.property) ? (ea.search.sortDirection(field.property) == 'DESC' ? 'ASC' : 'DESC') : 'DESC' %}
+                                <a href="{{ ea_url().set('page', 1).set('sort', { (field.property): sortDirection }) }}" class="text-decoration-none {% if ea.search.isSortingField(field.property) %}text-primary fw-bold{% else %}text-muted{% endif %}" style="display: flex; align-items: center; gap: 5px; color: inherit;">
+                                    {{ field.label|raw }}
+                                    {% if ea.search.isSortingField(field.property) %}
+                                        <i class="fas fa-sort-{{ sortDirection == 'DESC' ? 'up' : 'down' }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-sort" style="opacity: 0.3;"></i>
+                                    {% endif %}
+                                </a>
+                            {% else %}
+                                {{ field.label|raw }}
+                            {% endif %}
+                        </div>
                     {% endfor %}
                     <div class="text-end">Opciones</div>
                 </div>

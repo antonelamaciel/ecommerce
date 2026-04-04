@@ -50,13 +50,14 @@ class CashMovementCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $id = IdField::new('id')->hideOnForm();
+        $id = IdField::new('id')->hideOnForm()->setSortable(true);
         $type = ChoiceField::new('type', 'Tipo')
                 ->setChoices([
                     'Ingreso' => CashMovement::TYPE_INGRESS,
                     'Egreso' => CashMovement::TYPE_EGRESS,
                 ])
-                ->setRequired(true);
+                ->setRequired(true)
+                ->setSortable(false);
         $reason = ChoiceField::new('reason', 'Motivo')
                 ->setChoices([
                     'Venta' => CashMovement::REASON_SALE,
@@ -65,7 +66,8 @@ class CashMovementCrudController extends AbstractCrudController
                     'Ingreso propio (de mi cuenta)' => CashMovement::REASON_OWN_INGRESS,
                     'Retiro' => CashMovement::REASON_WITHDRAWAL,
                 ])
-                ->setRequired(true);
+                ->setRequired(true)
+                ->setSortable(false);
         
         $amountIndex = MoneyField::new('amount', 'Monto')
             ->setCurrency('ARS')
@@ -76,7 +78,8 @@ class CashMovementCrudController extends AbstractCrudController
                 $color = $entity->getType() === CashMovement::TYPE_INGRESS ? 'text-success' : 'text-danger';
                 return sprintf('<span class="%s fw-bold">%s $ %s</span>', $color, $prefix, number_format($rawAmount, 2, ',', '.'));
             })
-            ->onlyOnIndex();
+            ->onlyOnIndex()
+            ->setSortable(true);
 
         $amountForm = MoneyField::new('amount', 'Monto')
                 ->setCurrency('ARS')
@@ -85,7 +88,8 @@ class CashMovementCrudController extends AbstractCrudController
                 ->hideOnIndex();
 
         $date = DateTimeField::new('date', 'Fecha')
-                ->setRequired(true);
+                ->setRequired(true)
+                ->setSortable(true);
 
         return [$id, $type, $reason, $amountIndex, $amountForm, $date];
     }
