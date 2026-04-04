@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 class RegisterController extends AbstractController
 {
     #[Route('/register', name: 'register')]
-    public function index(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginAuthenticator $authenticator, EntityManagerInterface $em): Response
+    public function index(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginAuthenticator $authenticator, EntityManagerInterface $em, Mail $mail): Response
     {
         $user = new User();
 
@@ -36,7 +36,7 @@ class RegisterController extends AbstractController
 
             // Envoi mail confirmation
             $content = "Hola {$user->getFirstname()} le agradecemos su inscripción";
-            (new Mail)->send($user->getEmail(), $user->getFirstname(), "Bienvenido a empresa", $content);
+            $mail->send($user->getEmail(), $user->getFirstname(), "Bienvenido a empresa", $content);
 
             // Loggin auto
             return $userAuthenticator->authenticateUser(

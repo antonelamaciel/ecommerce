@@ -25,6 +25,7 @@ class AddressController extends AbstractController
     public function add(Request $request, EntityManagerInterface $em, SessionInterface $session): Response
     {
         $address = new Address();
+        $address->setCountry('AR');
         $user = $this->getUser();
         
         if ($user) {

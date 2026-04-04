@@ -10,9 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class MailerController extends AbstractController
 {
     #[Route('/mailer', name: 'mailer')]
-    public function index(): Response
+    public function index(Mail $mail): Response
     {
-        $mail = new Mail();
         $mail->send('bonnal.tristan91@gmail.com', 'Tristan', 'test', 'contenu');
         return $this->redirectToRoute('home');
     }

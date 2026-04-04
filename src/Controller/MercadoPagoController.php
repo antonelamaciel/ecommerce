@@ -69,7 +69,7 @@ class MercadoPagoController extends AbstractController
     }
 
     #[Route('/mercadopago/webhook', name: 'mercadopago_webhook', methods: ['POST', 'GET'])]
-    public function webhook(Request $request, OrderRepository $orderRepository, MercadoPagoService $mpService, EntityManagerInterface $em, LoggerInterface $logger): Response
+    public function webhook(Request $request, OrderRepository $orderRepository, MercadoPagoService $mpService, EntityManagerInterface $em, LoggerInterface $logger, Mail $mail): Response
     {
         // Identification of the payment
         $id = $request->query->get('id') ?? $request->request->get('id');
@@ -101,7 +101,7 @@ class MercadoPagoController extends AbstractController
 
                                     $user = $order->getUser();
                                     $mailContent = "Hola {$user->getFirstname()}, tu pago para el pedido {$order->getReference()} fue aprobado.";
-                                    (new Mail)->send($user->getEmail(), $user->getFirstname(), "Pago Confirmado", $mailContent);
+                                    $mail->send($user->getEmail(), $user->getFirstname(), "Pago Confirmado", $mailContent);
                                     $logger->info("Order {$reference} marked as PAID.");
                                 }
                                 break;

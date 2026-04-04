@@ -28,7 +28,7 @@ class PaymentController extends AbstractController
      * Méthode appelée lorsque le paiement est validé
      */
     #[Route('/order/success/{stripeSession}', name: 'payment_success')]
-    public function paymentSuccess(OrderRepository $repository, $stripeSession, EntityManagerInterface $em, Cart $cart) 
+    public function paymentSuccess(OrderRepository $repository, $stripeSession, EntityManagerInterface $em, Cart $cart, Mail $mail) 
     {
         // For MP, stripeSession is actually the reference or preference_id. 
         // We'll check by reference if preference_id fails.
@@ -52,7 +52,7 @@ class PaymentController extends AbstractController
         $user = $this->getUser();
 
         $content = "Hola {$user->getFirstname()}, te agradecemos por tu compra en nuestra tienda.";
-        (new Mail)->send(
+        $mail->send(
             $user->getEmail(), 
             $user->getFirstname(), 
             "Confirmación de pedido {$order->getReference()}", 

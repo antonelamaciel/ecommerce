@@ -60,15 +60,38 @@ class Cart
             $this->em->flush();
         }
     }
-
     public function add(int $id, int $qty = 1, ?string $variants = null): void
     {
+        $product = $this->repository->find($id);
+        if (!$product) {
+            return;
+        }
+
+        $stock = $product->getStock();
         $cart = $this->getCartArray();
         
         $variants = $variants ? trim($variants) : null;
         if ($variants === '') $variants = null;
         
         $compositeId = $variants ? $id . '-' . md5($variants) : (string)$id;
+
+        // Si el stock no es nulo, validamos el total en el carrito para este producto
+        if ($stock !== null) {
+            $totalInCartForThisProduct = 0;
+            foreach ($cart as $item) {
+                if ($item['id'] === $id) {
+                    $totalInCartForThisProduct += $item['qty'];
+                }
+            }
+            
+            if ($totalInCartForThisProduct + $qty > $stock) {
+                $qty = max(0, $stock - $totalInCartForThisProduct);
+            }
+        }
+
+        if ($qty <= 0) {
+            return;
+        }
 
         if (empty($cart[$compositeId])) {
             $cart[$compositeId] = [

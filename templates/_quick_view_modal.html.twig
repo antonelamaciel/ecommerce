@@ -330,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth <= 767) return;
     
     e.preventDefault();
+    e.stopImmediatePropagation();
     
     const item = btn.closest('.pcard');
     if(!item) {

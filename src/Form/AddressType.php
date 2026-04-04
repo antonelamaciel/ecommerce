@@ -45,7 +45,8 @@ class AddressType extends AbstractType
                 'label' => 'Ciudad'
             ])
             ->add('country', CountryType::class, [
-                'label' => 'País'
+                'label' => 'País',
+                'preferred_choices' => ['AR']
             ])
             ->add('phone', TelType::class, [
                 'label' => 'Teléfono'
