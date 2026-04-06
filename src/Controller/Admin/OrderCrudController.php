@@ -203,8 +203,8 @@ class OrderCrudController extends AbstractCrudController
             // This is for the index list summary
             TextField::new('productSummary', 'Productos')->onlyOnIndex(),
             
-            MoneyField::new('total', 'Total')->setCurrency('ARS')->hideOnForm()->setSortable(true),
-            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->hideOnForm()->hideOnIndex()->onlyOnDetail(),
+            MoneyField::new('total', 'Total')->setCurrency('ARS')->setStoredAsCents(false)->hideOnForm()->setSortable(true),
+            MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->setStoredAsCents(false)->hideOnForm()->hideOnIndex()->onlyOnDetail(),
             
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,
@@ -224,7 +224,7 @@ class OrderCrudController extends AbstractCrudController
             
             TextField::new('paymentMethod', 'Método de Pago')->onlyOnDetail(),
             TextField::new('carrierName', 'Transporte')->setSortable(false),
-            MoneyField::new('carrierPrice', 'Costo Envío')->setCurrency('ARS'),
+            MoneyField::new('carrierPrice', 'Costo Envío')->setCurrency('ARS')->setStoredAsCents(false),
             TextField::new('delivery', 'Detalle de Entrega / Dirección')->hideOnIndex()->renderAsHtml(),
         ];
     }

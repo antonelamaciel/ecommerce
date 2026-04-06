@@ -42,9 +42,10 @@ class CarrierCrudController extends AbstractCrudController
                 ]),
 
             MoneyField::new('price', 'Precio')
-            ->setHelp('Precio del envío')
                 ->setCurrency('ARS')
+                ->setStoredAsCents(false)
                 ->setRequired(false)
+                ->setHelp('Precio del envío')
                 ->setFormTypeOption('attr', ['class' => 'field-carrier-price'])
         ];
     }

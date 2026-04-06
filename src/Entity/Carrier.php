@@ -88,7 +88,7 @@ class Carrier
         } elseif ($this->type === 'pickup') {
             $label .= " Gratis";
         } else {
-            $price = number_format(($this->price ?? 0)/100, 2);
+            $price = number_format(($this->price ?? 0.0), 2);
             $label .= " $price ARS";
         }
         return $label;

@@ -185,22 +185,22 @@ class Order
         return $this->orderDetails;
     }
 
-    public function addOderDetail(OrderDetails $oderDetail): self
+    public function addOrderDetail(OrderDetails $orderDetail): self
     {
-        if (!$this->orderDetails->contains($oderDetail)) {
-            $this->orderDetails[] = $oderDetail;
-            $oderDetail->setBindedOrder($this);
+        if (!$this->orderDetails->contains($orderDetail)) {
+            $this->orderDetails[] = $orderDetail;
+            $orderDetail->setBindedOrder($this);
         }
 
         return $this;
     }
 
-    public function removeOderDetail(OrderDetails $oderDetail): self
+    public function removeOrderDetail(OrderDetails $orderDetail): self
     {
-        if ($this->orderDetails->removeElement($oderDetail)) {
+        if ($this->orderDetails->removeElement($orderDetail)) {
             // set the owning side to null (unless already changed)
-            if ($oderDetail->getBindedOrder() === $this) {
-                $oderDetail->setBindedOrder(null);
+            if ($orderDetail->getBindedOrder() === $this) {
+                $orderDetail->setBindedOrder(null);
             }
         }
 
