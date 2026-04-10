@@ -426,7 +426,7 @@
       {% include "_pcard.html.twig" with {
         'product': product,
         'is_popular': true,
-        'buy_btn_text': 'Comprar',
+        'buy_btn_text': 'Ver producto',
         'suffix': 'top'
       } %}
     {% endfor %}
@@ -463,7 +463,7 @@
     {% for product in all_products %}
       {% include "_pcard.html.twig" with {
         'product': product,
-        'buy_btn_text': 'Comprar',
+        'buy_btn_text': 'Ver producto',
         'suffix': 'all'
       } %}
     {% endfor %}

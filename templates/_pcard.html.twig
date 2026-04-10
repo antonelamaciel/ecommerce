@@ -1,6 +1,6 @@
 {# templates/_pcard.html.twig #}
 {% set is_popular = is_popular|default(false) %}
-{% set buy_btn_text = buy_btn_text|default('Comprar') %}
+{% set buy_btn_text = buy_btn_text|default('Agregar al carrito') %}
 {% set suffix = suffix|default('gen') %}
 
 {% set maxBundleDiscount = product.getMaxDiscount() %}
@@ -95,8 +95,8 @@
            data-add-cart-url="{{ path('add_to_cart', {id: product.id, variants: firstVariant}) }}"
            style="border-radius: 0;">
             <span>
-                <span class="d-md-none">Agregar <i class="bi bi-cart-plus"></i></span>
-                <span class="d-none d-md-inline">Agregar al carrito</span>
+                <span class="d-md-none">{{ buy_btn_text == 'Agregar al carrito' ? 'Agregar' : buy_btn_text }} <i class="bi {{ buy_btn_text == 'Ver producto' ? 'bi-eye' : 'bi-cart-plus' }}"></i></span>
+                <span class="d-none d-md-inline">{{ buy_btn_text }}</span>
             </span>
         </a>
     {% endif %}
