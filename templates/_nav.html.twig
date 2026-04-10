@@ -13,7 +13,7 @@
         <!-- LOGO -->
         <a class="navbar-brand-custom" href="{{ path('home') }}">
             {% if personalize and personalize.logo %}
-                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" class="navbar-logo">
+                <img src="{{ asset('uploads/logo/' ~ personalize.logo) }}" alt="Logo" class="navbar-logo" fetchpriority="high">
             {% else %}
                 <span class="brand-text">{{ personalize.companyName ?? 'Empresa' }}</span>
             {% endif %}
@@ -155,7 +155,7 @@
 {% if bannerBundles is defined and bannerBundles %}
     {% for bundle in bannerBundles %}
         <div class="bundle-banner-full marquee-container" style="background-color: {{ bundle.bannerColor ?? '#1a1a1a' }}; width: 100vw; padding: 0.6rem 0; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-            <div class="marquee-content" style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em;">
+            <div class="marquee-content" style="font-family: var(--font-main), sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em;">
                 {% set repeatedText %}
                     {{ bundle.bannerText }} &nbsp;&nbsp;•&nbsp;&nbsp;
                     {{ bundle.bannerText }} &nbsp;&nbsp;•&nbsp;&nbsp;
@@ -1166,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             let html = '';
                             data.forEach(p => {
                                 const imgHtml = p.image 
-                                    ? `<img src="${p.image}" alt="${p.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; margin-right: 12px; flex-shrink: 0;">` 
+                                    ? `<img src="${p.image}" alt="${p.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; margin-right: 12px; flex-shrink: 0;" loading="lazy">` 
                                     : `<div style="width: 44px; height: 44px; background: #f8fafc; border-radius: 8px; margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="bi bi-bag text-muted"></i></div>`;
                                 
                                 const priceFormat = p.oldPrice 

@@ -13,8 +13,8 @@ class HomeController extends AbstractController
     #[Route('/', name: 'home')]
     public function index(ProductRepository $productRepository, HeadersRepository $headersRepository, \App\Repository\BundleRepository $bundleRepository): Response
     {
-        $products = $productRepository->findByIsInHome(1);
-        $allProducts = $productRepository->findAll();
+        $products = $productRepository->findBy(['isInHome' => 1], ['id' => 'DESC']);
+        $allProducts = $productRepository->findBy([], ['id' => 'DESC'], 12); // Limit home to 12 latest items
         $headers = $headersRepository->findAll();
         
         $qb = $bundleRepository->createQueryBuilder('b');

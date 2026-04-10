@@ -17,7 +17,7 @@
     --radius-sm: 8px;
     --shadow-soft: 0 10px 40px rgba(0,0,0,.03);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
-    --font-main: 'Outfit', sans-serif;
+    --font-main: var(--font-main), sans-serif;
   }
 
   body { 
@@ -34,7 +34,7 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 3.5rem;
+    margin-bottom: 1rem;
   }
   .step-item {
     display: flex;
@@ -273,7 +273,7 @@
     .address-grid { grid-template-columns: 1fr; }
     .btn-add-new-card { height: fit-content; min-height: 0; padding: 0.75rem; align-items: center; }
     .order-title { font-size: 1rem; }
-    .checkout-steps { margin-bottom: 2rem; gap: 0.5rem; }
+    .checkout-steps { margin-bottom: 1.5rem; gap: 0.5rem; }
     .step-item { font-size: 0.75rem; }
     .step-line { width: 25px; }
   }
@@ -321,23 +321,23 @@
     </div>
 
     <!-- Step Tracker -->
-    <div class="checkout-steps">
+    <div class="checkout-steps pt-3">
         <div class="step-item active">
-            <span class="step-num">1</span> Envio
+            <span class="step-num">1</span> Carrito
         </div>
         <div class="step-line"></div>
         <div class="step-item">
-            <span class="step-num">2</span> Pago
+            <span class="step-num">2</span> <u>Envio</u>
         </div>
         <div class="step-line"></div>
         <div class="step-item">
-            <span class="step-num">3</span> Confirmación
+            <span class="step-num">3</span> Pago
         </div>
     </div>
 
     <header class="order-header">
-        <p class="order-title">Seleccionar Dirección</p>
-        <small class="text-muted mt-2">¿En qué dirección entregamos tu pedido?</small>
+        <p class="order-title">Seccion de Envio</p>
+        <small class="text-muted mt-2">Seleccionar a cual dirección deberiamos entregar tu pedido</small>
     </header>
 
     {% set formHtml %}

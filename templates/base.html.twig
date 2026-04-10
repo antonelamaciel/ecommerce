@@ -8,12 +8,21 @@
     <meta name="generator" content="{{ personalize.companyName ?? 'Empresa' }}">
     <title>{% block title %}{{ personalize.companyName ?? 'Empresa' }}{% endblock %}</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
     <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/carousel.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/modern-theme.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    </noscript>
     
     {% if personalize and personalize.logo %}
         <link rel="icon" type="image/x-icon" href="{{ asset('uploads/logo/' ~ personalize.logo) }}">
@@ -21,6 +30,7 @@
     
     <style>
         :root {
+            --font-main: 'Inter', sans-serif;
             --bg-body: #f8f9fa;
             {% if personalize %}
                 /* Variables base */
@@ -35,7 +45,7 @@
         body {
             background-color: var(--bg-body) !important;
             transition: background-color 0.4s ease, color 0.4s ease;
-            font-family: 'Outfit', sans-serif !important;
+            font-family: var(--font-main) !important;
         }
 
         /* ── Dark Mode Theme Protocol ── */
@@ -743,8 +753,8 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="{{asset('assets/js/bootstrap.bundle.js')}}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" defer></script>
+    <script src="{{asset('assets/js/bootstrap.bundle.js')}}" defer></script>
     <script>
         // Global function to update cart count and animate the badge
         window.updateGlobalCartCount = function(count) {

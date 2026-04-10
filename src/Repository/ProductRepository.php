@@ -28,9 +28,12 @@ class ProductRepository extends ServiceEntityRepository
     public function findWithSearch(Search $search): array
     {
         $query = $this->createQueryBuilder('p')
-            ->select('c', 'p')
-            ->join('p.category', 'c')
+            ->select('p', 'c', 'b')
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('p.bundles', 'b')
+            ->orderBy('p.id', 'DESC')
         ;
+        
         if (!empty($search->getCategories())) {
             $query = $query
                 ->andWhere('c.id IN (:categories)')
@@ -40,7 +43,8 @@ class ProductRepository extends ServiceEntityRepository
 
         if (!empty($search->getSubcategories())) {
             $query = $query
-                ->join('p.subcategories', 's')
+                ->leftJoin('p.subcategories', 's')
+                ->addSelect('s')
                 ->andWhere('s.id IN (:subcategories)')
                 ->setParameter('subcategories', $search->getSubcategories())
             ;
@@ -48,7 +52,7 @@ class ProductRepository extends ServiceEntityRepository
 
         if (!empty($search->getString())) {
             $query = $query
-                ->andWhere('p.name LIKE :string')
+                ->andWhere('p.name LIKE :string OR p.subtitle LIKE :string')
                 ->setParameter('string', "%{$search->getString()}%")
             ;    
         }

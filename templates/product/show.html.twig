@@ -17,11 +17,9 @@
     --c-muted: #717171;
     --c-accent: var(--tertiary-color);
     --radius: 12px;
-    --font-main: 'Outfit', sans-serif;
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
   body { 
     background: var(--c-bg); 
@@ -392,6 +390,54 @@
   body.dark-mode .product-features-container * { 
     color: #ffffff !important; 
   }
+  /* ── Interactive Zoom Lens ── */
+  .gallery-container { position: relative; }
+  
+  .zoom-lens {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border: 3px solid #fff;
+    border-radius: 12px;
+    background-repeat: no-repeat;
+    display: none;
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.2), 
+        inset 0 0 10px rgba(0,0,0,0.1);
+    cursor: none;
+    transition: transform 0.1s ease-out;
+  }
+
+  .zoom-trigger {
+    display: flex;
+    position: absolute;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    z-index: 101;
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.1);
+    color: var(--c-ink);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .zoom-trigger:hover { transform: scale(1.1); }
+  .zoom-trigger.active {
+    background: var(--tertiary-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .main-img-slide { cursor: zoom-in; touch-action: pan-y; }
+  body.dark-mode .zoom-lens { border-color: #444; }
+  body.dark-mode .zoom-trigger { background: #1e1e1e; color: #fff; border-color: #333; }
 
 </style>
 
@@ -423,20 +469,23 @@
                              <img src="/uploads/{{ img }}" alt="{{ product.name }}" class="main-img">
                         </div>
                     {% endfor %}
-                    
-                    {# Badges overlay #}
-                    {% for bundle in product.bundles %}
-                        {% if bundle.topRightBadge %}
-                            {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
-                            <span class="gallery-badge">{{ badgeText }}</span>
-                        {% endif %}
-                    {% endfor %}
                 </div>
+
+                {# Badges overlay #}
+                {% for bundle in product.bundles %}
+                    {% if bundle.topRightBadge %}
+                        {% set badgeText = bundle.topRightBadge == 'envio_gratis' ? 'Envío gratis' : (bundle.topRightBadge == 'recomendado' ? 'Recomendado' : 'Más vendido') %}
+                        <span class="gallery-badge">{{ badgeText }}</span>
+                    {% endif %}
+                {% endfor %}
+                
+                <div class="zoom-lens" id="zoomLens"></div>
+                <div class="zoom-trigger" id="mobileZoomToggle"><i class="bi bi-search"></i></div>
                 
                 {% if all_imgs|length > 1 %}
                 <div class="thumb-strip px-3 pb-3">
                     {% for img in all_imgs %}
-                        <img src="/uploads/{{ img }}" class="thumb-item {{ loop.first ? 'active' : '' }}" data-index="{{ loop.index0 }}" data-src="/uploads/{{ img }}">
+                        <img src="/uploads/{{ img }}" class="thumb-item {{ loop.first ? 'active' : '' }}" data-index="{{ loop.index0 }}" data-src="/uploads/{{ img }}" loading="lazy">
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -752,6 +801,114 @@ document.addEventListener('DOMContentLoaded', function() {
             scrollToImage(parseInt(this.dataset.index));
         });
     });
+
+    // Loupe Zoom Logic
+    const lens = document.getElementById('zoomLens');
+    const zoomToggle = document.getElementById('mobileZoomToggle');
+    const zoomLevel = 2.5;
+    let isZoomActive = false;
+
+    if (lens && galleryScroll) {
+        function moveLens(e) {
+            // ONLY move and show if mode is active
+            if (!isZoomActive) return;
+
+            const rect = galleryScroll.getBoundingClientRect();
+            const isTouch = e.type.includes('touch');
+            const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+            const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+            
+            if (!clientX || !clientY) return;
+
+            let x = clientX - rect.left;
+            let y = clientY - rect.top;
+
+            // Constrain lens within gallery
+            if (x < 0 || x > rect.width || y < 0 || y > rect.height) {
+                return; // Mode is still active, just lens might be off-bounds
+            }
+
+            // Find current active image
+            const scrollIndex = Math.round(galleryScroll.scrollLeft / galleryScroll.offsetWidth);
+            const activeSlide = galleryScroll.children[scrollIndex];
+            const activeImg = activeSlide ? activeSlide.querySelector('img') : null;
+            
+            if (!activeImg) return;
+
+            lens.style.display = 'block';
+
+            // Position lens centered 
+            let lensX = x - (lens.offsetWidth / 2);
+            let lensY = y - (lens.offsetHeight / 2);
+            
+            lens.style.left = lensX + 'px';
+            lens.style.top = lensY + 'px';
+
+            const bgX = (x * zoomLevel) - (lens.offsetWidth / 2);
+            const bgY = (y * zoomLevel) - (lens.offsetHeight / 2);
+
+            lens.style.backgroundImage = `url('${activeImg.src}')`;
+            lens.style.backgroundSize = `${rect.width * zoomLevel}px ${rect.height * zoomLevel}px`;
+            lens.style.backgroundPosition = `-${bgX}px -${bgY}px`;
+
+            if (isTouch) e.preventDefault();
+        }
+
+        // Toggle Logic (Global) - Click icon OR click image
+        function toggleZoom(e) {
+            if (e) e.stopPropagation();
+            isZoomActive = !isZoomActive;
+            if (zoomToggle) zoomToggle.classList.toggle('active', isZoomActive);
+            
+            if (!isZoomActive) {
+                lens.style.display = 'none';
+                galleryScroll.style.touchAction = 'auto';
+            } else {
+                galleryScroll.style.touchAction = 'none';
+                
+                // If it was a mouse/touch event, use that position. 
+                // Otherwise (from button click) use center.
+                const rect = galleryScroll.getBoundingClientRect();
+                const clientX = (e && e.clientX) ? e.clientX : rect.left + (galleryScroll.offsetWidth / 2);
+                const clientY = (e && e.clientY) ? e.clientY : rect.top + (galleryScroll.offsetHeight / 2);
+
+                moveLens({
+                    clientX: clientX,
+                    clientY: clientY,
+                    type: (e && e.type) || 'mousemove',
+                    preventDefault: () => {}
+                });
+            }
+        }
+
+        if (zoomToggle) {
+            zoomToggle.addEventListener('click', toggleZoom);
+        }
+
+        // Click image to toggle
+        galleryScroll.addEventListener('click', (e) => {
+            if (e.target.closest('.main-img-slide')) {
+                toggleZoom(e);
+            }
+        });
+
+        galleryScroll.addEventListener('mousemove', moveLens);
+        galleryScroll.addEventListener('touchmove', moveLens, { passive: false });
+        
+        galleryScroll.addEventListener('mouseleave', () => { 
+            if (!isZoomActive) lens.style.display = 'none'; 
+        });
+        
+        galleryScroll.addEventListener('touchend', (e) => {
+            if (!isZoomActive) lens.style.display = 'none';
+        });
+
+        galleryScroll.addEventListener('touchstart', (e) => {
+            if (isZoomActive && e.touches.length === 1) {
+                moveLens(e);
+            }
+        }, { passive: false });
+    }
 
     // Qty Logic
     document.getElementById('pd-minus').addEventListener('click', () => {

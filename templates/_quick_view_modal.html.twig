@@ -691,15 +691,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 qvSubmit.innerHTML = originalHtml;
                 qvSubmit.disabled = false;
             }, 300);
-          }, 500); // 0.5s for the check
-        }
-      }, remainingTime);
-    })
+          }, 500); 
+        }, 500); // Added closing for setTimeout starting on line 669
+      }
+    }, remainingTime);
+  })
     .catch(err => {
       console.error(err);
       qvSubmit.innerHTML = '<i class="bi bi-cart-plus mr-2"></i> Comprar';
       qvSubmit.disabled = false;
     });
-  });
 });
 </script>

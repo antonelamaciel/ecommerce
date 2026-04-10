@@ -17,7 +17,6 @@
     --radius-sm: 8px;
     --shadow-soft: 0 4px 25px rgba(0,0,0,0.04);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
-    --font-main: 'Outfit', sans-serif;
   }
 
   body { 
@@ -34,7 +33,7 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 3.5rem;
+    margin-bottom: 1rem;
   }
   .step-item {
     display: flex;
@@ -192,7 +191,7 @@
   .cart-summary {
     background: var(--c-surface);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
+    padding: 1rem;
     border: none;
     box-shadow: var(--shadow-soft);
     position: sticky; top: 120px;
@@ -202,10 +201,10 @@
   
   .summary-row {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--c-muted); font-weight: 500;
+    margin-bottom: .5rem; font-size: 0.95rem; color: var(--c-muted); font-weight: 500;
   }
   .summary-row.total {
-    margin-top: 2rem; padding-top: 1.5rem;
+    margin-top: 1rem; padding-top: 1rem;
     border-top: 1px solid var(--c-border);
     align-items: flex-end;
   }
@@ -272,7 +271,7 @@
   @media (max-width: 991px) {
     .cart-container { padding-top: 0px; padding-bottom: .5rem; }
     .cart-grid { grid-template-columns: 1fr; gap: 1rem; }
-    .cart-summary { position: static; max-width: 100%; padding: 1.25rem; }
+    .cart-summary { position: static; max-width: 100%; padding: 1rem; }
     .cart-items-list { padding: 1rem; gap: 0.25rem; }
     .checkout-steps { margin-bottom: 1.5rem; gap: 0.5rem; }
     .step-item { font-size: 0.7rem; gap: 0.4rem; }
@@ -373,17 +372,17 @@
         </div>
 
         <!-- Step Tracker -->
-        <div class="checkout-steps">
+        <div class="checkout-steps pt-3">
             <div class="step-item">
-                <span class="step-num">1</span> Envio
+                <span class="step-num">1</span> <u>Carrito</u>
             </div>
             <div class="step-line"></div>
             <div class="step-item">
-                <span class="step-num">2</span> Pago
+                <span class="step-num">2</span> Envio
             </div>
             <div class="step-line"></div>
             <div class="step-item">
-                <span class="step-num">3</span> Confirmación
+                <span class="step-num">3</span> Pago
             </div>
         </div>
 
@@ -398,7 +397,7 @@
                     {% for item in cart %}
                         <article class="cart-item js-cart-item" data-id="{{ item.compositeId }}" data-price="{{ item.product.price }}">
                             <div class="cart-item__img-wrap">
-                                <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-item__img">
+                                <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-item__img" loading="lazy">
                             </div>
                             
                             <div class="cart-item__main">

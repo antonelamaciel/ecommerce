@@ -189,7 +189,6 @@
 {% block body %}
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
   :root {
     --c-bg: #fcfbf9;
@@ -208,7 +207,7 @@
     --radius-sm: 10px;
     --shadow-soft: 0 10px 40px rgba(0,0,0,.04);
     --transition: .3s cubic-bezier(.4, 0, .2, 1);
-    --font-main: 'Outfit', sans-serif;
+    --font-main: var(--font-main), sans-serif;
   }
 
   .orders-wrap {

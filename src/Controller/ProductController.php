@@ -24,7 +24,7 @@ class ProductController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $products = $repository->findWithSearch($search);
         } else {
-            $products = $repository->findAll();
+            $products = $repository->findBy([], ['id' => 'DESC'], 24);
         }
 
         
@@ -54,34 +54,26 @@ class ProductController extends AbstractController
             return $p->getId() !== $product->getId();
         });
 
-        // Fallback to random products if there are less than 7
+        // Fallback to recent products if category is thin
         if (count($relatedProducts) < 7) {
-            $allProducts = $repository->findAll();
-            $allProducts = array_filter($allProducts, function($p) use ($product) {
-                return $p->getId() !== $product->getId();
-            });
+            $excludeIds = [$product->getId()];
+            foreach($relatedProducts as $rp) $excludeIds[] = $rp->getId();
             
-            shuffle($allProducts);
-            $needed = 7 - count($relatedProducts);
-            $randomProducts = array_slice($allProducts, 0, $needed);
-            $relatedProducts = array_merge($relatedProducts, $randomProducts);
+            $fallbacks = $repository->createQueryBuilder('p')
+                ->andWhere('p.id NOT IN (:ids)')
+                ->setParameter('ids', $excludeIds)
+                ->setMaxResults(7 - count($relatedProducts))
+                ->orderBy('p.id', 'DESC')
+                ->getQuery()
+                ->getResult();
+            
+            $relatedProducts = array_merge($relatedProducts, $fallbacks);
         }
-
-        // Ensure absolute uniqueness by ID
-        $uniqueRelated = [];
-        $ids = [];
-        foreach ($relatedProducts as $p) {
-            if (!isset($ids[$p->getId()])) {
-                $ids[$p->getId()] = true;
-                $uniqueRelated[] = $p;
-            }
-        }
-        $relatedProducts = array_slice($uniqueRelated, 0, 7);
 
         return $this->render('product/show.html.twig', [
             'product' => $product,
             'carriers' => $carriers,
-            'relatedProducts' => $relatedProducts
+            'relatedProducts' => array_slice($relatedProducts, 0, 7)
         ]);
     }
 
@@ -97,6 +89,7 @@ class ProductController extends AbstractController
         $search = new Search();
         $search->setString($query);
         $products = $repository->findWithSearch($search);
+        $products = array_slice($products, 0, 8); // Limit to 8 items for AJAX
         
         $data = [];
         $domain = $request->getSchemeAndHttpHost();
