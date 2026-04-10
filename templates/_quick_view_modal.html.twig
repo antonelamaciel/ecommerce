@@ -326,21 +326,68 @@ document.addEventListener('DOMContentLoaded', function() {
     const btn = e.target.closest('.pcard__buy-btn');
     if(!btn || btn.getAttribute('id') === 'pd-submit') return;
     
-    // En mobile (<= 767px) no abrimos el popup, dejamos que vaya al detalle (href)
-    if (window.innerWidth <= 767) return;
-    
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    
     const item = btn.closest('.pcard');
-    if(!item) {
-        window.location.href = btn.href;
+    if (item && item.dataset.stock && parseInt(item.dataset.stock) <= 0) {
+        return;
+    }
+
+    // Direct Add for Mobile (no popup)
+    if (window.innerWidth <= 767) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        
+        const urlStr = btn.dataset.addCartUrl || btn.href;
+        if (!urlStr) return;
+        const url = new URL(urlStr, window.location.origin);
+        url.searchParams.set('ajax', '1');
+        
+        const originalHtml = btn.innerHTML;
+        const btnWidth = btn.offsetWidth;
+        btn.style.minWidth = btnWidth + 'px';
+        btn.classList.add('disabled');
+        btn.style.pointerEvents = 'none';
+
+        fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (window.updateGlobalCartCount) {
+                    window.updateGlobalCartCount(data.cartCount);
+                }
+                if (window.showCartNotification) window.showCartNotification();
+                
+                const oldBg = btn.style.background;
+                const oldColor = btn.style.color;
+                btn.style.background = '#198754';
+                btn.style.color = '#ffffff';
+                btn.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.1rem;"></i></span>';
+                
+                setTimeout(() => {
+                    btn.style.background = oldBg;
+                    btn.style.color = oldColor;
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove('disabled');
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.minWidth = '';
+                }, 1000);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.classList.remove('disabled');
+            btn.style.pointerEvents = 'auto';
+        });
         return;
     }
     
-    // Si no hay stock, no abrimos el popup
-    const stock = item.dataset.stock;
-    if (stock !== "" && stock !== null && stock !== undefined && parseInt(stock) <= 0) {
+    // Quick View for Desktop
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    
+    if(!item) {
+        window.location.href = btn.href;
         return;
     }
     

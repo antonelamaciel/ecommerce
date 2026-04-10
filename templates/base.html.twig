@@ -830,57 +830,6 @@
     </script>
     {% block javascripts %}{% endblock %}
     <script>
-            // Global AJAX Cart Add logic for .pcard__buy-btn
-            document.addEventListener('click', function(e) {
-                const btn = e.target.closest('.pcard__buy-btn');
-                if (!btn || btn.getAttribute('id') === 'pd-submit') return; 
-
-                const item = btn.closest('.pcard');
-                if (item && item.dataset.stock && parseInt(item.dataset.stock) <= 0) {
-                    return;
-                }
-                
-                e.preventDefault();
-                const urlStr = btn.dataset.addCartUrl || btn.href;
-                if (!urlStr) return;
-                const url = new URL(urlStr, window.location.origin);
-                url.searchParams.set('ajax', '1');
-                
-                const originalHtml = btn.innerHTML;
-                const btnWidth = btn.offsetWidth;
-                btn.style.minWidth = btnWidth + 'px';
-                btn.classList.add('disabled');
-                btn.style.pointerEvents = 'none';
-
-                fetch(url.toString(), {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (window.updateGlobalCartCount) {
-                            window.updateGlobalCartCount(data.cartCount);
-                        }
-                        
-                        const oldBg = btn.style.background;
-                        btn.style.background = '#198754';
-                        btn.innerHTML = '<span class="check-animated"><i class="bi bi-check-lg" style="font-size: 1.1rem;"></i></span>';
-                        
-                        setTimeout(() => {
-                            btn.style.background = oldBg;
-                            btn.innerHTML = originalHtml;
-                            btn.classList.remove('disabled');
-                            btn.style.pointerEvents = 'auto';
-                            btn.style.minWidth = '';
-                        }, 1000);
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    btn.classList.remove('disabled');
-                    btn.style.pointerEvents = 'auto';
-                });
-            });
 
             // Quick View Modal AJAX Add to Cart is handled in _quick_view_modal.html.twig
 
