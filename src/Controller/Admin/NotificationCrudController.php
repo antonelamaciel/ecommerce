@@ -104,6 +104,7 @@ class NotificationCrudController extends AbstractCrudController
             TextField::new('user.fullName', 'Cliente'),
             TextField::new('productSummary', 'Resumen de Productos'),
             MoneyField::new('total', 'Total')->setCurrency('ARS')->setStoredAsCents(false)->setSortable(false),
+            TextField::new('paymentMethod', 'Método de Pago'),
             MoneyField::new('grossProfit', 'Ganancia Bruta')->setCurrency('ARS')->setStoredAsCents(false)->hideOnForm()->hideOnIndex()->hideOnDetail(),
             ChoiceField::new('state', 'Estado')->setChoices([
                 'No pagado' => 0,

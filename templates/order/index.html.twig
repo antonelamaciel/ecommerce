@@ -350,51 +350,66 @@
                         Mis Direcciones Guardadas
                     </div>
                     
-                    <div class="address-grid">
-                        {% for choice in form.addresses %}
-                            {% set fullLabel = choice.vars.label|replace({'[br]': '<br>', '{br}': '<br>'}) %}
-                            {# Split by the colon separator #}
-                            {% set labelParts = fullLabel|split(': <br>') %}
-                            
-                            <label class="address-option">
-                                <input type="radio" name="{{ choice.vars.full_name }}" value="{{ choice.vars.value }}" {% if choice.vars.checked %}checked="checked"{% endif %}>
-                                <div class="address-card-inner">
-                                    <div class="address-card__header">
-                                        <div class="address-card__name">
+                    {% if hasAddresses %}
+                        <div class="address-grid">
+                            {% for choice in form.addresses %}
+                                {% set fullLabel = choice.vars.label|replace({'[br]': '<br>', '{br}': '<br>'}) %}
+                                {# Split by the colon separator #}
+                                {% set labelParts = fullLabel|split(': <br>') %}
+                                
+                                <label class="address-option">
+                                    <input type="radio" name="{{ choice.vars.full_name }}" value="{{ choice.vars.value }}" {% if choice.vars.checked %}checked="checked"{% endif %}>
+                                    <div class="address-card-inner">
+                                        <div class="address-card__header">
+                                            <div class="address-card__name">
+                                                {% if labelParts|length > 1 %}
+                                                    {{ labelParts[0]|raw }}
+                                                {% else %}
+                                                    Dirección
+                                                {% endif %}
+                                            </div>
+                                            <div class="address-card__check">
+                                                <i class="bi bi-check-lg"></i>
+                                            </div>
+                                        </div>
+                                        <div class="address-card__details">
                                             {% if labelParts|length > 1 %}
-                                                {{ labelParts[0]|raw }}
+                                                {{ labelParts[1]|raw }}
                                             {% else %}
-                                                Dirección
+                                                {{ fullLabel|raw }}
                                             {% endif %}
                                         </div>
-                                        <div class="address-card__check">
-                                            <i class="bi bi-check-lg"></i>
-                                        </div>
                                     </div>
-                                    <div class="address-card__details">
-                                        {% if labelParts|length > 1 %}
-                                            {{ labelParts[1]|raw }}
-                                        {% else %}
-                                            {{ fullLabel|raw }}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </label>
-                        {% endfor %}
+                                </label>
+                            {% endfor %}
 
-                        <a href="{{ path('account_address_new') }}" class="btn-add-new-card">
-                            <i class="bi bi-plus-circle"></i>
-                            <span>Nueva Dirección</span>
-                        </a>
-                    </div>
-                    {% do form.addresses.setRendered() %}
+                            <a href="{{ path('account_address_new') }}" class="btn-add-new-card">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>Nueva Dirección</span>
+                            </a>
+                        </div>
+                        {% do form.addresses.setRendered() %}
 
-                    <div>
-                        <button type="submit" class="btn-order-next" id="btn-proceed">
-                            <span class="fw-800">Continuar al Pago</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
+                        <div>
+                            <button type="submit" class="btn-order-next" id="btn-proceed">
+                                <span class="fw-800">Continuar al Pago</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-geo-alt text-muted opacity-25" style="font-size: 4rem;"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">No tienes direcciones guardadas</h3>
+                            <p class="text-muted mb-4">Necesitamos saber a dónde enviar tu pedido para poder continuar.</p>
+                            <a href="{{ path('account_address_new') }}" class="btn-order-next d-inline-flex px-5 w-auto">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>Agregar mi primera dirección</span>
+                            </a>
+                        </div>
+                        {% do form.addresses.setRendered() %}
+                    {% endif %}
 
                     <div class="mt-4 text-center opacity-75">
                         <small class="text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.7rem;">

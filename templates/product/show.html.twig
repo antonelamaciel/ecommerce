@@ -590,7 +590,7 @@
                     <button class="qty-btn" id="pd-plus" {{ product.stock is not null and product.stock <= 0 ? 'disabled' : '' }}>+</button>
                 </div>
                 
-                <form id="product-add-form" action="{{ path('add_to_cart', {id: product.id}) }}" method="GET" style="flex-grow: 1;">
+                <form id="product-add-form" action="{{ path('add_to_cart', {id: product.id}) }}" method="POST" style="flex-grow: 1;">
                     <input type="hidden" name="variants" id="variants-input">
                     <button type="submit" id="pd-submit" class="add-cart-btn w-100 py-3" {{ product.stock is not null and product.stock <= 0 ? 'disabled' : '' }}>
                         {% if product.stock is not null and product.stock <= 0 %}
@@ -1093,14 +1093,14 @@ document.addEventListener('DOMContentLoaded', function() {
         url.searchParams.set('qty', qtyInput.value);
         if (variantsInput.value) url.searchParams.set('variants', variantsInput.value);
         url.searchParams.set('ajax', '1');
-
+        
         pdSubmit.disabled = true;
         const originalHtml = pdSubmit.innerHTML;
         
         // Rolling cart animation - no text as requested
         pdSubmit.innerHTML = '<i class="bi bi-cart3 cart-rolling"></i>';
 
-        fetch(url).then(r => r.json()).then(data => {
+        fetch(url, { method: 'POST' }).then(r => r.json()).then(data => {
             if (data.success) {
                 // Wait for the requested 0.5 seconds of animation before showing success
                 setTimeout(() => {

@@ -557,7 +557,10 @@ document.addEventListener('DOMContentLoaded', function() {
             item.style.opacity = '0.5';
             item.style.pointerEvents = 'none';
 
-            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            fetch(url, { 
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+            })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -587,7 +590,10 @@ document.addEventListener('DOMContentLoaded', function() {
             item.style.transform = 'scale(0.95)';
             item.style.opacity = '0.5';
 
-            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            fetch(url, { 
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+            })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {

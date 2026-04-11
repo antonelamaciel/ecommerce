@@ -581,6 +581,29 @@
   </div>
 </div>
 
+<div class="modal fade" id="mercadoPagoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pb-0 px-4 pt-4">
+        <h5 class="modal-title fw-bold">Pago con Mercado Pago</h5>
+        <button type="button" class="close" data-dismiss="modal" style="background:none; border:none; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3">
+            <i class="bi bi-whatsapp text-success" style="font-size: 3rem;"></i>
+        </div>
+        <p class="fw-bold mb-2">¡Importante!</p>
+        <p class="small text-muted mb-0">Al finalizar tu pago en Mercado Pago, recuerda que <b>debes enviar el comprobante</b> a través de nuestro WhatsApp para que podamos procesar tu pedido inmediatamente.</p>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0">
+        <a id="btn-mercadopago-confirm-mobile" href="{{ path('mercadopago_checkout', {reference: order.reference}) }}" class="btn btn-dark w-100 rounded-pill py-3 fw-bold">
+            Entendido, ir a pagar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% block javascripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -751,14 +774,32 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isComplete) return;
 
         if (selectedPayment === 'mercadopago') {
-            window.location.href = "{{ path('mercadopago_checkout', {reference: order.reference}) }}";
+            if (window.innerWidth < 991) {
+                $('#mercadoPagoModal').modal('show');
+            } else {
+                window.location.href = "{{ path('mercadopago_checkout', {reference: order.reference}) }}";
+            }
         } else if (selectedPayment === 'cash') {
-
             $('#cashModal').modal('show');
         } else if (selectedPayment === 'transfer') {
             $('#transferModal').modal('show');
         }
     });
+
+    // Mobile Mercado Pago Logic: Open MP in new tab, and redirect current to success/transfer info
+    const btnMPMobile = document.getElementById('btn-mercadopago-confirm-mobile');
+    if (btnMPMobile) {
+        btnMPMobile.addEventListener('click', function(e) {
+            e.preventDefault();
+            const mpUrl = this.href;
+            
+            // Open Mercado Pago in new window/app
+            window.open(mpUrl, '_blank');
+            
+            // Redirect current window to the Mercado Pago success/instruction page
+            window.location.href = "{{ path('order_confirm_mercadopago', {reference: order.reference}) }}";
+        });
+    }
 
     const triggerSuccessScreen = (callback) => {
         callback();

@@ -36,15 +36,16 @@ class CartController extends AbstractController
      * Ajoute un article au panier (id du produit) et incrémente la quantitée (voir classe Cart)
      * @param Cart $cart
      * @param int $id
-     * @return Repsonse
+     * @return Response
      */
-    #[Route('/cart/add/{id}', name: 'add_to_cart')]
+    #[Route('/cart/add/{id}', name: 'add_to_cart', methods: ['POST', 'GET'])]
     public function add(Cart $cart, int $id, Request $request): Response
     {
         $qty = $request->query->getInt('qty', 1);
         $variants = $request->query->get('variants'); // Ex: "Color: Rojo, Talle: L"
+        $exclusive = $request->query->getBoolean('set', false);
         
-        $cart->add($id, $qty, $variants);
+        $cart->add($id, $qty, $variants, $exclusive);
 
         if ($request->isXmlHttpRequest() || $request->headers->get('X-Requested-With') === 'XMLHttpRequest' || $request->query->get('ajax')) {
             $details = $cart->getDetails();
@@ -64,7 +65,12 @@ class CartController extends AbstractController
      * @param string $id (Composite key)
      * @return Response
      */
-    #[Route('/cart/decrease/{id}', name: 'decrease_item')]
+    /**
+     * @param Cart $cart
+     * @param string $id
+     * @return Response
+     */
+    #[Route('/cart/decrease/{id}', name: 'decrease_item', methods: ['POST', 'GET'])]
     public function decrease(Cart $cart, string $id, Request $request): Response
     {
         $cart->decreaseItem($id);
@@ -88,7 +94,7 @@ class CartController extends AbstractController
      * @param string $id (Composite key)
      * @return Response
      */
-    #[Route('/cart/remove/{id}', name: 'remove_cart_item')]
+    #[Route('/cart/remove/{id}', name: 'remove_cart_item', methods: ['POST', 'GET'])]
     public function removeItem(Cart $cart, string $id, Request $request): Response
     {
         $cart->removeItem($id);
@@ -111,7 +117,7 @@ class CartController extends AbstractController
      * @param Cart $cart
      * @return Response
      */
-    #[Route('/cart/clear/', name: 'remove_cart')]
+    #[Route('/cart/clear/', name: 'remove_cart', methods: ['POST', 'GET'])]
     public function remove(Cart $cart): Response
     {
         $cart->remove();

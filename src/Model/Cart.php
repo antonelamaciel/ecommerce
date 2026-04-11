@@ -16,6 +16,7 @@ class Cart
     private ProductRepository $repository;
     private Security $security;
     private EntityManagerInterface $em;
+    private ?array $cartArray = null;
 
     public function __construct(SessionInterface $session, ProductRepository $repository, Security $security, EntityManagerInterface $em)
     {
@@ -27,6 +28,10 @@ class Cart
 
     private function getCartArray(): array
     {
+        if ($this->cartArray !== null) {
+            return $this->cartArray;
+        }
+
         $sessionCart = $this->session->get('cart_v2', []);
         $user = $this->security->getUser();
         
@@ -40,19 +45,24 @@ class Cart
                         $dbCart[$key] = $item;
                     }
                 }
-                $user->setCartData($dbCart);
-                $this->em->flush();
+                if (method_exists($user, 'setCartData')) {
+                    $user->setCartData($dbCart);
+                    $this->em->flush();
+                }
                 $this->session->set('cart_db_merged', true);
             }
             $this->session->set('cart_v2', $dbCart);
+            $this->cartArray = $dbCart;
             return $dbCart;
         }
         
+        $this->cartArray = $sessionCart;
         return $sessionCart;
     }
 
     private function saveCartArray(array $cart): void
     {
+        $this->cartArray = $cart;
         $this->session->set('cart_v2', $cart);
         $user = $this->security->getUser();
         if ($user && method_exists($user, 'setCartData')) {
@@ -60,7 +70,7 @@ class Cart
             $this->em->flush();
         }
     }
-    public function add(int $id, int $qty = 1, ?string $variants = null): void
+    public function add(int $id, int $qty = 1, ?string $variants = null, bool $exclusive = false): void
     {
         $product = $this->repository->find($id);
         if (!$product) {
@@ -75,21 +85,33 @@ class Cart
         
         $compositeId = $variants ? $id . '-' . md5($variants) : (string)$id;
 
-        // Si el stock no es nulo, validamos el total en el carrito para este producto
+        // Si el stock no es nulo, validamos
         if ($stock !== null) {
-            $totalInCartForThisProduct = 0;
-            foreach ($cart as $item) {
-                if ($item['id'] === $id) {
-                    $totalInCartForThisProduct += $item['qty'];
+            if ($exclusive) {
+                // Si es modo exclusivo, validamos directamente contra el stock
+                if ($qty > $stock) {
+                    $qty = $stock;
                 }
-            }
-            
-            if ($totalInCartForThisProduct + $qty > $stock) {
-                $qty = max(0, $stock - $totalInCartForThisProduct);
+            } else {
+                // Si es modo incremental, validamos el total acumulado
+                $totalInCartForThisProduct = 0;
+                foreach ($cart as $item) {
+                    if ($item['id'] === $id) {
+                        $totalInCartForThisProduct += $item['qty'];
+                    }
+                }
+                
+                if ($totalInCartForThisProduct + $qty > $stock) {
+                    $qty = max(0, $stock - $totalInCartForThisProduct);
+                }
             }
         }
 
         if ($qty <= 0) {
+            if ($exclusive && !empty($cart[$compositeId])) {
+                unset($cart[$compositeId]);
+                $this->saveCartArray($cart);
+            }
             return;
         }
 
@@ -100,7 +122,11 @@ class Cart
                 'variants' => $variants
             ];
         } else {
-            $cart[$compositeId]['qty'] += $qty;
+            if ($exclusive) {
+                $cart[$compositeId]['qty'] = $qty;
+            } else {
+                $cart[$compositeId]['qty'] += $qty;
+            }
         }
 
         $this->saveCartArray($cart);

@@ -336,8 +336,12 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         e.stopImmediatePropagation();
         
-        const urlStr = btn.dataset.addCartUrl || btn.href;
-        if (!urlStr) return;
+        const urlStr = btn.dataset.addCartUrl;
+        if (!urlStr) {
+            // If it's a "Ver producto" button without data-add-cart-url, follow the link normally
+            window.location.href = btn.href;
+            return;
+        }
         const url = new URL(urlStr, window.location.origin);
         url.searchParams.set('ajax', '1');
         
@@ -348,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.style.pointerEvents = 'none';
 
         fetch(url.toString(), {
+            method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(response => response.json())
@@ -691,6 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const startTimeCounter = Date.now();
     
     fetch(actionUrl.toString(), {
+      method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())

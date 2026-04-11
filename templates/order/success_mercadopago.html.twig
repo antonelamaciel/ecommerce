@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pago en Proceso - {{ personalize.companyName }}{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --c-mp: #009ee3;
+        --c-bg: #fcfbf9;
+        --radius-lg: 24px;
+        --shadow: 0 10px 40px rgba(0,0,0,.04);
+    }
+    .success-container {
+        padding: 4rem 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50dvh;
+    }
+    .success-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        padding: 4rem;
+        max-width: 650px;
+        width: 100%;
+        text-align: center;
+        box-shadow: var(--shadow);
+        border: 1px solid #f0ede8;
+    }
+    
+    @media (max-width: 767px) {
+        .success-container { padding: 2rem 1.25rem; min-height: auto; }
+        .success-card { padding: 2rem 1.25rem; border-radius: 16px; }
+        .success-icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
+        .status-badge { padding: 0.4rem 1.25rem; font-size: 0.8rem; margin-bottom: 1.5rem; }
+        h1 { font-size: 1.2rem !important; }
+        .text-muted.fs-5 { font-size: 0.95rem !important; margin-bottom: 1.5rem !important; }
+        .info-box { padding: 1.25rem; margin-top: 1.5rem; }
+        .important-text { font-size: 0.95rem !important; }
+        .btn-whatsapp { margin-top: 1.5rem; padding: 0.8rem 1.5rem; width: 100%; font-size: 0.9rem; }
+    }
+    .success-icon {
+        font-size: 5rem;
+        color: var(--c-mp);
+        margin-bottom: 2rem;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        background: #e1f5fe;
+        color: #0288d1;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+    .order-ref {
+        font-family: monospace;
+        background: #f8f9fa;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        color: #1a1a1a;
+    }
+    .btn-whatsapp {
+        background: #25d366;
+        color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        transition: 0.3s;
+        margin-top: 2rem;
+        width: 100%;
+    }
+    .btn-whatsapp:hover {
+        background: #128c7e;
+        color: #fff;
+    }
+    .info-box {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 16px;
+        text-align: left;
+        border: 1px solid #dee2e6;
+    }
+    .important-text {
+        color: #e53e3e;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+    }
+
+    body.dark-mode { --c-bg: #121212; }
+    body.dark-mode .success-card { background-color: #1e1e1e !important; border-color: #333 !important; color: #fff !important; }
+    body.dark-mode .info-box { background-color: #2a2a2a !important; border-color: #333 !important; color: #fff !important; }
+    body.dark-mode .status-badge { background-color: #001f33 !important; color: #80d4ff !important; }
+    body.dark-mode .order-ref { background-color: #2a2a2a !important; color: #fff !important; }
+</style>
+
+<div class="container success-container">
+    <div class="success-card">
+        <i class="bi bi-wallet2 success-icon"></i>
+        <h1 class="fw-bold mb-3">¡Pedido en Proceso de Pago!</h1>
+        <div class="status-badge">Pago vía Mercado Pago</div>
+        
+        <p class="text-muted fs-5 mb-4">
+            Hola <b>{{ order.user.firstname }}</b>, hemos registrado tu pedido <span class="order-ref">#{{ order.reference }}</span>.
+        </p>
+
+        <div class="info-box">
+            <p class="important-text text-center mb-3">¡Paso Final!</p>
+            <p class="text-dark mb-3 text-center">
+                Una vez que realices el pago en la aplicación de <b>Mercado Pago</b>, es fundamental que nos envíes el comprobante.
+            </p>
+            <ul class="small text-muted mb-0">
+                <li>Esto nos permite verificar tu pago mucho más rápido.</li>
+                <li>Por favor, adjunta la captura de pantalla del pago exitoso.</li>
+                <li>Tu pedido se procesará inmediatamente después de la verificación.</li>
+            </ul>
+        </div>
+
+        <a id="success-whatsapp-link" href="#" target="_blank" class="btn-whatsapp">
+            <i class="bi bi-whatsapp mr-2"></i>Enviar comprobante por WhatsApp
+        </a>
+
+        <div class="mt-5">
+            <a href="{{ path('account_order', {'reference': order.reference}) }}" class="text-decoration-none fw-bold" style="color: var(--tertiary-color, #000);">
+                Ver detalle del pedido <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const whatsappNumber = "{{ personalize.whatsapp|replace({' ': '', '+': '', '-': ''}) }}";
+    let message = "Hola! Aquí envío el comprobante de mi pago por Mercado Pago.\n\n";
+    message += "*Orden:* #{{ order.reference }}\n";
+    message += "*Cliente:* {{ order.user.firstname }} {{ order.user.lastname }}\n";
+    
+    const encodedMessage = encodeURIComponent(message);
+    document.getElementById('success-whatsapp-link').href = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+});
+</script>
+{% endblock %}

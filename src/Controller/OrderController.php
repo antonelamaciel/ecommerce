@@ -24,7 +24,7 @@ class OrderController extends AbstractController
      * @return Response
      */
     #[Route('/order', name: 'order')]
-    public function index(SessionInterface $session, Cart $cart): Response
+    public function index(SessionInterface $session, Cart $cart, \App\Repository\AddressRepository $addressRepository): Response
     {
         $user = $this->getUser();
         $cartProducts = $cart->getDetails();
@@ -34,18 +34,15 @@ class OrderController extends AbstractController
             return $this->redirectToRoute('product');
         }
         
-        //Redirection si utilisateur n'a pas encore d'adresse
-        if (!$user->getAddresses()->getValues()) {      //getValues() Récupère directement les valeurs d'une collection d'objet
-            $session->set('order', 1);
-            return $this->redirectToRoute('account_address_new');
-        }
+        // Pasar las direcciones al template para manejar el estado vacío allí y evitar bucles de redirección
+        $addresses = $addressRepository->findBy(['user' => $user]);
 
         $form = $this->createForm(OrderType::class, null, [
-            'user' => $user     //Permet de passer l'utilisateur courant dans le tableau d'options du OrderType
-        ]); 
+            'user' => $user
+        ]);
 
         $addressesJson = [];
-        foreach ($user->getAddresses() as $address) {
+        foreach ($addresses as $address) {
             $addressesJson[$address->getId()] = [
                 'city' => $address->getCity(),
                 'postal' => $address->getPostal(),
@@ -57,7 +54,8 @@ class OrderController extends AbstractController
             'form' => $form,
             'cart' => $cartProducts,
             'totalPrice' =>$cartProducts['totals']['price'],
-            'addressesJson' => json_encode($addressesJson)
+            'addressesJson' => json_encode($addressesJson),
+            'hasAddresses' => !empty($addresses)
         ]);
     }
 
@@ -268,6 +266,22 @@ class OrderController extends AbstractController
         $cart->remove();
 
         return $this->render('order/success_transfer.html.twig', [
+            'order' => $order
+        ]);
+    }
+
+    #[Route('/order/confirm-mercadopago/{reference}', name: 'order_confirm_mercadopago')]
+    public function confirmMercadoPago(string $reference, OrderRepository $orderRepository, Cart $cart): Response
+    {
+        $order = $orderRepository->findOneByReference($reference);
+        if (!$order || $order->getUser() != $this->getUser()) {
+            return $this->redirectToRoute('cart');
+        }
+
+        // On vide le panier car le paiement est initié
+        $cart->remove();
+
+        return $this->render('order/success_mercadopago.html.twig', [
             'order' => $order
         ]);
     }

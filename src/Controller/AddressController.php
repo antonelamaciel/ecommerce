@@ -13,20 +13,25 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AddressController extends AbstractController
 {
-    #[Route('account/addresses', name: 'account_address')]
+    #[Route('/account/addresses', name: 'account_address')]
     public function index(): Response
     {
-        // Adresses récupérées directement dans la vue grâce à app.user
-        return $this->render('account/address.html.twig', [
-        ]);
+        return $this->render('account/address.html.twig');
     }
 
-    #[Route('account/addresses/add', name: 'account_address_new')]
+    #[Route('/account/addresses/add', name: 'account_address_new')]
     public function add(Request $request, EntityManagerInterface $em, SessionInterface $session): Response
     {
+        $user = $this->getUser();
+        
+        // Evitar direcciones excesivas (Máximo 5)
+        if ($user && count($user->getAddresses()) >= 5) {
+            $this->addFlash('notice', 'Has alcanzado el límite máximo de direcciones.');
+            return $this->redirectToRoute('account_address');
+        }
+
         $address = new Address();
         $address->setCountry('AR');
-        $user = $this->getUser();
         
         if ($user) {
             $address->setFirstname($user->getFirstname());
@@ -54,7 +59,7 @@ class AddressController extends AbstractController
         ]);
     }
 
-    #[Route('account/addresses/edit/{id}', name: 'account_address_update')]
+    #[Route('/account/addresses/edit/{id}', name: 'account_address_update')]
     public function update(Request $request, EntityManagerInterface $em, ?Address $address = null): Response
     {
         if (!$address || $address->getUser() != $this->getUser()) {
@@ -77,7 +82,7 @@ class AddressController extends AbstractController
         ]);
     }
 
-    #[Route('account/addresses/delete/{id}', name: 'account_address_delete')]
+    #[Route('/account/addresses/delete/{id}', name: 'account_address_delete')]
     public function delete(EntityManagerInterface $em, ?Address $address = null): Response
     {
         if ($address && $address->getUser() == $this->getUser()) {
