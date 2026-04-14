@@ -100,8 +100,39 @@ class MercadoPagoController extends AbstractController
                                     $em->flush();
 
                                     $user = $order->getUser();
-                                    $mailContent = "Hola {$user->getFirstname()}, tu pago para el pedido {$order->getReference()} fue aprobado.";
-                                    $mail->send($user->getEmail(), $user->getFirstname(), "Pago Confirmado", $mailContent);
+                                    
+                                    // Construir contenido detallado del email
+                                    $totalOrder = $order->getTotal() + (float)$order->getCarrierPrice();
+                                    $mailContent = "<h2>¡Hola {$user->getFirstname()}!</h2>";
+                                    $mailContent .= "<p>Te confirmamos que tu pago para el pedido <strong>#{$order->getReference()}</strong> ha sido aprobado con éxito.</p>";
+                                    
+                                    $mailContent .= "<h3>Resumen de tu compra:</h3>";
+                                    $mailContent .= "<table style='width: 100%; border-collapse: collapse;'>";
+                                    $mailContent .= "<thead><tr style='background-color: #f8f9fa;'><th style='padding: 10px; border: 1px solid #dee2e6; text-align: left;'>Producto</th><th style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>Cant.</th><th style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'>Total</th></tr></thead>";
+                                    $mailContent .= "<tbody>";
+                                    
+                                    foreach ($order->getOrderDetails() as $detail) {
+                                        $mailContent .= "<tr>";
+                                        $mailContent .= "<td style='padding: 10px; border: 1px solid #dee2e6;'>{$detail->getProduct()}</td>";
+                                        $mailContent .= "<td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{$detail->getQuantity()}</td>";
+                                        $mailContent .= "<td style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'>$" . number_format($detail->getTotal(), 2, ',', '.') . "</td>";
+                                        $mailContent .= "</tr>";
+                                    }
+                                    
+                                    $mailContent .= "</tbody>";
+                                    $mailContent .= "<tfoot>";
+                                    $mailContent .= "<tr><td colspan='2' style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'><strong>Subtotal:</strong></td><td style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'>$" . number_format($order->getTotal(), 2, ',', '.') . "</td></tr>";
+                                    $mailContent .= "<tr><td colspan='2' style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'><strong>Envío ({$order->getCarrierName()}):</strong></td><td style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'>$" . number_format((float)$order->getCarrierPrice(), 2, ',', '.') . "</td></tr>";
+                                    $mailContent .= "<tr style='background-color: #f8f9fa;'><td colspan='2' style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'><strong>TOTAL:</strong></td><td style='padding: 10px; border: 1px solid #dee2e6; text-align: right;'><strong>$" . number_format($totalOrder, 2, ',', '.') . "</strong></td></tr>";
+                                    $mailContent .= "</tfoot></table>";
+                                    
+                                    $mailContent .= "<h3>Datos de entrega:</h3>";
+                                    $mailContent .= "<p>" . $order->getDelivery() . "</p>";
+                                    $mailContent .= "<p>Pronto nos pondremos en contacto para coordinar el envío.</p>";
+                                    $mailContent .= "<p><strong>¡Muchas gracias por elegirnos!</strong></p>";
+
+                                    $mail->send($user->getEmail(), $user->getFirstname(), "Pago Confirmado - Pedido {$order->getReference()}", $mailContent);
+
                                     $logger->info("Order {$reference} marked as PAID.");
                                 }
                                 break;

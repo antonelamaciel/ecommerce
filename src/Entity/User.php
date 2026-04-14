@@ -47,7 +47,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $cartData = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $resetTokenAt = null;
+
     public function __construct()
+
     {
         $this->addresses = new ArrayCollection();
         $this->orders = new ArrayCollection();
@@ -246,4 +253,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
+    public function getResetTokenAt(): ?\DateTimeInterface
+    {
+        return $this->resetTokenAt;
+    }
+
+    public function setResetTokenAt(?\DateTimeInterface $resetTokenAt): self
+    {
+        $this->resetTokenAt = $resetTokenAt;
+
+        return $this;
+    }
 }
+

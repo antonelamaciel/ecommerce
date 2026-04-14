@@ -25,17 +25,17 @@ class RegisterController extends AbstractController
     {
         $user = new User();
 
-        $form = $this->createForm(RegisterType::class,$user);
+        $form = $this->createForm(RegisterType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($userPasswordHasher->hashPassword($user,$form->get('password')->getData()));
+            $user->setPassword($userPasswordHasher->hashPassword($user, $form->get('password')->getData()));
 
             $em->persist($user);
             $em->flush();
 
             // Envoi mail confirmation
-            $content = "Hola {$user->getFirstname()} le agradecemos su inscripción";
+            $content = "Hola {$user->getFirstname()} Gracias por registrarte en nuestra tienda! esperamos que encuentres lo que estas buscando, en caso de no encontrarlo, siempre estaremos dispuestos a ayudarte!";
             $mail->send($user->getEmail(), $user->getFirstname(), "Bienvenido a empresa", $content);
 
             // Loggin auto

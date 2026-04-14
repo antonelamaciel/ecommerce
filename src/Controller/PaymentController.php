@@ -48,16 +48,8 @@ class PaymentController extends AbstractController
             $em->flush();
         }
 
-        // Envoi mail de Confirmation
-        $user = $this->getUser();
+        // Removal of duplicate email as requested - the detailed email is sent elsewhere.
 
-        $content = "Hola {$user->getFirstname()}, te agradecemos por tu compra en nuestra tienda.";
-        $mail->send(
-            $user->getEmail(), 
-            $user->getFirstname(), 
-            "Confirmación de pedido {$order->getReference()}", 
-            $content
-        );
 
         // Suppression du panier une fois la commande validée
         $cart->remove();    

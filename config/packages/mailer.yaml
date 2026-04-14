@@ -4,4 +4,4 @@ framework:
         envelope:
             sender: 'antonelamaciel2024@gmail.com'
         headers:
-            from: 'Tu Tienda <antonelamaciel2024@gmail.com>'
+            from: 'antonelamaciel2024@gmail.com'
