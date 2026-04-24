@@ -37,21 +37,30 @@ class Cart
         
         if ($user && method_exists($user, 'getCartData')) {
             $dbCart = $user->getCartData() ?? [];
+            
+            // Si hay algo en la sesión (carrito anónimo), lo mezclamos con la DB una sola vez
             if (!empty($sessionCart) && !$this->session->get('cart_db_merged')) {
                 foreach ($sessionCart as $key => $item) {
                     if (isset($dbCart[$key])) {
+                        // Si ya existe el producto en el carrito de la DB, sumamos cantidades 
+                        // pero solo para el merge inicial.
                         $dbCart[$key]['qty'] += $item['qty'];
                     } else {
                         $dbCart[$key] = $item;
                     }
                 }
+                
                 if (method_exists($user, 'setCartData')) {
                     $user->setCartData($dbCart);
                     $this->em->flush();
                 }
+                
+                // Marcamos como mezclado y LIMPIAMOS el carrito de sesión
+                // para que no se vuelva a sumar en la próxima carga de página.
                 $this->session->set('cart_db_merged', true);
+                $this->session->remove('cart_v2');
             }
-            $this->session->set('cart_v2', $dbCart);
+            
             $this->cartArray = $dbCart;
             return $dbCart;
         }
@@ -63,11 +72,17 @@ class Cart
     private function saveCartArray(array $cart): void
     {
         $this->cartArray = $cart;
-        $this->session->set('cart_v2', $cart);
         $user = $this->security->getUser();
+        
         if ($user && method_exists($user, 'setCartData')) {
+            // Para usuarios logueados, guardamos en DB y limpiamos la sesión
+            // Evitamos usar 'cart_v2' como caché para no caer en duplicaciones de merge
             $user->setCartData($cart);
             $this->em->flush();
+            $this->session->remove('cart_v2'); 
+        } else {
+            // Para usuarios anónimos, usamos la sesión habitual
+            $this->session->set('cart_v2', $cart);
         }
     }
     public function add(int $id, int $qty = 1, ?string $variants = null, bool $exclusive = false): void
