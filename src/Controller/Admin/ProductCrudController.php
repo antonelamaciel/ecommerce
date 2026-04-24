@@ -7,7 +7,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -154,21 +153,7 @@ class ProductCrudController extends AbstractCrudController
             DateTimeField::new('purchaseDate', 'Fecha de compra')
                 ->setRequired(false)
                 ->hideOnIndex(),
-            DateTimeField::new('createdAt', 'Fecha de publicación')
-                ->onlyOnIndex()
-                ->setFormat('dd/MM/yyyy HH:mm')
-                ->setHelp('Fecha y hora en que se publicó el producto.'),
-            DateTimeField::new('createdAt', 'Publicado el')
-                ->onlyOnDetail(),
         ];
-    }
-
-    public function configureFilters(Filters $filters): Filters
-    {
-        return $filters
-            ->add('name')
-            ->add('category')
-            ->add('createdAt');
     }
 
     // ─── CRUD configuration ───────────────────────────────────────────────────
@@ -178,7 +163,6 @@ class ProductCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Producto')
             ->setEntityLabelInPlural('Productos')
-            ->setDefaultSort(['createdAt' => 'DESC'])
             ->setSearchFields(['id', 'name', 'subtitle', 'description', 'price', 'category.name', 'stock'])
             ->overrideTemplate('crud/index', 'admin/sales/products.html.twig')
             ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig']);
