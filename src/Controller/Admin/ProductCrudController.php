@@ -7,6 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -53,7 +54,7 @@ class ProductCrudController extends AbstractCrudController
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Información Básica')
                 ->addCssClass('padded-internal-panel'),
             TextField::new('name', 'Nombre')->setRequired(true)
-            ->setHelp('Nombre del producto visible en la tienda'),
+                ->setHelp('Nombre del producto visible en la tienda'),
             SlugField::new('slug')->setTargetFieldName('name')->hideOnForm()->hideOnIndex()->hideOnDetail(),
 
             // --- PORTADA ---
@@ -105,23 +106,23 @@ class ProductCrudController extends AbstractCrudController
                 ->setTemplatePath('admin/fields/product_images_gallery.html.twig'),
 
             TextField::new('subtitle', 'Subtítulo')->hideOnIndex()->setRequired(false)
-            ->setHelp('Subtítulo del producto visible en la tienda'),
+                ->setHelp('Subtítulo del producto visible en la tienda'),
             TextareaField::new('description', 'Descripción')->hideOnIndex()->setRequired(false)
-            ->setHelp('Descripción del producto visible en la tienda'),
+                ->setHelp('Descripción del producto visible en la tienda'),
             AssociationField::new('category', 'Categoría')->setRequired(true)
                 ->setHelp('Categoría principal del producto. Ej: INVIERNO, PARTES DE ARRIBA, ACCESORIOS, etc. <br><a href="/admin?crudAction=new&crudControllerFqcn=App\\Controller\\Admin\\CategoryCrudController" class="btn btn-sm btn-primary mt-2 shadow-sm text-white btn-confirm-exit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; padding: 8px 20px; margin-bottom: 12px; border-radius: 10px; text-align:center; min-width: 180px;"><i class="fas fa-plus-circle me-2"></i> Crear Nueva Categoría</a>'),
             AssociationField::new('subcategories', 'Subcategorías')
-            ->setHelp('Categorias mas especificas del producto. Ej: BUZOS, COLLARES, TOPS, etc.')
+                ->setHelp('Categorias mas especificas del producto. Ej: BUZOS, COLLARES, TOPS, etc.')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->hideOnIndex(),
             NumberField::new('price', 'Precio (ARS)')->setRequired(true)
-            ->setHelp('Precio del producto visible en la tienda (Ej: 1500,50)'),
+                ->setHelp('Precio del producto visible en la tienda (Ej: 1500,50)'),
             NumberField::new('oldPrice', 'Precio Tachado (ARS)')
-            ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).')
-            ->setSortable(false),
-           
+                ->setHelp('Precio anterior que aparecerá tachado (no obligatorio).')
+                ->setSortable(false),
+
             BooleanField::new('isInHome', 'Producto Destacado')
-            ->setHelp('El producto aparecera entre los primeros en la pagina de inicio? si/no.')
+                ->setHelp('El producto aparecera entre los primeros en la pagina de inicio? si/no.')
                 ->setFormTypeOption('disabled', $pageName === Crud::PAGE_INDEX)
                 ->setSortable(false),
 
@@ -136,10 +137,10 @@ class ProductCrudController extends AbstractCrudController
                 ->setCssClass('padded-options-collection'),
 
             IntegerField::new('stock', 'Cantidad de Stock (opcional)')
-            ->setHelp('Unidades disponibles en inventario (no obligatorio).')
+                ->setHelp('Unidades disponibles en inventario (no obligatorio).')
                 ->setRequired(false)
                 ->setHelp('Unidades disponibles en inventario.'),
-                
+
             \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addPanel('Administración (Solo Interno)')
                 ->setIcon('fas fa-user-shield')
                 ->addCssClass('padded-internal-panel'),
@@ -153,7 +154,21 @@ class ProductCrudController extends AbstractCrudController
             DateTimeField::new('purchaseDate', 'Fecha de compra')
                 ->setRequired(false)
                 ->hideOnIndex(),
+            DateTimeField::new('createdAt', 'Fecha de publicación')
+                ->onlyOnIndex()
+                ->setFormat('dd/MM/yyyy HH:mm')
+                ->setHelp('Fecha y hora en que se publicó el producto.'),
+            DateTimeField::new('createdAt', 'Publicado el')
+                ->onlyOnDetail(),
         ];
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name')
+            ->add('category')
+            ->add('createdAt');
     }
 
     // ─── CRUD configuration ───────────────────────────────────────────────────
@@ -163,6 +178,7 @@ class ProductCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Producto')
             ->setEntityLabelInPlural('Productos')
+            ->setDefaultSort(['createdAt' => 'DESC'])
             ->setSearchFields(['id', 'name', 'subtitle', 'description', 'price', 'category.name', 'stock'])
             ->overrideTemplate('crud/index', 'admin/sales/products.html.twig')
             ->setFormThemes(['admin/forms/product_images_theme.html.twig', '@EasyAdmin/crud/form_theme.html.twig']);
@@ -180,7 +196,7 @@ class ProductCrudController extends AbstractCrudController
         // Procesar eliminación de imágenes manual
         $deleteImages = $request->request->all()['delete_images'] ?? [];
         if (!empty($deleteImages) && is_array($deleteImages)) {
-            $currentImages = array_filter($currentImages, function($img) use ($deleteImages) {
+            $currentImages = array_filter($currentImages, function ($img) use ($deleteImages) {
                 return !in_array($img, $deleteImages);
             });
             // Eliminar archivos físicos
@@ -489,6 +505,6 @@ class ProductCrudController extends AbstractCrudController
     }
 </style>
 HTML
-        );
+            );
     }
 }

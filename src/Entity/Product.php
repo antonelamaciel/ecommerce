@@ -19,6 +19,9 @@ class Product
             $base = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->name)));
             $this->slug = $base . '-' . bin2hex(random_bytes(3));
         }
+        if (!$this->createdAt) {
+            $this->createdAt = new \DateTime();
+        }
     }
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -81,6 +84,9 @@ class Product
 
     #[ORM\ManyToOne(targetEntity: Supplier::class, inversedBy: 'products')]
     private ?Supplier $supplier = null;
+
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $createdAt = null;
 
     public function __construct()
     {
@@ -341,7 +347,7 @@ class Product
         $maxDiscount = 0;
         foreach ($this->bundles as $bundle) {
             if ($bundle->getDiscountPercentage() > $maxDiscount) {
-                $maxDiscount = (int)$bundle->getDiscountPercentage();
+                $maxDiscount = (int) $bundle->getDiscountPercentage();
             }
         }
         return $maxDiscount;
@@ -354,6 +360,18 @@ class Product
     public function setStock(?int $stock): self
     {
         $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
